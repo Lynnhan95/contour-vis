@@ -1,29 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from "react"
 import './App.css';
+import { csv } from 'd3'
 import BaseMap from './components/map'
 
-function App() {
-  return (
-    <div className="App">
-    <BaseMap></BaseMap>
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
 
-    </div>
-  );
+class App extends Component {
+  constructor(){
+    super()
+    this.state = {
+    }
+  }
+
+  componentDidMount(){
+    // csv('/religious_data.csv').then( data => {
+    //   //string to number
+    //   data.forEach( (d) => {
+    //     d["id"] = +d["id"];
+    //     d["Latitude"] = +d["Latitude"]
+    //     d["Longitude"] = +d["Longitude"]
+    //     d["year"] = +d["year"]
+    //   })
+    //   return data
+
+    // }).then( data => {
+    //   const ZhejiangData = data.filter( (d) => {
+    //     return d.province == "Zhejiang"
+    //   })
+    //   this.setState({Zhejiang: ZhejiangData})
+
+    // })
+  }
+
+  render(){
+    return (
+      <div className="App">
+        <BaseMap></BaseMap>
+      </div>
+    );
+  }
+
 }
 
 export default App;
