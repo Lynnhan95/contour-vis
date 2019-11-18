@@ -1,10 +1,12 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import BaseMap from './components/map'
 
 function App() {
   return (
     <div className="App">
+    <BaseMap></BaseMap>
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
@@ -19,6 +21,7 @@ function App() {
           Learn React
         </a>
       </header>
+
     </div>
   );
 }
