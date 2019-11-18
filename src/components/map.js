@@ -59,7 +59,7 @@ class BaseMap extends Component {
             key = {`path-${ i }`}
             d = { geoPath().projection(this.projection())(d) }
             stroke = "#fff"
-            stroke-width = "0.2"
+            strokeWidth = "0.2"
             file = "#E7E7E7"
             />
             )
@@ -67,7 +67,7 @@ class BaseMap extends Component {
 
         // draw circles to the map
         const Dots = this.state.ZhejiangData.map((d,i) => {
-            console.log(this.projection()([ d.Longitude, d.Latitude ]))
+            // console.log(this.projection()([ d.Longitude, d.Latitude ]))
             return (
             <circle 
             key = {`dot-${ i }`}
