@@ -69,7 +69,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 # contour-vis
 
-### development map
+### Intro
 From data to csv
 Boundary data: 
 geojson (array) —>
@@ -79,18 +79,18 @@ medial axis computation ⭐([https://github.com/FlorisSteenkamp/MAT](https://git
 segmentation 
 
 
-Sites data:
+### Sites data:
 Map dots to the map (作为参照) —> 
 Given a segmentation, map dot density —> color range 
 computes all segments —> color ranges 
 
 
-Code: 
+### Code: 
 1. react or not?  Using lots of npm package;
 2. ⭐ problem of using an library:  1. Data input;   2. 等距两点 —> 画出最大内切圆 —> 内切圆点的集合 == medial axis      
 
 
-Step:
+### Step:
 1. Start from Zhejiang province, mapping Zhejiang boundary + dots (example: [http://ssz.fr/places/?eu#ac$//](http://ssz.fr/places/?eu#ac$//))
 2. Smooth outline + offset outline 
 3. Medial axis + segmentation
