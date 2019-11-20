@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
+import { findMats, traverseEdges } from 'flo-mat'
 import smooth from 'smooth-polyline'
 import Offset from 'polygon-offset'
 
@@ -19,16 +20,45 @@ class BaseMap extends Component {
         // offset
         this.offset = new Offset()
         this.offsetPadding = -0.1
+
     }
+
     // projection function with empirical params
     projection() {
         return geoMercator().scale(500).center([110,36])
     }
+    
+    //turn Geojson (boundary) data into certain format that findmats function can read, example:
+        //  [
+        //     [
+        //         [[50.000, 95.000],[92.797, 63.905]], 
+        //         [[92.797, 63.905],[76.450, 13.594]],
+        //         [[76.450, 13.594],[23.549, 13.594]],
+        //         [[23.549, 13.594],[7.202, 63.90]],
+        //         [[7.202,  63.900],[50.000, 95.000]]
+        //     ]
+        //     ];
 
-    // when component mounted, fetch geojson data locally
-    componentDidMount() {
+    constructList(list) {
+        var res = [[]] 
+        // list[0] = [x, y]
+        for (var i =0; i< list.length; i++) {
+            if (i< list.length-1) {
+                var prev = list[i]
+                var next = list[i+1]
+                res[0].push([prev, next])
+            }else {
+                var prev = list[i]
+                res[0].push([prev, list[0]])
+            }
+
+        }
+        return res
+    }
+
+    // when component will mount, fetch geojson data locally
+    componentWillMount(){
         let _me = this
-
         fetch("/chinaGeo.geojson")
         .then(response => {
             if (response.status !== 200){
@@ -39,7 +69,8 @@ class BaseMap extends Component {
                 console.log('chinaGeoData', chinaGeoData)
                 this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
                 this.setState ({
-                    chinaGeoData:  chinaGeoData.features
+                    chinaGeoData:  chinaGeoData.features,
+                    outerBoundary: chinaGeoData.features[27].geometry.coordinates[9]
                 })
             })
         })
@@ -64,16 +95,89 @@ class BaseMap extends Component {
 
     }
 
+    componentDidUpdate(prevPros, prevState){
+        if(prevState.outerBoundary !== this.state.outerBoundary) {
+            console.log(this.state.outerBoundary)
+        //compute medial axis
+        // draw paths - helper function
+        function getLinePathStr(ps) {
+            let [[x0,y0],[x1,y1]] = ps;
+            return `M${x0} ${y0} L${x1} ${y1}`;
+        }
+
+        function getQuadBezierPathStr(ps) {
+            let [[x0,y0],[x1,y1],[x2,y2]] = ps;
+            return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
+        }
+
+        function getCubicBezierPathStr(ps) {
+            let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
+            return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
+        }
+
+        // store computed dots and paths 
+        let resDots = [];
+        const resPaths = new Array()
+        // loops data format
+        let testloop = [
+        [
+            [[50.000, 95.000],[92.797, 63.905]], 
+            [[92.797, 63.905],[76.450, 13.594]],
+            [[76.450, 13.594],[23.549, 13.594]],
+            [[23.549, 13.594],[7.202, 63.90]],
+            [[7.202,  63.900],[50.000, 95.000]]
+        ]
+        ];
+        let resloop = this.constructList(this.state.outerBoundary[0])
+
+        console.log(resloop)
+        console.log(testloop)
+
+        let mats = findMats(resloop, 1);
+
+        //traverse
+        mats.forEach(f)
+        function f(mat){
+            let cpNode = mat.cpNode
+
+            if(!cpNode) { return; }
+
+            // let bezier = cpNode.matCurveToNextVertex
+            traverseEdges(cpNode, function(cpNode){
+                if (cpNode.isTerminating()) { return ;}
+                let bezier = cpNode.matCurveToNextVertex;
+
+                if(!bezier) { return; }
+                // console.log(bezier)
+                resDots.push(bezier)
+
+                if(bezier.length == 2){
+                    resPaths.push(getLinePathStr(bezier))
+                }else if(bezier.length == 3){
+                    resPaths.push(getQuadBezierPathStr(bezier))
+                }else if(bezier.length == 4){
+                    resPaths.push(getCubicBezierPathStr(bezier))
+                }
+                
+            })
+        }
+        console.log(resPaths[0])
+        this.setState({resPaths: resPaths})
+        }
+
+    }
+    componentDidMount() {
+
+
+    }
+
     render() {
-        // console.log(this.state.ZhejiangData)
-        
         // define province shapes with chinaGeoData
         const Regions = this.state.chinaGeoData.map((d, i) => {
             /**
              * only render zhejiang for showing more detail
              */
             if(d.properties.name === '浙江'){
-
                 // smooth boundary
                 d.geometry.coordinates.forEach(e=>{
                     e[0] = smooth(e[0])
@@ -101,10 +205,9 @@ class BaseMap extends Component {
                     }
                 })
 
+
                 let innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
 
-                // let res = this.offset.data(innerBoundaryCoordinates).padding(this.offsetPadding)
-                console.log('innerBoundaryCoordinates', innerBoundaryCoordinates)
                 let paddinged = {
                     type: 'Feature',
                     properties: {
@@ -125,21 +228,34 @@ class BaseMap extends Component {
                     stroke = "#fff"
                     strokeWidth = "0.2"
                     fill = "#edc949"
-                    // fillOpacity="0.5"
                     />
-
+                
                 return [
                     outsideBoundary, 
                     innerBoundary
                 ]
             }
-
             
         })
 
-        // draw circles to the map
+        var tempArr = this.state.resPaths
+        console.log(tempArr)
+        if(tempArr) {
+            const MedialAxis= tempArr.map((d,i) => {
+                return (
+                    <path
+                    key = {`medial-${ i }`}
+                    d = {d}
+                    stroke = "#000"
+                    />
+                )
+            })
+        }
+
+
+
+        // draw dots to the map 
         const Dots = this.state.ZhejiangData.map((d,i) => {
-            // console.log(this.projection()([ d.Longitude, d.Latitude ]))
             return (
             <circle 
             key = {`dot-${ i }`}
@@ -159,6 +275,9 @@ class BaseMap extends Component {
             </g>
              <g className="Dots"> 
                 {Dots}
+            </g>
+            <g className="MedialAxis"> 
+                {/* {MedialAxis} */}
             </g>
             </svg>
         </div>
