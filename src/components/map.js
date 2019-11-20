@@ -10,7 +10,8 @@ class BaseMap extends Component {
         super();
         this.state = {
             chinaGeoData: [],
-            ZhejiangData:[]
+            ZhejiangData:[],
+            resDots: null
         }
 
         this.autoProjection = null
@@ -95,29 +96,35 @@ class BaseMap extends Component {
 
     }
 
+    //compute medial axis
+    // draw paths - helper function
+    /**
+     * helper funcs can be defined in the class, make code clearer
+     */
+    getLinePathStr(ps) {
+        let [[x0,y0],[x1,y1]] = ps;
+        return `M${x0} ${y0} L${x1} ${y1}`;
+    }
+
+    getQuadBezierPathStr(ps) {
+        let [[x0,y0],[x1,y1],[x2,y2]] = ps;
+        return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
+    }
+
+    getCubicBezierPathStr(ps) {
+        let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
+        return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
+    }
+
     componentDidUpdate(prevPros, prevState){
+        let _me = this
+
         if(prevState.outerBoundary !== this.state.outerBoundary) {
             console.log(this.state.outerBoundary)
-        //compute medial axis
-        // draw paths - helper function
-        function getLinePathStr(ps) {
-            let [[x0,y0],[x1,y1]] = ps;
-            return `M${x0} ${y0} L${x1} ${y1}`;
-        }
-
-        function getQuadBezierPathStr(ps) {
-            let [[x0,y0],[x1,y1],[x2,y2]] = ps;
-            return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
-        }
-
-        function getCubicBezierPathStr(ps) {
-            let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
-            return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
-        }
 
         // store computed dots and paths 
         let resDots = [];
-        const resPaths = new Array()
+        const resPaths = []
         // loops data format
         let testloop = [
         [
@@ -145,24 +152,28 @@ class BaseMap extends Component {
             // let bezier = cpNode.matCurveToNextVertex
             traverseEdges(cpNode, function(cpNode){
                 if (cpNode.isTerminating()) { return ;}
-                let bezier = cpNode.matCurveToNextVertex;
-
+                let bezier = cpNode.matCurveToNextVertex.map(e=>{
+                    return _me.autoProjection(e)
+                })
+                // console.log('bezier', bezier, cpNode.matCurveToNextVertex)
                 if(!bezier) { return; }
                 // console.log(bezier)
                 resDots.push(bezier)
 
                 if(bezier.length == 2){
-                    resPaths.push(getLinePathStr(bezier))
+                    resPaths.push(_me.getLinePathStr(bezier))
                 }else if(bezier.length == 3){
-                    resPaths.push(getQuadBezierPathStr(bezier))
+                    resPaths.push(_me.getQuadBezierPathStr(bezier))
                 }else if(bezier.length == 4){
-                    resPaths.push(getCubicBezierPathStr(bezier))
+                    resPaths.push(_me.getCubicBezierPathStr(bezier))
                 }
                 
             })
         }
-        console.log(resPaths[0])
-        this.setState({resPaths: resPaths})
+        // console.log('resPaths[0]', resPaths)
+        this.setState({
+            resPaths: resPaths
+        })
         }
 
     }
@@ -238,18 +249,26 @@ class BaseMap extends Component {
             
         })
 
-        var tempArr = this.state.resPaths
-        console.log(tempArr)
+        var tempArr = this.state.resPaths,
+            MedialAxis
+
         if(tempArr) {
-            const MedialAxis= tempArr.map((d,i) => {
-                return (
-                    <path
-                    key = {`medial-${ i }`}
-                    d = {d}
-                    stroke = "#000"
-                    />
-                )
-            })
+            // console.log(tempArr.join(' '))
+            // MedialAxis = tempArr.map((d,i) => {
+            //     return (
+            //         <path
+            //         key = {`medial-${ i }`}
+            //         d = {d}
+            //         stroke = "#000"
+            //         />
+            //     )
+            // })
+
+            MedialAxis = <path
+                key = {`medial-121212`}
+                d = {tempArr.join(' ')}
+                stroke = "#000"
+                />
         }
 
 
@@ -277,7 +296,7 @@ class BaseMap extends Component {
                 {Dots}
             </g>
             <g className="MedialAxis"> 
-                {/* {MedialAxis} */}
+                {MedialAxis}
             </g>
             </svg>
         </div>
