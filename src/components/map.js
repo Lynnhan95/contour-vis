@@ -1,6 +1,8 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
+import smooth from 'smooth-polyline'
+import Offset from 'polygon-offset'
 
 class BaseMap extends Component {
     constructor(){
@@ -9,6 +11,14 @@ class BaseMap extends Component {
             chinaGeoData: [],
             ZhejiangData:[]
         }
+
+        this.autoProjection = null
+        this.svg_w = 960
+        this.svg_h = 600
+
+        // offset
+        this.offset = new Offset()
+        this.offsetPadding = -0.1
     }
     // projection function with empirical params
     projection() {
@@ -17,6 +27,8 @@ class BaseMap extends Component {
 
     // when component mounted, fetch geojson data locally
     componentDidMount() {
+        let _me = this
+
         fetch("/chinaGeo.geojson")
         .then(response => {
             if (response.status !== 200){
@@ -24,6 +36,8 @@ class BaseMap extends Component {
                 return
             }
             response.json().then(chinaGeoData => {
+                console.log('chinaGeoData', chinaGeoData)
+                this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
                 this.setState ({
                     chinaGeoData:  chinaGeoData.features
                 })
@@ -51,18 +65,76 @@ class BaseMap extends Component {
     }
 
     render() {
-        console.log(this.state.ZhejiangData)
+        // console.log(this.state.ZhejiangData)
+        
         // define province shapes with chinaGeoData
         const Regions = this.state.chinaGeoData.map((d, i) => {
-            return (
-            <path
-            key = {`path-${ i }`}
-            d = { geoPath().projection(this.projection())(d) }
-            stroke = "#fff"
-            strokeWidth = "0.2"
-            file = "#E7E7E7"
-            />
-            )
+            /**
+             * only render zhejiang for showing more detail
+             */
+            if(d.properties.name === '浙江'){
+
+                // smooth boundary
+                d.geometry.coordinates.forEach(e=>{
+                    e[0] = smooth(e[0])
+                })
+
+                // reset projection
+                this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
+
+                let outsideBoundary = <path
+                    key = {`path-${ i }`}
+                    d = { geoPath().projection(this.autoProjection)(d) }
+                    stroke = "#fff"
+                    strokeWidth = "0.2"
+                    fill = "#2c75b1"
+                    />
+
+                // offset boundary
+                let offsetCoordinates = d.geometry.coordinates.map(e=>{
+                    try {
+                        let temp = new Offset(e).offset(this.offsetPadding)
+
+                        return temp
+                    } catch (error) {
+                        return null
+                    }
+                })
+
+                let innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
+
+                // let res = this.offset.data(innerBoundaryCoordinates).padding(this.offsetPadding)
+                console.log('innerBoundaryCoordinates', innerBoundaryCoordinates)
+                let paddinged = {
+                    type: 'Feature',
+                    properties: {
+                        id: "33-1",
+                        latitude: 29.1084,
+                        longitude: 119.97,
+                        name: "浙江"
+                    },  
+                    geometry: {
+                      type: 'MultiPolygon',
+                      coordinates: innerBoundaryCoordinates
+                    }
+                }
+                
+                let innerBoundary = <path
+                    key = {`path-${ ++i }`}
+                    d = { geoPath().projection(this.autoProjection)(paddinged) }
+                    stroke = "#fff"
+                    strokeWidth = "0.2"
+                    fill = "#edc949"
+                    // fillOpacity="0.5"
+                    />
+
+                return [
+                    outsideBoundary, 
+                    innerBoundary
+                ]
+            }
+
+            
         })
 
         // draw circles to the map
@@ -71,17 +143,17 @@ class BaseMap extends Component {
             return (
             <circle 
             key = {`dot-${ i }`}
-            cx = { this.projection()([ d.Longitude, d.Latitude ])[0]}
-            cy = { this.projection()([ d.Longitude, d.Latitude ])[1]}
+            cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
+            cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
             fill="red"
-            r = "0.1"
+            r = "1"
             />
             )
         })
         return (
         <div>
             <p>Basemap</p>
-            <svg width = "960" height = "600" viewBox = '0 0 960 600'>
+            <svg width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
             <g className="Regions">
                 {Regions}
             </g>
