@@ -182,6 +182,62 @@ class BaseMap extends Component {
 
     }
 
+    getMats(points){
+        let _me = this,
+            resPaths = []
+        let mats = findMats(points, 1)
+
+        //traverse
+        mats.forEach(f)
+        function f(mat){
+            let cpNode = mat.cpNode
+
+            if(!cpNode) { return; }
+
+            // let bezier = cpNode.matCurveToNextVertex
+            traverseEdges(cpNode, function(cpNode){
+                if (cpNode.isTerminating()) { return ;}
+                let bezier = cpNode.matCurveToNextVertex.map(e=>{
+                    return _me.autoProjection(e)
+                })
+                // console.log('bezier', bezier, cpNode.matCurveToNextVertex)
+                if(!bezier) { return; }
+
+                if(bezier.length === 2){
+                    resPaths.push(_me.getLinePathStr(bezier))
+                }else if(bezier.length === 3){
+                    resPaths.push(_me.getQuadBezierPathStr(bezier))
+                }else if(bezier.length === 4){
+                    resPaths.push(_me.getCubicBezierPathStr(bezier))
+                }
+                
+            })
+        }
+    }
+
+    getZhejiangPathLength(){
+        let unit_len = 50,
+            temp_len = 0,
+            even_points = []
+
+        let totle_len = this.outsideBoundary.getTotalLength()
+        this.path_length_txt.innerText = totle_len
+
+        // let point = this.outsideBoundary.getPointAtLength(100)
+        // this.path_point.innerText = `x: ${point.x} y: ${point.y}`
+        
+        let loop_time = parseInt(totle_len / unit_len)
+        for (let i = 0; i <= loop_time; i++) {
+            let point = this.outsideBoundary.getPointAtLength(temp_len)
+            even_points.push([point.x, point.y])
+
+            temp_len += unit_len
+        }
+        console.log('even_points', even_points)
+
+        // TODO: divide boundary path evenly and calculate MATs
+    }
+
     render() {
         // define province shapes with chinaGeoData
         const Regions = this.state.chinaGeoData.map((d, i) => {
@@ -198,6 +254,7 @@ class BaseMap extends Component {
                 this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
 
                 let outsideBoundary = <path
+                    ref={ele=>this.outsideBoundary=ele}
                     key = {`path-${ i }`}
                     d = { geoPath().projection(this.autoProjection)(d) }
                     stroke = "#fff"
@@ -299,6 +356,13 @@ class BaseMap extends Component {
                 {MedialAxis}
             </g>
             </svg>
+
+            <div>
+                <button onClick={this.getZhejiangPathLength.bind(this)}>Total Length</button>
+                Total Length: <em ref={ele=>this.path_length_txt=ele}></em>
+                <br/>
+                <em ref={ele=>this.path_point=ele}></em>
+            </div>
         </div>
         
         )
