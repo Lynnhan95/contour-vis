@@ -120,7 +120,7 @@ class BaseMap extends Component {
         let _me = this
 
         if(prevState.outerBoundary !== this.state.outerBoundary) {
-            console.log(this.state.outerBoundary)
+            console.log('this.state.outerBoundary[0]', this.state.outerBoundary[0])
 
         // store computed dots and paths 
         let resDots = [];
@@ -198,7 +198,8 @@ class BaseMap extends Component {
             traverseEdges(cpNode, function(cpNode){
                 if (cpNode.isTerminating()) { return ;}
                 let bezier = cpNode.matCurveToNextVertex.map(e=>{
-                    return _me.autoProjection(e)
+                    // return _me.autoProjection(e)
+                    return e
                 })
                 // console.log('bezier', bezier, cpNode.matCurveToNextVertex)
                 if(!bezier) { return; }
@@ -213,6 +214,8 @@ class BaseMap extends Component {
                 
             })
         }
+
+        return resPaths
     }
 
     getZhejiangPathLength(){
@@ -233,9 +236,17 @@ class BaseMap extends Component {
 
             temp_len += unit_len
         }
-        console.log('even_points', even_points)
+        let last_point = this.outsideBoundary.getPointAtLength(totle_len)
+        even_points.push([last_point.x, last_point.y])
 
         // TODO: divide boundary path evenly and calculate MATs
+        let formatData = this.constructList(even_points)
+
+        let matPath = this.getMats(formatData)
+
+        this.svg_mat.setAttribute('d', matPath)
+
+        console.log('even_points', matPath)
     }
 
     render() {
@@ -354,6 +365,13 @@ class BaseMap extends Component {
             </g>
             <g className="MedialAxis"> 
                 {MedialAxis}
+            </g>
+            <g className="MedialAxis"> 
+                <path
+                    ref={ele=>this.svg_mat=ele}
+                    d = ''
+                    stroke = "#0f0"
+                    />
             </g>
             </svg>
 
