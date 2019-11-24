@@ -193,24 +193,39 @@ class BaseMap extends Component {
                 let mainArea = d.geometry.coordinates[9]
                 console.log(mainArea )
                 let interpolateArr = []
+                let MedianPoints = []
                 let interpolateNum = 3
 
-                mainArea.forEach(e=>{   
-                    for(let i=0; i< e.length -1; i++) {
+                //mainArea.forEach(e=>{   
+                //    for(let i=0; i< e.length -1; i++) {
+                //        let prev = e[i]
+                //        let next = e[i+1]
+                //        let thetaX = ( next[0] - prev[0] ) 
+                //        let thetaY = ( next[1] - prev[1] )
+                //        // k = thetaY / thetaX
+                //        for(let j=0; j<= interpolateNum; j++ ) {
+                //            let cur = []
+                //            cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
+                //            cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
+                //            interpolateArr.push(cur)
+                //        }
+                //    }
+                //})
+                console.log(interpolateArr)
+
+                let MedianVertical = []
+
+                interpolateArr.forEach(e => {
+                    for (let i = 0; i < e.length - 1; i++) {
                         let prev = e[i]
-                        let next = e[i+1]
-                        let thetaX = ( next[0] - prev[0] ) 
-                        let thetaY = ( next[1] - prev[1] )
-                        // k = thetaY / thetaX
-                        for(let j=0; j<= interpolateNum; j++ ) {
-                            let cur = []
-                            cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                            cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                            interpolateArr.push(cur)
-                        }
+                        let next = e[i + 1]
+                        let thetaX = (next[0] - prev[0])
+                        let thetaY = (next[1] - prev[1])
+                        let theta_Virtical = thetaY / thetaX
+                        let median = [(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2]
+                        MedianPoints.push(median)
                     }
                 })
-                console.log(interpolateArr)
                 
                 const boundaryDots = interpolateArr.map((d, i) => {
                         return(
