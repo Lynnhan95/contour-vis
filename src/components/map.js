@@ -3,6 +3,7 @@ import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import smooth from 'smooth-polyline'
+import hull from 'hull.js'
 import Offset from 'polygon-offset'
 
 class BaseMap extends Component {
@@ -20,7 +21,7 @@ class BaseMap extends Component {
 
         // offset
         this.offset = new Offset()
-        this.offsetPadding = -0.1
+        this.offsetPadding = -0.2
 
     }
 
@@ -120,7 +121,6 @@ class BaseMap extends Component {
         let _me = this
 
         if(prevState.outerBoundary !== this.state.outerBoundary) {
-            console.log(this.state.outerBoundary)
 
         // store computed dots and paths 
         let resDots = [];
@@ -136,9 +136,6 @@ class BaseMap extends Component {
         ]
         ];
         let resloop = this.constructList(this.state.outerBoundary[0])
-
-        console.log(resloop)
-        console.log(testloop)
 
         let mats = findMats(resloop, 1);
 
@@ -177,6 +174,7 @@ class BaseMap extends Component {
         }
 
     }
+
     componentDidMount() {
 
 
@@ -189,9 +187,43 @@ class BaseMap extends Component {
              * only render zhejiang for showing more detail
              */
             if(d.properties.name === '浙江'){
-                // smooth boundary
-                d.geometry.coordinates.forEach(e=>{
-                    e[0] = smooth(e[0])
+                // no smooth boundary anymore, because that increase complexity for now
+
+                // compute interpolate  interpolate array with original boundary array
+                let mainArea = d.geometry.coordinates[9]
+                console.log(mainArea )
+                let interpolateArr = []
+                let interpolateNum = 3
+
+                mainArea.forEach(e=>{   
+                    for(let i=0; i< e.length -1; i++) {
+                        let prev = e[i]
+                        let next = e[i+1]
+                        let thetaX = ( next[0] - prev[0] ) 
+                        let thetaY = ( next[1] - prev[1] )
+                        // k = thetaY / thetaX
+                        for(let j=0; j<= interpolateNum; j++ ) {
+                            let cur = []
+                            cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
+                            cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
+                            interpolateArr.push(cur)
+                        }
+                    }
+                })
+                console.log(interpolateArr)
+                
+                const boundaryDots = interpolateArr.map((d, i) => {
+                        return(
+                            <circle
+                            key = {`boundaryDot-${i}`}
+                            r = "1"
+                            fill = "red"
+                            cx = {this.autoProjection(d)[0] }
+                            cy = {this.autoProjection(d)[1] }
+                            />
+                        )
+                    
+  
                 })
 
                 // reset projection
@@ -204,6 +236,7 @@ class BaseMap extends Component {
                     strokeWidth = "0.2"
                     fill = "#2c75b1"
                     />
+
 
                 // offset boundary
                 let offsetCoordinates = d.geometry.coordinates.map(e=>{
@@ -243,7 +276,8 @@ class BaseMap extends Component {
                 
                 return [
                     outsideBoundary, 
-                    innerBoundary
+                    innerBoundary,
+                    boundaryDots
                 ]
             }
             
@@ -253,17 +287,6 @@ class BaseMap extends Component {
             MedialAxis
 
         if(tempArr) {
-            // console.log(tempArr.join(' '))
-            // MedialAxis = tempArr.map((d,i) => {
-            //     return (
-            //         <path
-            //         key = {`medial-${ i }`}
-            //         d = {d}
-            //         stroke = "#000"
-            //         />
-            //     )
-            // })
-
             MedialAxis = <path
                 key = {`medial-121212`}
                 d = {tempArr.join(' ')}
@@ -271,20 +294,20 @@ class BaseMap extends Component {
                 />
         }
 
-
-
         // draw dots to the map 
         const Dots = this.state.ZhejiangData.map((d,i) => {
+            // console.log([ d.Longitude, d.Latitude ])
             return (
             <circle 
             key = {`dot-${ i }`}
             cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
             cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
-            fill="red"
+            fill="purple"
             r = "1"
             />
             )
         })
+
         return (
         <div>
             <p>Basemap</p>
