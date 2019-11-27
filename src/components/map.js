@@ -3,7 +3,7 @@ import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import smooth from 'smooth-polyline'
-import hull from 'hull.js'
+//import hull from 'hull.js'
 import Offset from 'polygon-offset'
 
 class BaseMap extends Component {
@@ -196,36 +196,36 @@ class BaseMap extends Component {
                 let MedianPoints = []
                 let interpolateNum = 3
 
-                //mainArea.forEach(e=>{   
-                //    for(let i=0; i< e.length -1; i++) {
-                //        let prev = e[i]
-                //        let next = e[i+1]
-                //        let thetaX = ( next[0] - prev[0] ) 
-                //        let thetaY = ( next[1] - prev[1] )
-                //        // k = thetaY / thetaX
-                //        for(let j=0; j<= interpolateNum; j++ ) {
-                //            let cur = []
-                //            cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                //            cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                //            interpolateArr.push(cur)
-                //        }
-                //    }
-                //})
+                mainArea.forEach(e=>{   
+                    for(let i=0; i< e.length -1; i++) {
+                        let prev = e[i]
+                        let next = e[i+1]
+                        let thetaX = ( next[0] - prev[0] ) 
+                        let thetaY = ( next[1] - prev[1] )
+                        // k = thetaY / thetaX
+                        for(let j=0; j<= interpolateNum; j++ ) {
+                            let cur = []
+                            cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
+                            cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
+                            interpolateArr.push(cur)
+                        }
+                    }
+                })
                 console.log(interpolateArr)
 
                 let MedianVertical = []
 
-                interpolateArr.forEach(e => {
-                    for (let i = 0; i < e.length - 1; i++) {
-                        let prev = e[i]
-                        let next = e[i + 1]
+                
+                 for (let i = 0; i < interpolateArr.length - 1; i++) {
+                        let prev = interpolateArr[i]
+                        let next = interpolateArr[i + 1]
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaY / thetaX
-                        let median = [(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2]
-                        MedianPoints.push(median)
+                        let median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + 100 * thetaY, (next[1] + prev[1]) / 2 +  100 *thetaX] ]
+                        MedianVertical.push(median)
                     }
-                })
+				console.log(MedianVertical)
                 
                 const boundaryDots = interpolateArr.map((d, i) => {
                         return(
