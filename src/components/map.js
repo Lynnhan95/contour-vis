@@ -2,8 +2,6 @@ import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
-import smooth from 'smooth-polyline'
-//import hull from 'hull.js'
 import Offset from 'polygon-offset'
 
 class BaseMap extends Component {
@@ -29,18 +27,11 @@ class BaseMap extends Component {
     projection() {
         return geoMercator().scale(500).center([110,36])
     }
-    
-    //turn Geojson (boundary) data into certain format that findmats function can read, example:
-        //  [
-        //     [
-        //         [[50.000, 95.000],[92.797, 63.905]], 
-        //         [[92.797, 63.905],[76.450, 13.594]],
-        //         [[76.450, 13.594],[23.549, 13.594]],
-        //         [[23.549, 13.594],[7.202, 63.90]],
-        //         [[7.202,  63.900],[50.000, 95.000]]
-        //     ]
-        //     ];
 
+    // helper functions for mathmatical computation
+    /*
+     * helper funcs can be defined in the class, make code clearer
+     */
     constructList(list) {
         var res = [[]] 
         // list[0] = [x, y]
@@ -58,7 +49,23 @@ class BaseMap extends Component {
         return res
     }
 
-    // when component will mount, fetch geojson data locally
+    // draw paths - helper functions
+    getLinePathStr(ps) {
+        let [[x0,y0],[x1,y1]] = ps;
+        return `M${x0} ${y0} L${x1} ${y1}`;
+    }
+
+    getQuadBezierPathStr(ps) {
+        let [[x0,y0],[x1,y1],[x2,y2]] = ps;
+        return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
+    }
+
+    getCubicBezierPathStr(ps) {
+        let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
+        return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
+    }
+
+    // when component will mount, fetch geojson and csv data locally
     componentWillMount(){
         let _me = this
         fetch("/chinaGeo.geojson")
@@ -94,35 +101,14 @@ class BaseMap extends Component {
             this.setState({ZhejiangData: ZhejiangData})
       
           })
-
-    }
-
-    //compute medial axis
-    // draw paths - helper function
-    /**
-     * helper funcs can be defined in the class, make code clearer
-     */
-    getLinePathStr(ps) {
-        let [[x0,y0],[x1,y1]] = ps;
-        return `M${x0} ${y0} L${x1} ${y1}`;
     }
 
 
-    getQuadBezierPathStr(ps) {
-        let [[x0,y0],[x1,y1],[x2,y2]] = ps;
-        return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
-    }
-
-    getCubicBezierPathStr(ps) {
-        let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
-        return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
-    }
 
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
         if(prevState.outerBoundary !== this.state.outerBoundary) {
-
         // store computed dots and paths 
         let resDots = [];
         const resPaths = []
@@ -144,18 +130,14 @@ class BaseMap extends Component {
         mats.forEach(f)
         function f(mat){
             let cpNode = mat.cpNode
-
             if(!cpNode) { return; }
-
             // let bezier = cpNode.matCurveToNextVertex
             traverseEdges(cpNode, function(cpNode){
                 if (cpNode.isTerminating()) { return ;}
                 let bezier = cpNode.matCurveToNextVertex.map(e=>{
                     return _me.autoProjection(e)
                 })
-                // console.log('bezier', bezier, cpNode.matCurveToNextVertex)
                 if(!bezier) { return; }
-                // console.log(bezier)
                 resDots.push(bezier)
 
                 if(bezier.length == 2){
@@ -165,36 +147,19 @@ class BaseMap extends Component {
                 }else if(bezier.length == 4){
                     resPaths.push(_me.getCubicBezierPathStr(bezier))
                 }
-                
             })
         }
-        // console.log('resPaths[0]', resPaths)
+
         this.setState({
             resPaths: resPaths
         })
-        }
 
-    }
-
-    componentDidMount() {
-
-
-    }
-
-    render() {
-        // define province shapes with chinaGeoData
-        const Regions = this.state.chinaGeoData.map((d, i) => {
-            /**
-             * only render zhejiang for showing more detail
-             */
-            if(d.properties.name === '浙江'){
-                // no smooth boundary anymore, because that increase complexity for now
-
+        this.state.chinaGeoData.map((d,i) => {
+            if (d.properties.name === '浙江'){
                 // compute interpolate  interpolate array with original boundary array
                 let mainArea = d.geometry.coordinates[9]
                 console.log(mainArea )
                 let interpolateArr = []
-                let MedianPoints = []
                 let interpolateNum = 3
 
                 function getInterpolate(arr) {
@@ -216,7 +181,7 @@ class BaseMap extends Component {
                 getInterpolate(mainArea)
 
 
-                let MedianVertical = []
+                let MedianVerticalPoints = []
                 function getMedialVertical(arr) {
                     for (let i = 0; i < arr.length - 1; i++) {
                         let prev = arr[i]
@@ -224,94 +189,72 @@ class BaseMap extends Component {
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-						let extend = 0.3
-						let median = [[(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical] ]
+                        let extend = 0.3
+                        let median = [[(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical] ]
                         
-                        MedianVertical.push(median)
+                        MedianVerticalPoints.push(median)
                     }
                 }
                 getMedialVertical(interpolateArr)
-                console.log(MedianVertical)
-				
-				function getPathfromPoints(arr)
-	                   {
-		              return `M${arr[0][0]} ${arr[0][1]} L${arr[1][0]} ${arr[1][1]}`;
-	                }
-				
-				let tempPath = []
-				function TurnLinetoPath(arr)
-				{	
-					for(let i = 0;i < arr.length; i++)
-					{  
-						tempPath.push(getPathfromPoints(arr[i]))		
-					}
-				}
-				
-				TurnLinetoPath(MedianVertical)
-				console.log(tempPath)
-				
-				
+                console.log(MedianVerticalPoints)
 
-				/*
 
-				function btwn(a, b1, b2) {
-  					if ((a >= b1) && (a <= b2)) { return true; }
-					if ((a >= b2) && (a <= b1)) { return true; }
-  					return false;	
-				}
+                let MedialVerticalPaths = []
+                function getPathsfromPoints(arr) {
+                    for (let i=0; i< arr.length-1; i++) {
+                        let x0 = _me.autoProjection(arr[i][0])[0], y0 = _me.autoProjection(arr[i][0])[1]
+                        let x1 = _me.autoProjection(arr[i][1])[0], y1 = _me.autoProjection(arr[i][1])[1]
+                        MedialVerticalPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
+                    }
+                }
+                getPathsfromPoints(MedianVerticalPoints)
 
-				function line_line_intersect(line1, line2) {
-				  var x1 = line1.x1, x2 = line1.x2, x3 = line2.x1, x4 = line2.x2;
-				  var y1 = line1.y1, y2 = line1.y2, y3 = line2.y1, y4 = line2.y2;
-				  var pt_denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-				  var pt_x_num = (x1*y2 - y1*x2) * (x3 - x4) - (x1 - x2) * (x3*y4 - y3*x4);
-				  var pt_y_num = (x1*y2 - y1*x2) * (y3 - y4) - (y1 - y2) * (x3*y4 - y3*x4);
-				  if (pt_denom == 0) { return "parallel"; }
-				  else { 
-					var pt = {'x': pt_x_num / pt_denom, 'y': pt_y_num / pt_denom}; 
-					if (btwn(pt.x, x1, x2) && btwn(pt.y, y1, y2) && btwn(pt.x, x3, x4) && btwn(pt.y, y3, y4)) { return pt; }
-					else { return "not in range"; }
-				  }
-				}
 
-				function path_line_intersections(pathEl, line) {
-
-				  var pts = []
-				  for (var i=0; i<n_segments; i++) {
-					var pos1 = pathEl.getPointAtLength(pathLength * i / n_segments);
-					var pos2 = pathEl.getPointAtLength(pathLength * (i+1) / n_segments);
-					var line1 = {x1: pos1.x, x2: pos2.x, y1: pos1.y, y2: pos2.y};
-					var line2 = {x1: line.attr('x1'), x2: line.attr('x2'), 
-								 y1: line.attr('y1'), y2: line.attr('y2')};
-					var pt = line_line_intersect(line1, line2);
-					if (typeof(pt) != "string") {
-					  pts.push(pt);
-					}
-				  }
-
-				  return pts;
-
-				}
-				*/
-				
-				
-				
-				
-
-                const verticalLines = MedianVertical.map((d,i) => {
-                    return (
-                        <line 
-                        x1 = {this.autoProjection(d[0])[0]}
-                        x2 = {this.autoProjection(d[1])[0]}
-                        y1 = {this.autoProjection(d[0])[1]}
-                        y2 = {this.autoProjection(d[1])[1]}
-                        stroke = "#000"
-                        strokeWidth = "0.5"
-                        />
-                    )
+                this.setState({
+                    interpolateArr: interpolateArr,
+                    MedialVerticalPaths: MedialVerticalPaths
                 })
+            }
+        })
 
-                const boundaryDots = interpolateArr.map((d, i) => {
+
+        }
+
+        //compute for medial vertical 
+       
+    }
+
+
+
+    render() {
+        // define province shapes with chinaGeoData
+        const Regions = this.state.chinaGeoData.map((d, i) => {
+            /**
+             * only render zhejiang for showing more detail
+             */
+            if(d.properties.name === '浙江'){
+                // no smooth boundary anymore, because that increase complexity for now
+
+                let verticalLines
+                
+                if ( this.state.MedialVerticalPaths ) {
+                    console.log(' this.MedialVerticalPaths' )
+                    verticalLines = this.state.MedialVerticalPaths.map((d,i) => {
+
+                            return (
+                                <path 
+                                d = {d}
+                                stroke = "#000"
+                                strokeWidth = "0.5"
+                                />
+                            )
+                        })
+                }
+
+                let boundaryDots
+                if ( this.state.interpolateArr ) {
+
+                    boundaryDots = this.state.interpolateArr.map((d, i) => {
                         return(
                             <circle
                             key = {`boundaryDot-${i}`}
@@ -324,6 +267,7 @@ class BaseMap extends Component {
                     
   
                 })
+                }
 
                 // reset projection
                 this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
@@ -378,25 +322,24 @@ class BaseMap extends Component {
                     innerBoundary,
                     boundaryDots,
                     verticalLines
+
                 ]
             }
             
         })
 
-        var tempArr = this.state.resPaths,
-            MedialAxis
-
-        if(tempArr) {
-            MedialAxis = <path
+        //draw medial axis to the map
+        let MedialAxis
+        if( this.state.resPaths) {
+           MedialAxis = <path
                 key = {`medial-121212`}
-                d = {tempArr.join(' ')}
+                d = { this.state.resPaths.join(' ')}
                 stroke = "#000"
                 />
         }
 
         // draw dots to the map 
         const Dots = this.state.ZhejiangData.map((d,i) => {
-            // console.log([ d.Longitude, d.Latitude ])
             return (
             <circle 
             key = {`dot-${ i }`}
