@@ -196,37 +196,54 @@ class BaseMap extends Component {
                 let MedianPoints = []
                 let interpolateNum = 3
 
-                mainArea.forEach(e=>{   
-                    for(let i=0; i< e.length -1; i++) {
-                        let prev = e[i]
-                        let next = e[i+1]
-                        let thetaX = ( next[0] - prev[0] ) 
-                        let thetaY = ( next[1] - prev[1] )
-                        // k = thetaY / thetaX
-                        for(let j=0; j<= interpolateNum; j++ ) {
-                            let cur = []
-                            cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                            cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                            interpolateArr.push(cur)
+                function getInterpolate(arr) {
+                    arr.forEach(e=>{   
+                        for(let i=0; i< e.length -1; i++) {
+                            let prev = e[i]
+                            let next = e[i+1]
+                            let thetaX = ( next[0] - prev[0] ) 
+                            let thetaY = ( next[1] - prev[1] )
+                            for(let j=1; j<= interpolateNum; j++ ) {
+                                let cur = []
+                                cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
+                                cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
+                                interpolateArr.push(cur)
+                            }
                         }
-                    }
-                })
-                console.log(interpolateArr)
+                    })
+                }
+                getInterpolate(mainArea)
+
 
                 let MedianVertical = []
-
-                
-                 for (let i = 0; i < interpolateArr.length - 1; i++) {
-                        let prev = interpolateArr[i]
-                        let next = interpolateArr[i + 1]
+                function getMedialVertical(arr) {
+                    for (let i = 0; i < arr.length - 1; i++) {
+                        let prev = arr[i]
+                        let next = arr[i + 1]
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
-                        let theta_Virtical = thetaY / thetaX
-                        let median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + 100 * thetaY, (next[1] + prev[1]) / 2 +  100 *thetaX] ]
+                        let theta_Virtical = thetaX / thetaY
+                        
+                        let median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + 0.1 , (next[1] + prev[1]) / 2 -  0.1 * theta_Virtical] ]
                         MedianVertical.push(median)
                     }
-				console.log(MedianVertical)
-                
+                }
+                getMedialVertical(interpolateArr)
+                console.log(MedianVertical)
+
+                const verticalLines = MedianVertical.map((d,i) => {
+                    return (
+                        <line 
+                        x1 = {this.autoProjection(d[0])[0]}
+                        x2 = {this.autoProjection(d[1])[0]}
+                        y1 = {this.autoProjection(d[0])[1]}
+                        y2 = {this.autoProjection(d[1])[1]}
+                        stroke = "#000"
+                        strokeWidth = "0.5"
+                        />
+                    )
+                })
+
                 const boundaryDots = interpolateArr.map((d, i) => {
                         return(
                             <circle
@@ -292,7 +309,8 @@ class BaseMap extends Component {
                 return [
                     outsideBoundary, 
                     innerBoundary,
-                    boundaryDots
+                    boundaryDots,
+                    verticalLines
                 ]
             }
             
