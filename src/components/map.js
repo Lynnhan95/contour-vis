@@ -189,7 +189,7 @@ class BaseMap extends Component {
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-                        let extend = 0.3
+                        let extend = 10.0
                         let median = [[(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical] ]
                         
                         MedianVerticalPoints.push(median)
@@ -208,12 +208,66 @@ class BaseMap extends Component {
                     }
                 }
                 getPathsfromPoints(MedianVerticalPoints)
-
+				
 
                 this.setState({
                     interpolateArr: interpolateArr,
                     MedialVerticalPaths: MedialVerticalPaths
                 })
+				
+				function CalculateIntersection(path1, path2)
+				{	
+					var intersect = require('path-intersection')
+					var intersection = intersect(path1, path2)
+					return intersection
+				}
+				
+//				let TestArray = []
+//				
+//				function GetAllPoints(arr)
+//				{	
+//					//let path2 = 
+//					for(let i = 0; i < arr.length; i++ )
+//					{	
+//						let path1 = arr[i]
+//						TestArray.push(CalculateIntersection(path1, resPaths.join(' ')))
+//						
+//					}
+//				}
+//				
+//				GetAllPoints(MedialVerticalPaths)
+				
+				function CalcDistance(x0, y0, x1, y1)
+				{
+					let distance = Math.sqrt((x0 - x1)^2 + (y0 - y1)^2)
+					return distance
+				}
+				
+//				console.log(interpolateArr.length)
+//				console.log(TestArray.length)
+//				let TryItOut = []
+//				function GetClosestPoint(arr1, arr2)
+//				{
+//					for(let i = 0; i< arr1.length-1; i++)
+//					{
+//						let MedianPoint = [(arr1[i][0] + arr1[i+1][0]) / 2, (arr1[i][1] + arr1[i+1][1]) / 2]
+//						let FinalPoint = []
+//						let mindistance = 1000
+//						for(let j = 0; j<= arr2[i].length; j++)
+//						{
+//							let IntersectionpPoint = [arr2[i][j].x, arr2[i][j].y]
+//							let distance = CalcDistance(MedianPoint[0], MedianPoint[1], IntersectionpPoint[0], IntersectionpPoint[1])
+//							if( distance < mindistance)
+//							{
+//								mindistance = distance
+//								FinalPoint = IntersectionpPoint
+//							}
+//						}
+//						TryItOut.push([MedianPoint, FinalPoint])
+//					}
+//				}
+//				GetClosestPoint(interpolateArr,TestArray)
+//				console.log(TryItOut)
             }
         })
 
@@ -238,7 +292,7 @@ class BaseMap extends Component {
                 let verticalLines
                 
                 if ( this.state.MedialVerticalPaths ) {
-                    console.log(' this.MedialVerticalPaths' )
+                    
                     verticalLines = this.state.MedialVerticalPaths.map((d,i) => {
 
                             return (
