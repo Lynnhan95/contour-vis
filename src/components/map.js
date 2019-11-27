@@ -107,6 +107,7 @@ class BaseMap extends Component {
         return `M${x0} ${y0} L${x1} ${y1}`;
     }
 
+
     getQuadBezierPathStr(ps) {
         let [[x0,y0],[x1,y1],[x2,y2]] = ps;
         return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
@@ -221,17 +222,36 @@ class BaseMap extends Component {
                         let prev = arr[i]
                         let next = arr[i + 1]
                         let thetaX = (next[0] - prev[0])
-						let flag
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-
-						let median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + 0.1, (next[1] + prev[1]) / 2 -  0.1 * theta_Virtical] ]
+						let extend = 0.3
+						let median = [[(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical] ]
                         
                         MedianVertical.push(median)
                     }
                 }
                 getMedialVertical(interpolateArr)
                 console.log(MedianVertical)
+				
+				function getPathfromPoints(arr)
+	                   {
+		              return `M${arr[0][0]} ${arr[0][1]} L${arr[1][0]} ${arr[1][1]}`;
+	                }
+				
+				let tempPath = []
+				function TurnLinetoPath(arr)
+				{	
+					for(let i = 0;i < arr.length; i++)
+					{  
+						tempPath.push(getPathfromPoints(arr[i]))		
+					}
+				}
+				
+				TurnLinetoPath(MedianVertical)
+				console.log(tempPath)
+				
+				
+
 				/*
 
 				function btwn(a, b1, b2) {
