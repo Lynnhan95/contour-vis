@@ -123,9 +123,7 @@ class BaseMap extends Component {
         ]
         ];
         let resloop = this.constructList(this.state.outerBoundary[0])
-
         let mats = findMats(resloop, 1);
-
         //traverse
         mats.forEach(f)
         function f(mat){
@@ -149,20 +147,16 @@ class BaseMap extends Component {
                 }
             })
         }
-
-        this.setState({
-            resPaths: resPaths
-        })
+        let medialPath = resPaths.join(' ')
 
         this.state.chinaGeoData.map((d,i) => {
             if (d.properties.name === '浙江'){
                 // compute interpolate  interpolate array with original boundary array
                 let mainArea = d.geometry.coordinates[9]
-                console.log(mainArea )
-                let interpolateArr = []
                 let interpolateNum = 3
 
-                function getInterpolate(arr) {
+                function getInterpolatePoints(arr) {
+                    let interpolatePoints = []
                     arr.forEach(e=>{
                         for(let i=0; i< e.length; i++) {
 							if(i<e.length-1)
@@ -175,7 +169,7 @@ class BaseMap extends Component {
 									let cur = []
 									cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
 									cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-									interpolateArr.push(cur)
+									interpolatePoints.push(cur)
 								}
                             }
 							else if(i == e.length-1)
@@ -188,19 +182,19 @@ class BaseMap extends Component {
 									let cur = []
 									cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
 									cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-									interpolateArr.push(cur)
+									interpolatePoints.push(cur)
 								}
 							}
 							
                         }
                     })
+                    return interpolatePoints
                 }
-                getInterpolate(mainArea)
-				console.log("mainArea",mainArea)
+                let interpolatePoints = getInterpolatePoints(mainArea)
 
-
-                let MedianVerticalPoints = []
-                function getMedialVertical(arr) {
+               
+                function getMedialVerticalPoints(arr) {
+                    let MedianVerticalPoints = []
                     for (let i = 0; i < arr.length - 1; i++) {
                         let prev = arr[i]
                         let next = arr[i + 1]
@@ -234,77 +228,56 @@ class BaseMap extends Component {
 					{
 						median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
 					}
-					MedianVerticalPoints.push(median)
+                    MedianVerticalPoints.push(median)
+                    return  MedianVerticalPoints 
                 }
-                getMedialVertical(interpolateArr)
+                let MedianVerticalPoints = getMedialVerticalPoints(interpolatePoints)
                 console.log(MedianVerticalPoints)
-
-
-                let MedialVerticalPaths = []
+                
                 function getPathsfromPoints(arr) {
+                    let MedialVerticalPaths = []
                     for (let i=0; i< arr.length; i++) {
                         let x0 = _me.autoProjection(arr[i][0])[0], y0 = _me.autoProjection(arr[i][0])[1]
                         let x1 = _me.autoProjection(arr[i][1])[0], y1 = _me.autoProjection(arr[i][1])[1]
                         MedialVerticalPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
                     }
+                    return MedialVerticalPaths
                 }
-                getPathsfromPoints(MedianVerticalPoints)
-				
-//				let projectedArray = []
-//                function ProjectAllPoints(arr) {
-//                    for (let i=0; i< arr.length-1; i++) {
-//                        let x0 = _me.autoProjection(arr[i])[0], y0 = _me.autoProjection(arr[i])[1]
-//                        projectedArray.push([x0,y0]);
-//                    }
-//                }
-//                ProjectAllPoints(projectedArray)
-				
+                let MedialVerticalPaths = getPathsfromPoints(MedianVerticalPoints)
 
-                this.setState({
-                    interpolateArr: interpolateArr,
-                    MedialVerticalPaths: MedialVerticalPaths
-                })
 				
-				function CalculateIntersection(path1, path2)
-				{	
+				function CalculateIntersection(path1, path2) {	
 					var intersect = require('path-intersection')
 					var intersection = intersect(path1, path2)
 					return intersection
 				}
 				
-				let TestArray = []
 				
-				function GetAllPoints(arr)
-				{	
-					//let path2 = 
-					for(let i = 0; i < arr.length; i++ )
-					{	
+				function getIntersectPoints(arr) {	
+                    let intersectPoints = []
+					for(let i = 0; i < arr.length; i++ ) {	
 						let path1 = arr[i]
-						TestArray.push(CalculateIntersection(path1, resPaths.join(' ')))
-						
-					}
+						intersectPoints.push(CalculateIntersection(path1, medialPath))
+                    }
+                    return intersectPoints
 				}
 				
-				GetAllPoints(MedialVerticalPaths)
-				console.log(TestArray)
+				let intersectPoints = getIntersectPoints(MedialVerticalPaths)
+				console.log(intersectPoints)
 				
-				function CalcDistance(x0, y0, x1, y1)
-				{
+				function CalcDistance(x0, y0, x1, y1) {
 					let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
 					return distance
 				}
-				console.log("interpolateArr",interpolateArr.length)
-				console.log("MedianVerticalPt",MedianVerticalPoints.length)
+				console.log("interpolatePoints", interpolatePoints.length)
+				console.log("MedianVerticalPt", MedianVerticalPoints.length)
 				console.log("MedialVerticalPaths", MedialVerticalPaths.length)
-				console.log("TestArray",TestArray.length)
+				console.log("intersectPoints", intersectPoints.length)
 				
 
-				
-				let TryItOut = []
-				function GetClosestPoint(arr1, arr2)
-				{
-					for(let i = 0; i< arr2.length-1; i++)
-					{
+				function GetClosestPoint(arr1, arr2) {
+                    let segmentBorderPoints = []
+					for(let i = 0; i< arr2.length-1; i++) {
 						let MedianPoint_x = (arr1[i][0] + arr1[i+1][0]) / 2
 						let MedianPoint_y = (arr1[i][1] + arr1[i+1][1]) / 2
 						let ProjectedPoint_x = _me.autoProjection([MedianPoint_x, MedianPoint_y])[0]
@@ -322,32 +295,38 @@ class BaseMap extends Component {
 								FinalPoint = IntersectionpPoint
 							}
 						}
-						TryItOut.push([MedianPoint, FinalPoint])
-					}
-				}
-				GetClosestPoint(interpolateArr,TestArray)
-				console.log(TryItOut)
-				let segmentBorderPaths = []
+						segmentBorderPoints.push([MedianPoint, FinalPoint])
+                    }
+                    return segmentBorderPoints
+                }
+                
+				let segmentBorderPoints = GetClosestPoint(interpolatePoints, intersectPoints)
+                console.log(segmentBorderPoints)
+                
+				
                 function getLinesfromPoints(arr) {
+                    let segmentBorderPaths = []
                     for (let i=0; i< arr.length-1; i++) {
                         let x0 = arr[i][0][0], y0 = arr[i][0][1]
                         let x1 = arr[i][1][0], y1 =arr[i][1][1]
                         segmentBorderPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
                 }
+                    return segmentBorderPaths
                 }
 				
-				getLinesfromPoints(TryItOut)
-				console.log(segmentBorderPaths)
-				this.setState({segmentBorderPaths: segmentBorderPaths})
+				let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+                console.log(segmentBorderPaths)
+
+                this.setState({
+                    interpolatePoints: interpolatePoints,
+                    MedialVerticalPaths: MedialVerticalPaths,
+                    resPaths: medialPath,
+                    segmentBorderPaths: segmentBorderPaths
+                })
 				
             }
         })
-
-
         }
-
-        //compute for medial vertical 
-       
     }
 
 
@@ -362,11 +341,8 @@ class BaseMap extends Component {
                 // no smooth boundary anymore, because that increase complexity for now
 
                 let verticalLines
-                
                 if ( this.state.segmentBorderPaths ) {
-                    
                     verticalLines = this.state.segmentBorderPaths.map((d,i) => {
-
                             return (
                                 <path 
                                 d = {d}
@@ -378,9 +354,9 @@ class BaseMap extends Component {
                 }
 
                 let boundaryDots
-                if ( this.state.interpolateArr ) {
+                if ( this.state.interpolatePoints ) {
 
-                    boundaryDots = this.state.interpolateArr.map((d, i) => {
+                    boundaryDots = this.state.interpolatePoints.map((d, i) => {
                         return(
                             <circle
                             key = {`boundaryDot-${i}`}
@@ -390,8 +366,6 @@ class BaseMap extends Component {
                             cy = {this.autoProjection(d)[1] }
                             />
                         )
-                    
-  
                 })
                 }
 
@@ -406,18 +380,15 @@ class BaseMap extends Component {
                     fill = "#2c75b1"
                     />
 
-
                 // offset boundary
                 let offsetCoordinates = d.geometry.coordinates.map(e=>{
                     try {
                         let temp = new Offset(e).offset(this.offsetPadding)
-
                         return temp
                     } catch (error) {
                         return null
                     }
                 })
-
 
                 let innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
 
@@ -448,7 +419,6 @@ class BaseMap extends Component {
                     innerBoundary,
                     boundaryDots,
                     verticalLines
-
                 ]
             }
             
@@ -458,10 +428,10 @@ class BaseMap extends Component {
         let MedialAxis
         if( this.state.resPaths) {
            MedialAxis = <path
-                key = {`medial-121212`}
-                d = { this.state.resPaths.join(' ')}
-                stroke = "#000"
-                />
+            key = {`medial-121212`}
+            d = { this.state.resPaths}
+            stroke = "#000"
+            />
         }
 
         // draw dots to the map 
