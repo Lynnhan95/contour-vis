@@ -3,8 +3,7 @@ import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import Offset from 'polygon-offset'
-import Snap from 'snapsvg-cjs';
-
+import Snap from 'snapsvg-cjs'
 
 class BaseMap extends Component {
     constructor(){
@@ -59,12 +58,12 @@ class BaseMap extends Component {
 
     getQuadBezierPathStr(ps) {
         let [[x0,y0],[x1,y1],[x2,y2]] = ps;
-        return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
+        return `M${x0} ${y0} L${x2} ${y2}`;
     }
 
     getCubicBezierPathStr(ps) {
         let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
-        return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
+        return `M${x0} ${y0} L${x3} ${y3}`;
     }
 
     // when component will mount, fetch geojson and csv data locally
@@ -77,11 +76,11 @@ class BaseMap extends Component {
                 return
             }
             response.json().then(chinaGeoData => {
-                console.log(chinaGeoData.features)
+                console.log('chinaGeoData', chinaGeoData)
                 this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
                 this.setState ({
                     chinaGeoData:  chinaGeoData.features,
-                    outerBoundary: chinaGeoData.features[16].geometry.coordinates
+                    outerBoundary: chinaGeoData.features[27].geometry.coordinates[9]
                 })
             })
         })
@@ -98,12 +97,14 @@ class BaseMap extends Component {
       
           }).then( data => {
             const ZhejiangData = data.filter( (d) => {
-              return d.province == "Hunan"
+              return d.province == "Zhejiang"
             })
             this.setState({ZhejiangData: ZhejiangData})
       
           })
     }
+
+
 
     componentDidUpdate(prevPros, prevState){
         let _me = this
@@ -148,50 +149,50 @@ class BaseMap extends Component {
             })
         }
         let medialPath = resPaths.join(' ')
-        console.log(medialPath)
 
         this.state.chinaGeoData.map((d,i) => {
-            if (d.properties.name === '湖南'){
+            if (d.properties.name === '浙江'){
                 // compute interpolate  interpolate array with original boundary array
-                let mainArea = d.geometry.coordinates
-                // let interpolateNum = 3
+                let mainArea = d.geometry.coordinates[9]
+                let interpolateNum = 3
 
-                function getInterpolatePoints(arr, interpolateNum) {
+                function getInterpolatePoints(arr) {
                     let interpolatePoints = []
                     arr.forEach(e=>{
                         for(let i=0; i< e.length; i++) {
-                            if(i<e.length-1)
-                            {
-                                let prev = e[i]
-                                let next = e[i+1]
-                                let thetaX = ( next[0] - prev[0] ) 
-                                let thetaY = ( next[1] - prev[1] )
-                                for(let j=1; j<= interpolateNum; j++ ) {
-                                    let cur = []
-                                    cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                                    cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                                    interpolatePoints.push(cur)
-                                }
+							if(i<e.length-1)
+							{
+								let prev = e[i]
+								let next = e[i+1]
+								let thetaX = ( next[0] - prev[0] ) 
+								let thetaY = ( next[1] - prev[1] )
+								for(let j=1; j<= interpolateNum; j++ ) {
+									let cur = []
+									cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
+									cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
+									interpolatePoints.push(cur)
+								}
                             }
-                            else if(i == e.length-1)
-                            {
-                                let prev = e[i]
-                                let next = e[0]
-                                let thetaX = ( next[0] - prev[0] ) 
-                                let thetaY = ( next[1] - prev[1] )
-                                for(let j=1; j<= interpolateNum; j++ ) {
-                                    let cur = []
-                                    cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                                    cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                                    interpolatePoints.push(cur)
-                                }
-                            }
-                            
+							else if(i == e.length-1)
+							{
+								let prev = e[i]
+								let next = e[0]
+								let thetaX = ( next[0] - prev[0] ) 
+								let thetaY = ( next[1] - prev[1] )
+								for(let j=1; j<= interpolateNum; j++ ) {
+									let cur = []
+									cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
+									cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
+									interpolatePoints.push(cur)
+								}
+							}
+							
                         }
                     })
                     return interpolatePoints
                 }
-                let interpolatePoints = getInterpolatePoints(mainArea, 3)
+                let interpolatePoints = getInterpolatePoints(mainArea)
+
                
                 function getMedialVerticalPoints(arr) {
                     let MedianVerticalPoints = []
@@ -201,37 +202,39 @@ class BaseMap extends Component {
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-                        let extend = 3
-                        let median
-                        if(thetaY > 0)
-                        {
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
-                        }
-                        else
-                        {
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
-                        }
+						let db = Math.sqrt(1+theta_Virtical*theta_Virtical)
+                        let extend = 1/ db
+						let median
+						if(thetaY > 0)
+						{
+							median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
+						}
+						else
+						{
+							median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
+						}
                         MedianVerticalPoints.push(median)
                     }
-                    let prev = arr[arr.length-1]
-                    let next = arr[0]
-                    let thetaX = (next[0] - prev[0])
-                    let thetaY = (next[1] - prev[1])
-                    let theta_Virtical = thetaX / thetaY
-                    let extend = 3
-                    let median
-                    if(thetaY > 0)
-                    {
-                        median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
-                    }
-                    else
-                    {
-                        median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
-                    }
+					let prev = arr[arr.length-1]
+					let next = arr[0]
+					let thetaX = (next[0] - prev[0])
+					let thetaY = (next[1] - prev[1])
+					let theta_Virtical = thetaX / thetaY
+					let extend = 0.3 
+					let median
+					if(thetaY > 0)
+					{
+						median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
+					}
+					else
+					{
+						median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
+					}
                     MedianVerticalPoints.push(median)
                     return  MedianVerticalPoints 
                 }
                 let MedianVerticalPoints = getMedialVerticalPoints(interpolatePoints)
+                console.log(MedianVerticalPoints)
                 
                 function getPathsfromPoints(arr) {
                     let MedialVerticalPaths = []
@@ -243,112 +246,105 @@ class BaseMap extends Component {
                     return MedialVerticalPaths
                 }
                 let MedialVerticalPaths = getPathsfromPoints(MedianVerticalPoints)
-                
-                function CalculateIntersection(path1, path2) {  
-                    var intersect = require('path-intersection')
-                    var intersection = intersect(path1, path2)
-                    return intersection
-                }
-                
-                console.log(resPaths)
-                function getIntersectPoints(arr) {  
-                    let intersectPoints = []
-                    let countError = 0
-                    for(let i = 0; i < arr.length; i++ ) {  
-                        let path1 = arr[i]
-                        // Snap.path.intersection
-                        let res = CalculateIntersection(path1, medialPath)
-                        // let res = Snap.pathintersection(path1, medialPath)
-                        if (res.length === 0) {
-                            countError += 1
-                        }
-                        intersectPoints.push(res)
-                    }
-                    console.log(countError)
-                    return intersectPoints
-                }
-                
-                let intersectPoints = getIntersectPoints(MedialVerticalPaths)
-                console.log(intersectPoints)
-                
-                function CalcDistance(x0, y0, x1, y1) {
-                    let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
-                    return distance
-                }
-                console.log("interpolatePoints", interpolatePoints.length)
-                console.log("MedianVerticalPt", MedianVerticalPoints.length)
-                console.log("MedialVerticalPaths", MedialVerticalPaths.length)
-                console.log("intersectPoints", intersectPoints.length)
-                
 
-                function GetClosestPoint(arr1, arr2) {
+				
+				function CalculateIntersection(path1, path2) {	
+					var intersect = require('path-intersection')
+					var intersection = intersect(path1, path2)
+					return intersection
+				}
+//				
+				
+				function getIntersectPoints(arr) {	
+                    let intersectPoints = []
+					for(let i = 0; i < arr.length; i++ ) {	
+						let path1 = arr[i]
+						//intersectPoints.push(Snap.path.intersection(path1, medialPath))
+						intersectPoints.push(CalculateIntersection(path1, medialPath))
+                    }
+                    return intersectPoints
+				}
+				
+				let intersectPoints = getIntersectPoints(MedialVerticalPaths)
+				
+				function CalcDistance(x0, y0, x1, y1) {
+					let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
+					return distance
+				}
+				console.log("interpolatePoints", interpolatePoints.length)
+				console.log("MedianVerticalPt", MedianVerticalPoints.length)
+				console.log("MedialVerticalPaths", MedialVerticalPaths.length)
+				console.log("intersectPoints", intersectPoints.length)
+				
+
+				function GetClosestPoint(arr1, arr2) {
                     let segmentBorderPoints = []
-                    for(let i = 0; i< arr2.length-1; i++) {
-                        let MedianPoint_x = (arr1[i][0] + arr1[i+1][0]) / 2
-                        let MedianPoint_y = (arr1[i][1] + arr1[i+1][1]) / 2
-                        let ProjectedPoint_x = _me.autoProjection([MedianPoint_x, MedianPoint_y])[0]
-                        let ProjectedPoint_y = _me.autoProjection([MedianPoint_x, MedianPoint_y])[1]
-                        let MedianPoint = [ProjectedPoint_x , ProjectedPoint_y ]
-                        let FinalPoint = []
-                        let mindistance = 100000
-                        for(let j = 0; j< arr2[i].length; j++)
-                        {
-                            let IntersectionpPoint = [arr2[i][j].x, arr2[i][j].y]
-                            let distance = CalcDistance(MedianPoint[0], MedianPoint[1], IntersectionpPoint[0], IntersectionpPoint[1])
-                            if( distance < mindistance)
-                            {
-                                mindistance = distance
-                                FinalPoint = IntersectionpPoint
-                            }
-                        }
-                        segmentBorderPoints.push([MedianPoint, FinalPoint])
+//					let MedianPoint_x0 = (arr1[0][0] + arr1[1][0]) / 2
+//					let MedianPoint_y0 = (arr1[0][1] + arr1[1][1]) / 2
+//					let ProjectedPoint_x0 = _me.autoProjection([MedianPoint_x0, MedianPoint_y0])[0]
+//					let ProjectedPoint_y0 = _me.autoProjection([MedianPoint_x0, MedianPoint_y0])[1]
+//					let MedianPoint0 = [ProjectedPoint_x0 , ProjectedPoint_y0 ]
+//					let FinalPoint0 = []
+//					let mindistance0 = 100000
+//					for(let j = 0; j< arr2[arr2.length-1].length; j++)
+//						{
+//							let IntersectionpPoint0 = [arr2[arr2.length-1][j].x, arr2[arr2.length-1][j].y]
+//							let distance0 = CalcDistance(MedianPoint0[0], MedianPoint0[1], IntersectionpPoint0[0], IntersectionpPoint0[1])
+//							if( distance0 < mindistance0)
+//							{
+//								mindistance0 = distance0
+//								FinalPoint0 = IntersectionpPoint0
+//							}
+//						}
+//					segmentBorderPoints.push([MedianPoint0, FinalPoint0])
+					for(let i = 0; i< arr1.length-1; i++) {
+						let MedianPoint_x = (arr1[i][0] + arr1[i+1][0]) / 2
+						let MedianPoint_y = (arr1[i][1] + arr1[i+1][1]) / 2
+						let ProjectedPoint_x = _me.autoProjection([MedianPoint_x, MedianPoint_y])[0]
+						let ProjectedPoint_y = _me.autoProjection([MedianPoint_x, MedianPoint_y])[1]
+						let MedianPoint = [ProjectedPoint_x , ProjectedPoint_y ]
+						let FinalPoint = []
+						let mindistance = 100000
+						for(let j = 0; j< arr2[i].length; j++)
+						{
+							let IntersectionpPoint = [arr2[i][j].x, arr2[i][j].y]
+							let distance = CalcDistance(MedianPoint[0], MedianPoint[1], IntersectionpPoint[0], IntersectionpPoint[1])
+							if( distance < mindistance)
+							{
+								mindistance = distance
+								FinalPoint = IntersectionpPoint
+							}
+						}
+						
+					 	segmentBorderPoints.push([MedianPoint, FinalPoint])		
                     }
                     return segmentBorderPoints
                 }
-                
-                let segmentBorderPoints = GetClosestPoint(interpolatePoints, intersectPoints)
+                console.log(intersectPoints[6])
+				let segmentBorderPoints = GetClosestPoint(interpolatePoints, intersectPoints)
                 console.log(segmentBorderPoints)
                 
+				
                 function getLinesfromPoints(arr) {
                     let segmentBorderPaths = []
-                    let countError = 0
                     for (let i=0; i< arr.length-1; i++) {
                         let x0 = arr[i][0][0], y0 = arr[i][0][1]
                         let x1 = arr[i][1][0], y1 =arr[i][1][1]
-
                         segmentBorderPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
-  
-                    }
-                    console.log(countError)
+                }
                     return segmentBorderPaths
                 }
 				
-				function MedianVerticalSegments(arr){
-					let SegmentArray = []
-					for(let i = 0; i < arr.length-1; i++)
-						{
-							let theataX = arr[i][1][0] - arr[i][0][0]
-							let theataY = arr[i][1][1] - arr[i][0][1]
-							for(let j = 0; j<= 5; j++)
-							{
-								SegmentArray.push([arr[i][0][0] + (theataX * j / 5), arr[i][0][1] + theataY * j / 5])
-							}
-						}
-					return SegmentArray
-				}
-				
-				let SegmentPoints = MedianVerticalSegments(segmentBorderPoints)
-                console.log(SegmentPoints)
-                let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+				let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+                console.log(segmentBorderPaths)
 
                 this.setState({
                     interpolatePoints: interpolatePoints,
-					//SegmentPoints: SegmentPoints,
                     MedialVerticalPaths: MedialVerticalPaths,
                     resPaths: medialPath,
                     segmentBorderPaths: segmentBorderPaths
                 })
-                
+				
             }
         })
         }
@@ -362,28 +358,39 @@ class BaseMap extends Component {
             /**
              * only render zhejiang for showing more detail
              */
-            if(d.properties.name === '湖南'){
+            if(d.properties.name === '浙江'){
                 // no smooth boundary anymore, because that increase complexity for now
 
                 let verticalLines
                 if ( this.state.segmentBorderPaths ) {
-                    
-                        verticalLines = this.state.segmentBorderPaths.map((d,i) => {
-                        
-                                return (
-                                    <path 
-                                    className = "segmentBorder"
-                                    key = {`segmentBorder-${i}`}
-                                    d = {d}
-                                    stroke = "#000"
-                                    strokeWidth = "0.5"
-                                    />
-                                )
-                            
- 
+                    verticalLines = this.state.segmentBorderPaths.map((d,i) => {
+
+								return (
+                                <path 
+                                d = {d}
+                                stroke = "#000"
+                                strokeWidth = "0.5"
+                                />
+                            )
+						
                         })
-                    
-  
+                }
+				
+				let Medianvertical
+                if ( this.state.MedialVerticalPaths ) {
+                    Medianvertical = this.state.MedialVerticalPaths.map((d,i) => {
+							if(i <= 9)
+								{
+									return (
+                                <path 
+                                d = {d}
+                                stroke = "yellow"
+                                strokeWidth = "0.2"
+                                />
+                            )
+								}
+							
+                        })
                 }
 
                 let boundaryDots
@@ -399,23 +406,8 @@ class BaseMap extends Component {
                             cy = {this.autoProjection(d)[1] }
                             />
                         )
-                	})
+                })
                 }
-
-//				//DrawSegmentsonMedianVerticalLines
-//				let SegmentDots
-//				SegmentDots = this.state.SegmentPoints.map((d, i) => {
-//					return(
-//						<circle
-//						key = {`SegmentDot-${i}`}
-//						r = "1"
-//						fill = "green"
-//						cx = {d[0]}
-//						cy = {d[1]}
-//						/>
-//					)
-//				})
-
 
                 // reset projection
                 this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
@@ -466,8 +458,8 @@ class BaseMap extends Component {
                     outsideBoundary, 
                     innerBoundary,
                     boundaryDots,
-					//SegmentDots,
-                    verticalLines
+                    verticalLines,
+					Medianvertical
                 ]
             }
             
@@ -491,7 +483,7 @@ class BaseMap extends Component {
             cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
             cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
             fill="purple"
-            r = "0.75"
+            r = "1"
             />
             )
         })
