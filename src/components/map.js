@@ -3,6 +3,7 @@ import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import Offset from 'polygon-offset'
+import Snap from 'snapsvg-cjs'
 
 class BaseMap extends Component {
     constructor(){
@@ -57,12 +58,12 @@ class BaseMap extends Component {
 
     getQuadBezierPathStr(ps) {
         let [[x0,y0],[x1,y1],[x2,y2]] = ps;
-        return `M${x0} ${y0} Q${x1} ${y1} ${x2} ${y2}`;
+        return `M${x0} ${y0} L${x2} ${y2}`;
     }
 
     getCubicBezierPathStr(ps) {
         let [[x0,y0],[x1,y1],[x2,y2],[x3,y3]] = ps;
-        return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
+        return `M${x0} ${y0} L${x3} ${y3}`;
     }
 
     // when component will mount, fetch geojson and csv data locally
@@ -201,7 +202,8 @@ class BaseMap extends Component {
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-                        let extend = 2.3
+						let db = Math.sqrt(1+theta_Virtical*theta_Virtical)
+                        let extend = 1/ db
 						let median
 						if(thetaY > 0)
 						{
@@ -218,7 +220,7 @@ class BaseMap extends Component {
 					let thetaX = (next[0] - prev[0])
 					let thetaY = (next[1] - prev[1])
 					let theta_Virtical = thetaX / thetaY
-					let extend = 2.3
+					let extend = 0.3 
 					let median
 					if(thetaY > 0)
 					{
@@ -251,19 +253,19 @@ class BaseMap extends Component {
 					var intersection = intersect(path1, path2)
 					return intersection
 				}
-				
+//				
 				
 				function getIntersectPoints(arr) {	
                     let intersectPoints = []
 					for(let i = 0; i < arr.length; i++ ) {	
 						let path1 = arr[i]
+						//intersectPoints.push(Snap.path.intersection(path1, medialPath))
 						intersectPoints.push(CalculateIntersection(path1, medialPath))
                     }
                     return intersectPoints
 				}
 				
 				let intersectPoints = getIntersectPoints(MedialVerticalPaths)
-				console.log(intersectPoints)
 				
 				function CalcDistance(x0, y0, x1, y1) {
 					let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
@@ -277,7 +279,25 @@ class BaseMap extends Component {
 
 				function GetClosestPoint(arr1, arr2) {
                     let segmentBorderPoints = []
-					for(let i = 0; i< arr2.length-1; i++) {
+//					let MedianPoint_x0 = (arr1[0][0] + arr1[1][0]) / 2
+//					let MedianPoint_y0 = (arr1[0][1] + arr1[1][1]) / 2
+//					let ProjectedPoint_x0 = _me.autoProjection([MedianPoint_x0, MedianPoint_y0])[0]
+//					let ProjectedPoint_y0 = _me.autoProjection([MedianPoint_x0, MedianPoint_y0])[1]
+//					let MedianPoint0 = [ProjectedPoint_x0 , ProjectedPoint_y0 ]
+//					let FinalPoint0 = []
+//					let mindistance0 = 100000
+//					for(let j = 0; j< arr2[arr2.length-1].length; j++)
+//						{
+//							let IntersectionpPoint0 = [arr2[arr2.length-1][j].x, arr2[arr2.length-1][j].y]
+//							let distance0 = CalcDistance(MedianPoint0[0], MedianPoint0[1], IntersectionpPoint0[0], IntersectionpPoint0[1])
+//							if( distance0 < mindistance0)
+//							{
+//								mindistance0 = distance0
+//								FinalPoint0 = IntersectionpPoint0
+//							}
+//						}
+//					segmentBorderPoints.push([MedianPoint0, FinalPoint0])
+					for(let i = 0; i< arr1.length-1; i++) {
 						let MedianPoint_x = (arr1[i][0] + arr1[i+1][0]) / 2
 						let MedianPoint_y = (arr1[i][1] + arr1[i+1][1]) / 2
 						let ProjectedPoint_x = _me.autoProjection([MedianPoint_x, MedianPoint_y])[0]
@@ -295,11 +315,12 @@ class BaseMap extends Component {
 								FinalPoint = IntersectionpPoint
 							}
 						}
-						segmentBorderPoints.push([MedianPoint, FinalPoint])
+						
+					 	segmentBorderPoints.push([MedianPoint, FinalPoint])		
                     }
                     return segmentBorderPoints
                 }
-                
+                console.log(intersectPoints[6])
 				let segmentBorderPoints = GetClosestPoint(interpolatePoints, intersectPoints)
                 console.log(segmentBorderPoints)
                 
@@ -343,13 +364,32 @@ class BaseMap extends Component {
                 let verticalLines
                 if ( this.state.segmentBorderPaths ) {
                     verticalLines = this.state.segmentBorderPaths.map((d,i) => {
-                            return (
+
+								return (
                                 <path 
                                 d = {d}
                                 stroke = "#000"
                                 strokeWidth = "0.5"
                                 />
                             )
+						
+                        })
+                }
+				
+				let Medianvertical
+                if ( this.state.MedialVerticalPaths ) {
+                    Medianvertical = this.state.MedialVerticalPaths.map((d,i) => {
+							if(i <= 9)
+								{
+									return (
+                                <path 
+                                d = {d}
+                                stroke = "yellow"
+                                strokeWidth = "0.2"
+                                />
+                            )
+								}
+							
                         })
                 }
 
@@ -418,7 +458,8 @@ class BaseMap extends Component {
                     outsideBoundary, 
                     innerBoundary,
                     boundaryDots,
-                    verticalLines
+                    verticalLines,
+					Medianvertical
                 ]
             }
             

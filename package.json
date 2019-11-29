@@ -14,6 +14,7 @@
     "react-dom": "^16.12.0",
     "react-scripts": "3.2.0",
     "smooth-polyline": "^1.0.8",
+    "snapsvg-cjs": "0.0.6",
     "topojson-client": "^3.1.0"
   },
   "scripts": {
