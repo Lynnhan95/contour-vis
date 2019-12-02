@@ -182,42 +182,6 @@ class BaseMap extends Component {
 
     }
 
-    getMats(points){
-        let _me = this,
-            resPaths = []
-        let mats = findMats(points, 1)
-
-        //traverse
-        mats.forEach(f)
-        function f(mat){
-            let cpNode = mat.cpNode
-
-            if(!cpNode) { return; }
-
-            // let bezier = cpNode.matCurveToNextVertex
-            traverseEdges(cpNode, function(cpNode){
-                if (cpNode.isTerminating()) { return ;}
-                let bezier = cpNode.matCurveToNextVertex.map(e=>{
-                    // return _me.autoProjection(e)
-                    return e
-                })
-                // console.log('bezier', bezier, cpNode.matCurveToNextVertex)
-                if(!bezier) { return; }
-
-                if(bezier.length === 2){
-                    resPaths.push(_me.getLinePathStr(bezier))
-                }else if(bezier.length === 3){
-                    resPaths.push(_me.getQuadBezierPathStr(bezier))
-                }else if(bezier.length === 4){
-                    resPaths.push(_me.getCubicBezierPathStr(bezier))
-                }
-                
-            })
-        }
-
-        return resPaths
-    }
-
     getZhejiangPathLength(){
         let unit_len = 50,
             temp_len = 0,
@@ -239,14 +203,6 @@ class BaseMap extends Component {
         let last_point = this.outsideBoundary.getPointAtLength(totle_len)
         even_points.push([last_point.x, last_point.y])
 
-        // TODO: divide boundary path evenly and calculate MATs
-        let formatData = this.constructList(even_points)
-
-        let matPath = this.getMats(formatData)
-
-        this.svg_mat.setAttribute('d', matPath)
-
-        console.log('even_points', matPath)
     }
 
     render() {
@@ -321,25 +277,12 @@ class BaseMap extends Component {
             MedialAxis
 
         if(tempArr) {
-            // console.log(tempArr.join(' '))
-            // MedialAxis = tempArr.map((d,i) => {
-            //     return (
-            //         <path
-            //         key = {`medial-${ i }`}
-            //         d = {d}
-            //         stroke = "#000"
-            //         />
-            //     )
-            // })
-
             MedialAxis = <path
                 key = {`medial-121212`}
                 d = {tempArr.join(' ')}
                 stroke = "#000"
                 />
         }
-
-
 
         // draw dots to the map 
         const Dots = this.state.ZhejiangData.map((d,i) => {
@@ -366,13 +309,7 @@ class BaseMap extends Component {
             <g className="MedialAxis"> 
                 {MedialAxis}
             </g>
-            <g className="MedialAxis"> 
-                <path
-                    ref={ele=>this.svg_mat=ele}
-                    d = ''
-                    stroke = "#0f0"
-                    />
-            </g>
+            
             </svg>
 
             <div>
