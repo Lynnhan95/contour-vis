@@ -105,6 +105,55 @@ class BaseMap extends Component {
           })
     }
 
+    calcDistanceFromTwoPoints(point1, point2) {
+        let [x0, y0] = point1,
+            [x1, y1] = point2
+
+        return Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
+    }
+
+    getEvenPointsFromCoordinates(coordinates, segment_len){
+        let _me = this,
+            total_len = coordinates.length,
+            remain_len = 0,
+            result = []
+
+        coordinates.forEach((e, i)=>{
+            let curr_point, next_point
+
+            if(i === total_len - 1){
+                curr_point = coordinates[total_len - 1]
+                next_point = coordinates[0]
+            }else{
+                curr_point = coordinates[i]
+                next_point = coordinates[++i]
+            }
+
+            let dis = _me.calcDistanceFromTwoPoints(curr_point, next_point),
+                curr_len = remain_len + dis
+
+            if(curr_len < segment_len){
+                remain_len += dis
+            }else{
+                let start_len = segment_len - remain_len,
+                    point_num = Math.floor(curr_len / segment_len),
+                    thetaX = next_point[0] - curr_point[0],
+                    thetaY = next_point[1] - curr_point[1]
+
+                for (let i = 0; i < point_num; i++) {
+                    let temp = []
+
+                    temp[0] = curr_point[0] + (start_len + i * segment_len) / dis * thetaX
+                    temp[1] = curr_point[1] + (start_len + i * segment_len) / dis * thetaY
+
+                    // TODO:
+                }
+            }
+
+            console.log('getEvenPointsFromCoordinates', dis)
+        })
+    }
+
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
@@ -148,7 +197,6 @@ class BaseMap extends Component {
             })
         }
         let medialPath = resPaths.join(' ')
-        console.log(medialPath)
 
         this.state.chinaGeoData.map((d,i) => {
             if (d.properties.name === '湖南'){
@@ -192,6 +240,8 @@ class BaseMap extends Component {
                     return interpolatePoints
                 }
                 let interpolatePoints = getInterpolatePoints(mainArea, 3)
+
+                _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
                
                 function getMedialVerticalPoints(arr) {
                     let MedianVerticalPoints = []
@@ -201,7 +251,7 @@ class BaseMap extends Component {
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-                        let extend = 3
+                        let extend = 4
                         let median
                         if(thetaY > 0)
                         {
@@ -250,7 +300,6 @@ class BaseMap extends Component {
                     return intersection
                 }
                 
-                console.log(resPaths)
                 function getIntersectPoints(arr) {  
                     let intersectPoints = []
                     let countError = 0
@@ -269,7 +318,6 @@ class BaseMap extends Component {
                 }
                 
                 let intersectPoints = getIntersectPoints(MedialVerticalPaths)
-                console.log(intersectPoints)
                 
                 function CalcDistance(x0, y0, x1, y1) {
                     let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
@@ -307,7 +355,6 @@ class BaseMap extends Component {
                 }
                 
                 let segmentBorderPoints = GetClosestPoint(interpolatePoints, intersectPoints)
-                console.log(segmentBorderPoints)
                 
                 function getLinesfromPoints(arr) {
                     let segmentBorderPaths = []
@@ -338,7 +385,6 @@ class BaseMap extends Component {
 				}
 				
 				let SegmentPoints = MedianVerticalSegments(segmentBorderPoints)
-                console.log(SegmentPoints)
                 let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
 
                 this.setState({
@@ -363,27 +409,26 @@ class BaseMap extends Component {
              * only render zhejiang for showing more detail
              */
             if(d.properties.name === '湖南'){
+                console.log('湖南', d)
                 // no smooth boundary anymore, because that increase complexity for now
 
                 let verticalLines
                 if ( this.state.segmentBorderPaths ) {
                     
-                        verticalLines = this.state.segmentBorderPaths.map((d,i) => {
-                        
-                                return (
-                                    <path 
-                                    className = "segmentBorder"
-                                    key = {`segmentBorder-${i}`}
-                                    d = {d}
-                                    stroke = "#000"
-                                    strokeWidth = "0.5"
-                                    />
-                                )
-                            
- 
-                        })
+                    verticalLines = this.state.segmentBorderPaths.map((d,i) => {
                     
-  
+                            return (
+                                <path 
+                                className = "segmentBorder"
+                                key = {`segmentBorder-${i}`}
+                                d = {d}
+                                stroke = "#000"
+                                strokeWidth = "0.5"
+                                />
+                            )
+                        
+
+                    })
                 }
 
                 let boundaryDots
@@ -393,7 +438,7 @@ class BaseMap extends Component {
                         return(
                             <circle
                             key = {`boundaryDot-${i}`}
-                            r = "1"
+                            r = "0.5"
                             fill = "red"
                             cx = {this.autoProjection(d)[0] }
                             cy = {this.autoProjection(d)[1] }
