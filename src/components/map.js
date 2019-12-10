@@ -12,7 +12,8 @@ class BaseMap extends Component {
         this.state = {
             chinaGeoData: [],
             ZhejiangData:[],
-            resDots: null
+            resDots: null,
+            segment_path_len: 0.05
         }
 
         this.autoProjection = null
@@ -146,12 +147,14 @@ class BaseMap extends Component {
                     temp[0] = curr_point[0] + (start_len + i * segment_len) / dis * thetaX
                     temp[1] = curr_point[1] + (start_len + i * segment_len) / dis * thetaY
 
-                    // TODO:
+                    result.push(temp)
                 }
-            }
 
-            console.log('getEvenPointsFromCoordinates', dis)
+                remain_len = curr_len - segment_len * point_num
+            }
         })
+
+        return result
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -241,7 +244,7 @@ class BaseMap extends Component {
                 }
                 let interpolatePoints = getInterpolatePoints(mainArea, 3)
 
-                _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
+                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], _me.state.segment_path_len)
                
                 function getMedialVerticalPoints(arr) {
                     let MedianVerticalPoints = []
@@ -392,7 +395,8 @@ class BaseMap extends Component {
 					//SegmentPoints: SegmentPoints,
                     MedialVerticalPaths: MedialVerticalPaths,
                     resPaths: medialPath,
-                    segmentBorderPaths: segmentBorderPaths
+                    segmentBorderPaths: segmentBorderPaths,
+                    even_points: even_points
                 })
                 
             }
@@ -438,13 +442,28 @@ class BaseMap extends Component {
                         return(
                             <circle
                             key = {`boundaryDot-${i}`}
-                            r = "0.5"
+                            r = "1"
                             fill = "red"
                             cx = {this.autoProjection(d)[0] }
                             cy = {this.autoProjection(d)[1] }
                             />
                         )
                 	})
+                }
+
+                let evenPoints
+                if(this.state.even_points){
+                    evenPoints = this.state.even_points.map((d, i)=>{
+                        return(
+                            <circle
+                            key = {`evenPoints-${i}`}
+                            r = "1"
+                            fill = "#33ff22"
+                            cx = {this.autoProjection(d)[0] }
+                            cy = {this.autoProjection(d)[1] }
+                            />
+                        )
+                    })
                 }
 
 //				//DrawSegmentsonMedianVerticalLines
@@ -512,7 +531,8 @@ class BaseMap extends Component {
                     innerBoundary,
                     boundaryDots,
 					//SegmentDots,
-                    verticalLines
+                    verticalLines,
+                    evenPoints
                 ]
             }
             
