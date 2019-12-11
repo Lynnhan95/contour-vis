@@ -155,6 +155,10 @@ class BaseMap extends Component {
         return result
     }
 
+    getVerticalPathFromEvenPoint(){
+        // TODO:
+    }
+
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
