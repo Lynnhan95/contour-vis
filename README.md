@@ -95,3 +95,8 @@ computes all segments —> color ranges
 2. Smooth outline + offset outline 
 3. Medial axis + segmentation
 4. Mapping density —> color
+
+## Algorithm about
+1. Interpolate point on path evenly:
+![even_points](./src/assets/even_points.jpg)
+
