@@ -3,6 +3,10 @@ import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import Offset from 'polygon-offset'
+import paper from 'paper'
+const intersect = require('path-intersection')
+
+console.log('paper', paper)
 
 class BaseMap extends Component {
     constructor(){
@@ -11,7 +15,7 @@ class BaseMap extends Component {
             chinaGeoData: [],
             ZhejiangData:[],
             resDots: null,
-            segment_path_len: 0.05
+            segment_path_len: 0.1
         }
 
         this.autoProjection = null
@@ -67,7 +71,7 @@ class BaseMap extends Component {
     }
 
     // when component will mount, fetch geojson and csv data locally
-    componentWillMount(){
+    componentDidMount(){
         let _me = this
         fetch("/chinaGeo.geojson")
         .then(response => {
@@ -201,7 +205,7 @@ class BaseMap extends Component {
                 }
             })
         }
-        let medialPath = resPaths.join(' ')
+        let medialPath = resPaths.join('')
 
         this.state.chinaGeoData.map((d,i) => {
             if (d.properties.name === '湖南'){
@@ -244,7 +248,7 @@ class BaseMap extends Component {
                     })
                     return interpolatePoints
                 }
-                let interpolatePoints = getInterpolatePoints(mainArea, 3)
+                // let interpolatePoints = getInterpolatePoints(mainArea, 3)
 
                 let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], _me.state.segment_path_len)
                
@@ -256,7 +260,7 @@ class BaseMap extends Component {
                         let thetaX = (next[0] - prev[0])
                         let thetaY = (next[1] - prev[1])
                         let theta_Virtical = thetaX / thetaY
-                        let extend = 4
+                        let extend = .3
                         let median
                         if(thetaY > 0)
                         {
@@ -273,7 +277,7 @@ class BaseMap extends Component {
                     let thetaX = (next[0] - prev[0])
                     let thetaY = (next[1] - prev[1])
                     let theta_Virtical = thetaX / thetaY
-                    let extend = 3
+                    let extend = .02
                     let median
                     if(thetaY > 0)
                     {
@@ -286,13 +290,16 @@ class BaseMap extends Component {
                     MedianVerticalPoints.push(median)
                     return  MedianVerticalPoints 
                 }
-                let MedianVerticalPoints = getMedialVerticalPoints(interpolatePoints)
+                let MedianVerticalPoints = getMedialVerticalPoints(even_points)
                 
                 function getPathsfromPoints(arr) {
                     let MedialVerticalPaths = []
                     for (let i=0; i< arr.length; i++) {
-                        let x0 = _me.autoProjection(arr[i][0])[0], y0 = _me.autoProjection(arr[i][0])[1]
-                        let x1 = _me.autoProjection(arr[i][1])[0], y1 = _me.autoProjection(arr[i][1])[1]
+                        let x0 = _me.autoProjection(arr[i][0])[0], 
+                            y0 = _me.autoProjection(arr[i][0])[1]
+                        let x1 = _me.autoProjection(arr[i][1])[0], 
+                            y1 = _me.autoProjection(arr[i][1])[1]
+
                         MedialVerticalPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
                     }
                     return MedialVerticalPaths
@@ -300,10 +307,21 @@ class BaseMap extends Component {
                 let MedialVerticalPaths = getPathsfromPoints(MedianVerticalPoints)
                 
                 function CalculateIntersection(path1, path2) {  
-                    var intersect = require('path-intersection')
                     var intersection = intersect(path1, path2)
                     return intersection
                 }
+
+                let paper_inter
+                if(this.state.chinaGeoData){
+                    paper.setup('myCanvas')
+
+                    let test_path1 = new paper.Path('M298.6176759180689 454.83509800690354 L327.91220863382114 436.9236819216658'),
+                        test_medialPath = new paper.Path(medialPath)
+
+                    paper_inter = test_medialPath.getIntersections(test_path1)
+                    console.log('TEST', paper_inter)
+                }
+                
                 
                 function getIntersectPoints(arr) {  
                     let intersectPoints = []
@@ -318,7 +336,7 @@ class BaseMap extends Component {
                         }
                         intersectPoints.push(res)
                     }
-                    console.log(countError)
+                    console.log('countError', countError)
                     return intersectPoints
                 }
                 
@@ -328,10 +346,10 @@ class BaseMap extends Component {
                     let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
                     return distance
                 }
-                console.log("interpolatePoints", interpolatePoints.length)
+                // console.log("interpolatePoints", interpolatePoints.length)
                 console.log("MedianVerticalPt", MedianVerticalPoints.length)
                 console.log("MedialVerticalPaths", MedialVerticalPaths.length)
-                console.log("intersectPoints", intersectPoints.length)
+                console.log("intersectPoints", intersectPoints)
                 
 
                 function GetClosestPoint(arr1, arr2) {
@@ -344,23 +362,25 @@ class BaseMap extends Component {
                         let MedianPoint = [ProjectedPoint_x , ProjectedPoint_y ]
                         let FinalPoint = []
                         let mindistance = 100000
-                        for(let j = 0; j< arr2[i].length; j++)
-                        {
-                            let IntersectionpPoint = [arr2[i][j].x, arr2[i][j].y]
-                            let distance = CalcDistance(MedianPoint[0], MedianPoint[1], IntersectionpPoint[0], IntersectionpPoint[1])
-                            if( distance < mindistance)
+                        if(arr2[i].length > 0){
+                            for(let j = 0; j< arr2[i].length; j++)
                             {
-                                mindistance = distance
-                                FinalPoint = IntersectionpPoint
+                                let IntersectionpPoint = [arr2[i][j].x, arr2[i][j].y]
+                                let distance = CalcDistance(MedianPoint[0], MedianPoint[1], IntersectionpPoint[0], IntersectionpPoint[1])
+                                if( distance < mindistance)
+                                {
+                                    mindistance = distance
+                                    FinalPoint = IntersectionpPoint
+                                }
                             }
+                            segmentBorderPoints.push([MedianPoint, FinalPoint])
                         }
-                        segmentBorderPoints.push([MedianPoint, FinalPoint])
                     }
                     return segmentBorderPoints
                 }
                 
-                let segmentBorderPoints = GetClosestPoint(interpolatePoints, intersectPoints)
-                
+                let segmentBorderPoints = GetClosestPoint(even_points, intersectPoints)
+                console.log('segmentBorderPoints', segmentBorderPoints)
                 function getLinesfromPoints(arr) {
                     let segmentBorderPaths = []
                     let countError = 0
@@ -393,20 +413,19 @@ class BaseMap extends Component {
                 let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
 
                 this.setState({
-                    interpolatePoints: interpolatePoints,
+                    // interpolatePoints: interpolatePoints,
 					//SegmentPoints: SegmentPoints,
                     MedialVerticalPaths: MedialVerticalPaths,
                     resPaths: medialPath,
                     segmentBorderPaths: segmentBorderPaths,
-                    even_points: even_points
+                    even_points: even_points,
+                    paper_inter: paper_inter
                 })
                 
             }
         })
         }
     }
-
-
 
     render() {
         // define province shapes with chinaGeoData
@@ -420,20 +439,16 @@ class BaseMap extends Component {
 
                 let verticalLines
                 if ( this.state.segmentBorderPaths ) {
-                    
                     verticalLines = this.state.segmentBorderPaths.map((d,i) => {
-                    
-                            return (
-                                <path 
-                                className = "segmentBorder"
-                                key = {`segmentBorder-${i}`}
-                                d = {d}
-                                stroke = "#000"
-                                strokeWidth = "0.5"
-                                />
-                            )
-                        
-
+                        return (
+                            <path 
+                            className = "segmentBorder"
+                            key = {`segmentBorder-${i}`}
+                            d = {d}
+                            stroke = "#000"
+                            strokeWidth = "0.5"
+                            />
+                        )
                     })
                 }
 
@@ -463,6 +478,36 @@ class BaseMap extends Component {
                             fill = "#33ff22"
                             cx = {this.autoProjection(d)[0] }
                             cy = {this.autoProjection(d)[1] }
+                            />
+                        )
+                    })
+                }
+
+                let medial_vertical_paths
+                if(this.state.MedialVerticalPaths){
+                    medial_vertical_paths = this.state.MedialVerticalPaths.map((d, i)=>{
+                        return (
+                            <path 
+                            className = "vertical-path"
+                            key = {`vertical-path-${i}`}
+                            d = {d}
+                            stroke = "#009"
+                            strokeWidth = "0.1"
+                            />
+                        )
+                    })
+                }
+
+                let paper_inter
+                if(this.state.paper_inter){
+                    paper_inter = this.state.paper_inter.map((d, i)=>{
+                        return(
+                            <circle
+                            key = {`paper_inter-${i}`}
+                            r = "1"
+                            fill = "#009dec"
+                            cx = {d.point.x}
+                            cy = {d.point.y}
                             />
                         )
                     })
@@ -534,7 +579,9 @@ class BaseMap extends Component {
                     boundaryDots,
 					//SegmentDots,
                     verticalLines,
-                    evenPoints
+                    evenPoints,
+                    medial_vertical_paths,
+                    paper_inter
                 ]
             }
             
@@ -546,7 +593,7 @@ class BaseMap extends Component {
            MedialAxis = <path
             key = {`medial-121212`}
             d = { this.state.resPaths}
-            stroke = "#000"
+            stroke = "#e56048"
             />
         }
 
@@ -566,7 +613,7 @@ class BaseMap extends Component {
         return (
         <div>
             <p>Basemap</p>
-            <svg width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
+            <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
             <g className="Regions">
                 {Regions}
             </g>
