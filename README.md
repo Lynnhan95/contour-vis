@@ -98,5 +98,6 @@ computes all segments —> color ranges
 
 ## Algorithm about
 1. Interpolate point on path evenly:
+
 ![even_points](./src/assets/even_points.jpg)
 

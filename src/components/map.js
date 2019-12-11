@@ -3,8 +3,6 @@ import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import Offset from 'polygon-offset'
-import Snap from 'snapsvg-cjs';
-
 
 class BaseMap extends Component {
     constructor(){
@@ -40,11 +38,11 @@ class BaseMap extends Component {
         // list[0] = [x, y]
         for (var i =0; i< list.length; i++) {
             if (i< list.length-1) {
-                var prev = list[i]
-                var next = list[i+1]
+                let prev = list[i]
+                let next = list[i+1]
                 res[0].push([prev, next])
             }else {
-                var prev = list[i]
+                let prev = list[i]
                 res[0].push([prev, list[0]])
             }
 
@@ -99,7 +97,7 @@ class BaseMap extends Component {
       
           }).then( data => {
             const ZhejiangData = data.filter( (d) => {
-              return d.province == "Hunan"
+              return d.province === "Hunan"
             })
             this.setState({ZhejiangData: ZhejiangData})
       
@@ -165,15 +163,15 @@ class BaseMap extends Component {
         let resDots = [];
         const resPaths = []
         // loops data format
-        let testloop = [
-        [
-            [[50.000, 95.000],[92.797, 63.905]], 
-            [[92.797, 63.905],[76.450, 13.594]],
-            [[76.450, 13.594],[23.549, 13.594]],
-            [[23.549, 13.594],[7.202, 63.90]],
-            [[7.202,  63.900],[50.000, 95.000]]
-        ]
-        ];
+        // let testloop = [
+        // [
+        //     [[50.000, 95.000],[92.797, 63.905]], 
+        //     [[92.797, 63.905],[76.450, 13.594]],
+        //     [[76.450, 13.594],[23.549, 13.594]],
+        //     [[23.549, 13.594],[7.202, 63.90]],
+        //     [[7.202,  63.900],[50.000, 95.000]]
+        // ]
+        // ];
         let resloop = this.constructList(this.state.outerBoundary[0])
         let mats = findMats(resloop, 1);
         //traverse
@@ -190,11 +188,11 @@ class BaseMap extends Component {
                 if(!bezier) { return; }
                 resDots.push(bezier)
 
-                if(bezier.length == 2){
+                if(bezier.length === 2){
                     resPaths.push(_me.getLinePathStr(bezier))
-                }else if(bezier.length == 3){
+                }else if(bezier.length === 3){
                     resPaths.push(_me.getQuadBezierPathStr(bezier))
-                }else if(bezier.length == 4){
+                }else if(bezier.length === 4){
                     resPaths.push(_me.getCubicBezierPathStr(bezier))
                 }
             })
@@ -224,7 +222,7 @@ class BaseMap extends Component {
                                     interpolatePoints.push(cur)
                                 }
                             }
-                            else if(i == e.length-1)
+                            else if(i === e.length-1)
                             {
                                 let prev = e[i]
                                 let next = e[0]
