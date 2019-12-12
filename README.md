@@ -101,6 +101,7 @@ computes all segments —> color ranges
 2. Look into Medial Axis source code, and understand how [a point on medial axis] and [a point on the edge] matches.
 3. Junhan will help on segmentation computation, therefore, we can make sure to have an output whatever which region segmentation algorithm to use.
 4. Compare medial axis computation result with Junhan's maximum intersect circle.
+5. Guojun will look at "region with multiple center" implementation.
 
 ## Algorithm about
 1. Interpolate point on path evenly:
