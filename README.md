@@ -24,7 +24,7 @@ computes all segments —> color ranges
 ### Step:
 1. Start from Zhejiang province, mapping Zhejiang boundary + dots (example: [http://ssz.fr/places/?eu#ac$//] (http://ssz.fr/places/?eu#ac$//)) . ✅
 2. Smooth outline + offset outline ✅
-3. Medial axis + segmentation ❌ (Problem: Can not segment the region correctly because there's too many branch; Can not find all intersection points, which may due to: findMinDistance issue, or path-intersection issue).
+3. Medial axis + segmentation ❌ <br/> (Problem: Can not segment the region correctly because there's too many branch; Can not find all intersection points, which may due to: findMinDistance issue, or path-intersection issue).
 4. Mapping density —> color ✅ （Need to refine and aggregate them into a pure function)
 
 ### Schedule for December:
