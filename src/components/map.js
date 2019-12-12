@@ -311,15 +311,44 @@ class BaseMap extends Component {
                     return intersection
                 }
 
-                let paper_inter
+                let paper_inter, test_near_points = []
                 if(this.state.chinaGeoData){
                     paper.setup('myCanvas')
 
                     let test_path1 = new paper.Path('M298.6176759180689 454.83509800690354 L327.91220863382114 436.9236819216658'),
+                        p1 = [298.6176759180689, 454.83509800690354],
+                        test_path2 = new paper.Path('M275.48356169878025 368.7534409032455 L300.59881713695455 410.0156271911363'),
+                        p2 = [275.48356169878025, 368.7534409032455],
                         test_medialPath = new paper.Path(medialPath)
 
-                    paper_inter = test_medialPath.getIntersections(test_path1)
+                    let inter1 = test_medialPath.getIntersections(test_path1)
+                    let inter2 = test_medialPath.getIntersections(test_path2)
+                    paper_inter = [].concat(inter1, inter2)
                     console.log('TEST', paper_inter)
+
+                    let point1, dis1 = Infinity
+                    inter1.forEach((e)=>{
+                        let curr = _me.calcDistanceFromTwoPoints(p1, [e.point.x, e.point.y])
+
+                        if(curr < dis1){
+                            dis1 = curr
+                            point1 = [e.point.x, e.point.y]
+                        }
+                    })
+
+                    let point2, dis2 = Infinity
+                    inter2.forEach((e)=>{
+                        let curr = _me.calcDistanceFromTwoPoints(p2, [e.point.x, e.point.y])
+
+                        if(curr < dis2){
+                            dis2 = curr
+                            point2 = [e.point.x, e.point.y]
+                        }
+                    })
+
+                    test_near_points.push(point1, point2)
+
+                    console.log('test_near_points', test_near_points)
                 }
                 
                 
@@ -349,7 +378,7 @@ class BaseMap extends Component {
                 // console.log("interpolatePoints", interpolatePoints.length)
                 console.log("MedianVerticalPt", MedianVerticalPoints.length)
                 console.log("MedialVerticalPaths", MedialVerticalPaths.length)
-                console.log("intersectPoints", intersectPoints)
+                // console.log("intersectPoints", intersectPoints)
                 
 
                 function GetClosestPoint(arr1, arr2) {
@@ -380,7 +409,7 @@ class BaseMap extends Component {
                 }
                 
                 let segmentBorderPoints = GetClosestPoint(even_points, intersectPoints)
-                console.log('segmentBorderPoints', segmentBorderPoints)
+
                 function getLinesfromPoints(arr) {
                     let segmentBorderPaths = []
                     let countError = 0
@@ -419,7 +448,8 @@ class BaseMap extends Component {
                     resPaths: medialPath,
                     segmentBorderPaths: segmentBorderPaths,
                     even_points: even_points,
-                    paper_inter: paper_inter
+                    paper_inter: paper_inter,
+                    test_near_points: test_near_points
                 })
                 
             }
@@ -498,20 +528,7 @@ class BaseMap extends Component {
                     })
                 }
 
-                let paper_inter
-                if(this.state.paper_inter){
-                    paper_inter = this.state.paper_inter.map((d, i)=>{
-                        return(
-                            <circle
-                            key = {`paper_inter-${i}`}
-                            r = "1"
-                            fill = "#009dec"
-                            cx = {d.point.x}
-                            cy = {d.point.y}
-                            />
-                        )
-                    })
-                }
+                
 
 //				//DrawSegmentsonMedianVerticalLines
 //				let SegmentDots
@@ -581,7 +598,7 @@ class BaseMap extends Component {
                     verticalLines,
                     evenPoints,
                     medial_vertical_paths,
-                    paper_inter
+                    // paper_inter
                 ]
             }
             
@@ -610,6 +627,36 @@ class BaseMap extends Component {
             )
         })
 
+        let paper_inter
+        if(this.state.paper_inter){
+            paper_inter = this.state.paper_inter.map((d, i)=>{
+                return(
+                    <circle
+                    key = {`paper_inter-${i}`}
+                    r = "1"
+                    fill = "#009dec"
+                    cx = {d.point.x}
+                    cy = {d.point.y}
+                    />
+                )
+            })
+        }
+
+        let test_near
+        if(this.state.test_near_points){
+            test_near = this.state.test_near_points.map((d, i)=>{
+                return(
+                    <circle
+                    key = {`test_near-${i}`}
+                    r = ".5"
+                    fill = "#dec009"
+                    cx = {d[0]}
+                    cy = {d[1]}
+                    />
+                )
+            })
+        }
+
         return (
         <div>
             <p>Basemap</p>
@@ -622,6 +669,12 @@ class BaseMap extends Component {
             </g>
             <g className="MedialAxis"> 
                 {MedialAxis}
+            </g>
+            <g className="paper_inter">
+                {paper_inter}
+            </g>
+            <g className="test_near">
+                {test_near}
             </g>
             </svg>
         </div>
