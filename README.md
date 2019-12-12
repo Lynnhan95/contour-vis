@@ -99,7 +99,8 @@ computes all segments —> color ranges
 ### Schedule for December:
 1. Finish the boundary segmentation function, sub-segment counting function and color projection function, by December 28th.
 2. Look into Medial Axis source code, and understand how [a point on medial axis] and [a point on the edge] matches.
-3. Junhan will help on segmentation computation, therefore, we can make sure to have an output whatever which region segmentation algorithm we use.
+3. Junhan will help on segmentation computation, therefore, we can make sure to have an output whatever which region segmentation algorithm to use.
+4. Compare medial axis computation result with Junhan's maximum intersect circle.
 
 ## Algorithm about
 1. Interpolate point on path evenly:
