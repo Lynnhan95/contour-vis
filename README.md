@@ -39,3 +39,7 @@ computes all segments —> color ranges
 
 ![even_points](./src/assets/even_points.jpg)
 
+2. test two weird vertical paths, get nearest points with paper successfully
+
+![even_points](./src/assets/test-intersect.jpg)
+
