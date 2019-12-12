@@ -96,6 +96,11 @@ computes all segments —> color ranges
 3. Medial axis + segmentation
 4. Mapping density —> color
 
+### Schedule for December:
+1. Finish the boundary segmentation function, sub-segment counting function and color projection function, by December 28th.
+2. Look into Medial Axis source code, and understand how [a point on medial axis] and [a point on the edge] matches.
+3. Junhan will help on segmentation computation, therefore, we can make sure to have an output whatever which region segmentation algorithm we use.
+
 ## Algorithm about
 1. Interpolate point on path evenly:
 
