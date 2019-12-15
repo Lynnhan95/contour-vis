@@ -253,41 +253,43 @@ class BaseMap extends Component {
                 let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], _me.state.segment_path_len)
                
                 function getMedialVerticalPoints(arr) {
-                    let MedianVerticalPoints = []
-                    for (let i = 0; i < arr.length - 1; i++) {
-                        let prev = arr[i]
-                        let next = arr[i + 1]
-                        let thetaX = (next[0] - prev[0])
-                        let thetaY = (next[1] - prev[1])
-                        let theta_Virtical = thetaX / thetaY
-                        let extend = .3
+                    let MedianVerticalPoints = [],
+                        prev, next
+                    
+                    for (let i = 0; i < arr.length; i++) {
+                        if(i === arr.length - 1){
+                            prev = arr[arr.length-1]
+                            next = arr[0]
+                        }else{
+                            prev = arr[i]
+                            next = arr[i + 1]
+                        }
+                        let δx = next[0] - prev[0]
+                        let δy = next[1] - prev[1]
+                        let tanθ = δy / δx
+                        let len = .5
                         let median
-                        if(thetaY > 0)
-                        {
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
+                        let Xa = (next[0] + prev[0]) / 2,
+                            Ya = (next[1] + prev[1]) / 2,
+                            Xb, Yb
+                            
+                        // TODO: 
+                        if(tanθ > 0){
+                            Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                            Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                        }else{
+                            Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                            Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
                         }
-                        else
-                        {
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
-                        }
+
+                        median = [
+                            [Xa, Ya], 
+                            [Xb, Yb]
+                        ]
+
                         MedianVerticalPoints.push(median)
                     }
-                    let prev = arr[arr.length-1]
-                    let next = arr[0]
-                    let thetaX = (next[0] - prev[0])
-                    let thetaY = (next[1] - prev[1])
-                    let theta_Virtical = thetaX / thetaY
-                    let extend = .02
-                    let median
-                    if(thetaY > 0)
-                    {
-                        median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
-                    }
-                    else
-                    {
-                        median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
-                    }
-                    MedianVerticalPoints.push(median)
+                    
                     return  MedianVerticalPoints 
                 }
                 let MedianVerticalPoints = getMedialVerticalPoints(even_points)
