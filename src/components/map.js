@@ -159,6 +159,12 @@ class BaseMap extends Component {
         return result
     }
 
+    vLineEquation(A, B, x){ // A, B are known points
+        let k = (B.x-A.x)/(B.y-A.y)
+        
+        return -1*k*x + k*(A.x+B.x)/2 + (A.y+B.y)/2
+    }
+
     getVerticalPathFromEvenPoint(){
         // TODO:
     }
@@ -274,12 +280,48 @@ class BaseMap extends Component {
                             Xb, Yb
                             
                         // TODO: 
+                        // if(tanθ > 0){
+                        //     Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                        //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                        // }else{
+                        //     Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                        //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                        // }
+                        // if(δy > 0){
+                        //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                        // }else{
+                        //     Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
+                        // }
+
+                        // if(δx > 0){
+                        //     if(tanθ > 0){ // 同号
+                        //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                        //     }else{ // 异号
+                        //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                        //     }
+                        // }else{
+                        //     if(tanθ > 0){ // 异号
+                        //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                        //     }else{ // 同号
+                        //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                        //     }
+                        // }
                         if(tanθ > 0){
-                            Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                            Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                            if(δy > 0){
+                                Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                                Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                            }else{
+                                Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
+                                Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                            }
                         }else{
-                            Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                            Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                            if(δy > 0){
+                                Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                                Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                            }else{
+                                Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
+                                Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                            }
                         }
 
                         median = [
