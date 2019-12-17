@@ -73,21 +73,24 @@ class BaseMap extends Component {
     // when component will mount, fetch geojson and csv data locally
     componentDidMount(){
         let _me = this
+
+        paper.setup('myCanvas')
+
         fetch("/chinaGeo.geojson")
-        .then(response => {
-            if (response.status !== 200){
-                console.log('can not load geojson file')
-                return
-            }
-            response.json().then(chinaGeoData => {
-                console.log(chinaGeoData.features)
-                this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
-                this.setState ({
-                    chinaGeoData:  chinaGeoData.features,
-                    outerBoundary: chinaGeoData.features[16].geometry.coordinates
+            .then(response => {
+                if (response.status !== 200){
+                    console.log('can not load geojson file')
+                    return
+                }
+                response.json().then(chinaGeoData => {
+                    console.log(chinaGeoData.features)
+                    this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
+                    this.setState ({
+                        chinaGeoData:  chinaGeoData.features,
+                        outerBoundary: chinaGeoData.features[16].geometry.coordinates
+                    })
                 })
             })
-        })
 
         csv('/religious_data.csv').then( data => {
             //string to number
@@ -99,13 +102,12 @@ class BaseMap extends Component {
             })
             return data
       
-          }).then( data => {
-            const ZhejiangData = data.filter( (d) => {
-              return d.province === "Hunan"
+            }).then( data => {
+                const ZhejiangData = data.filter( (d) => {
+                    return d.province === "Hunan"
+                })
+                this.setState({ZhejiangData: ZhejiangData})
             })
-            this.setState({ZhejiangData: ZhejiangData})
-      
-          })
     }
 
     calcDistanceFromTwoPoints(point1, point2) {
@@ -161,12 +163,131 @@ class BaseMap extends Component {
 
     vLineEquation(A, B, x){ // A, B are known points
         let k = (B.x-A.x)/(B.y-A.y)
-        
+
         return -1*k*x + k*(A.x+B.x)/2 + (A.y+B.y)/2
     }
 
-    getVerticalPathFromEvenPoint(){
+    getVerticalPathFromEvenPoint(arr){
         // TODO:
+        let MedianVerticalPoints = [],
+            prev, next
+        
+        for (let i = 0; i < arr.length; i++) {
+            if(i === arr.length - 1){
+                prev = arr[arr.length-1]
+                next = arr[0]
+            }else{
+                prev = arr[i]
+                next = arr[i + 1]
+            }
+            let δx = next[0] - prev[0]
+            let δy = next[1] - prev[1]
+            let tanθ = δy / δx
+            let len = .5
+            let median
+            let Xa = (next[0] + prev[0]) / 2,
+                Ya = (next[1] + prev[1]) / 2,
+                Xb, Yb
+                
+            // TODO: 
+            // if(tanθ > 0){
+            //     Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+            // }else{
+            //     Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+            // }
+            // if(δy > 0){
+            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+            // }else{
+            //     Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
+            // }
+
+            // if(δx > 0){
+            //     if(tanθ > 0){ // 同号
+            //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+            //     }else{ // 异号
+            //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+            //     }
+            // }else{
+            //     if(tanθ > 0){ // 异号
+            //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+            //     }else{ // 同号
+            //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+            //     }
+            // }
+            if(tanθ > 0){
+                if(δy > 0){
+                    Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                    Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                }else{
+                    Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
+                    Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                }
+            }else{
+                if(δy > 0){
+                    Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
+                    Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                }else{
+                    Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
+                    Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                }
+            }
+
+            median = [
+                [Xa, Ya], 
+                [Xb, Yb]
+            ]
+
+            MedianVerticalPoints.push(median)
+        }
+        
+        return  MedianVerticalPoints 
+    }
+
+    getClosestIntersectPoints(v_end_points, medialPath){
+        let _me = this,
+            intersect_paths = [],
+            // p_mats = new paper.Path(medialPath),
+            inter_points = []
+
+        v_end_points.forEach(e=>{
+            let p0 = _me.autoProjection(e[0]),
+                p1 = _me.autoProjection(e[1])
+
+            let v_path = new paper.Path(`M${p0[0]} ${p0[1]} L${p1[0]} ${p1[1]}`)
+
+            let intersect_points = []
+            
+            medialPath.forEach(e=>{
+                let p_mat = new paper.Path(e),
+                    temp_inter = p_mat.getIntersections(v_path)
+                // console.log('temp_inter', temp_inter)
+                if(temp_inter.length > 0){
+                    intersect_points = intersect_points.concat(temp_inter)
+                }
+            })
+
+            if(intersect_points.length > 0){
+                let temp_point,
+                    temp_dis = Infinity
+
+                intersect_points.forEach(e=>{
+                    let curr = _me.calcDistanceFromTwoPoints(p0, [e.point.x, e.point.y])
+    
+                    if(curr < temp_dis){
+                        temp_dis = curr
+                        temp_point = [e.point.x, e.point.y]
+                    }
+
+                    inter_points.push([e.point.x, e.point.y])
+                })
+    
+                intersect_paths.push([p0, temp_point])
+            }
+        })
+
+        return [intersect_paths, inter_points]
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -174,20 +295,11 @@ class BaseMap extends Component {
 
         if(prevState.outerBoundary !== this.state.outerBoundary) {
         // store computed dots and paths 
-        let resDots = [];
-        const resPaths = []
+        let resDots = []
+        let resPaths = []
         // loops data format
-        // let testloop = [
-        // [
-        //     [[50.000, 95.000],[92.797, 63.905]], 
-        //     [[92.797, 63.905],[76.450, 13.594]],
-        //     [[76.450, 13.594],[23.549, 13.594]],
-        //     [[23.549, 13.594],[7.202, 63.90]],
-        //     [[7.202,  63.900],[50.000, 95.000]]
-        // ]
-        // ];
         let resloop = this.constructList(this.state.outerBoundary[0])
-        let mats = findMats(resloop, 1);
+        let mats = findMats(resloop, 1)
         //traverse
         mats.forEach(f)
         function f(mat){
@@ -211,7 +323,8 @@ class BaseMap extends Component {
                 }
             })
         }
-        let medialPath = resPaths.join('')
+        let medialPath = resPaths.join(' ')
+        console.log('resPaths', resPaths)
 
         this.state.chinaGeoData.map((d,i) => {
             if (d.properties.name === '湖南'){
@@ -219,49 +332,12 @@ class BaseMap extends Component {
                 let mainArea = d.geometry.coordinates
                 // let interpolateNum = 3
 
-                function getInterpolatePoints(arr, interpolateNum) {
-                    let interpolatePoints = []
-                    arr.forEach(e=>{
-                        for(let i=0; i< e.length; i++) {
-                            if(i<e.length-1)
-                            {
-                                let prev = e[i]
-                                let next = e[i+1]
-                                let thetaX = ( next[0] - prev[0] ) 
-                                let thetaY = ( next[1] - prev[1] )
-                                for(let j=1; j<= interpolateNum; j++ ) {
-                                    let cur = []
-                                    cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                                    cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                                    interpolatePoints.push(cur)
-                                }
-                            }
-                            else if(i === e.length-1)
-                            {
-                                let prev = e[i]
-                                let next = e[0]
-                                let thetaX = ( next[0] - prev[0] ) 
-                                let thetaY = ( next[1] - prev[1] )
-                                for(let j=1; j<= interpolateNum; j++ ) {
-                                    let cur = []
-                                    cur[0] = prev[0] + ( j / interpolateNum ) * thetaX 
-                                    cur[1] = prev[1] + ( j / interpolateNum ) * thetaY
-                                    interpolatePoints.push(cur)
-                                }
-                            }
-                            
-                        }
-                    })
-                    return interpolatePoints
-                }
-                // let interpolatePoints = getInterpolatePoints(mainArea, 3)
-
-                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], _me.state.segment_path_len)
+                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.08)
                
                 function getMedialVerticalPoints(arr) {
                     let MedianVerticalPoints = [],
                         prev, next
-                    
+
                     for (let i = 0; i < arr.length; i++) {
                         if(i === arr.length - 1){
                             prev = arr[arr.length-1]
@@ -270,65 +346,20 @@ class BaseMap extends Component {
                             prev = arr[i]
                             next = arr[i + 1]
                         }
-                        let δx = next[0] - prev[0]
-                        let δy = next[1] - prev[1]
-                        let tanθ = δy / δx
-                        let len = .5
+
+                        let thetaX = (next[0] - prev[0])
+                        let thetaY = (next[1] - prev[1])
+                        let theta_Virtical = thetaX / thetaY
+                        let extend = 3
                         let median
-                        let Xa = (next[0] + prev[0]) / 2,
-                            Ya = (next[1] + prev[1]) / 2,
-                            Xb, Yb
-                            
-                        // TODO: 
-                        // if(tanθ > 0){
-                        //     Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                        //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                        // }else{
-                        //     Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                        //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                        // }
-                        // if(δy > 0){
-                        //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                        // }else{
-                        //     Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-                        // }
-
-                        // if(δx > 0){
-                        //     if(tanθ > 0){ // 同号
-                        //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                        //     }else{ // 异号
-                        //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                        //     }
-                        // }else{
-                        //     if(tanθ > 0){ // 异号
-                        //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                        //     }else{ // 同号
-                        //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                        //     }
-                        // }
-                        if(tanθ > 0){
-                            if(δy > 0){
-                                Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                                Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                            }else{
-                                Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-                                Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                            }
-                        }else{
-                            if(δy > 0){
-                                Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                                Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                            }else{
-                                Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-                                Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-                            }
+                        if(thetaY > 0)
+                        {
+                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
                         }
-
-                        median = [
-                            [Xa, Ya], 
-                            [Xb, Yb]
-                        ]
-
+                        else
+                        {
+                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
+                        }
                         MedianVerticalPoints.push(median)
                     }
                     
@@ -337,63 +368,67 @@ class BaseMap extends Component {
                 let MedianVerticalPoints = getMedialVerticalPoints(even_points)
                 
                 function getPathsfromPoints(arr) {
-                    let MedialVerticalPaths = []
+                    let paths = []
+
                     for (let i=0; i< arr.length; i++) {
                         let x0 = _me.autoProjection(arr[i][0])[0], 
                             y0 = _me.autoProjection(arr[i][0])[1]
                         let x1 = _me.autoProjection(arr[i][1])[0], 
                             y1 = _me.autoProjection(arr[i][1])[1]
 
-                        MedialVerticalPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
+                        paths.push(`M${x0} ${y0} L${x1} ${y1}`);
                     }
-                    return MedialVerticalPaths
+                    return paths
                 }
                 let MedialVerticalPaths = getPathsfromPoints(MedianVerticalPoints)
                 
                 function CalculateIntersection(path1, path2) {  
                     var intersection = intersect(path1, path2)
+
                     return intersection
                 }
 
-                let paper_inter, test_near_points = []
-                if(this.state.chinaGeoData){
-                    paper.setup('myCanvas')
+                // let paper_inter, test_near_points = []
+                // if(this.state.chinaGeoData){
 
-                    let test_path1 = new paper.Path('M298.6176759180689 454.83509800690354 L327.91220863382114 436.9236819216658'),
-                        p1 = [298.6176759180689, 454.83509800690354],
-                        test_path2 = new paper.Path('M275.48356169878025 368.7534409032455 L300.59881713695455 410.0156271911363'),
-                        p2 = [275.48356169878025, 368.7534409032455],
-                        test_medialPath = new paper.Path(medialPath)
+                //     let test_path1 = new paper.Path('M298.6176759180689 454.83509800690354 L327.91220863382114 436.9236819216658'),
+                //         p1 = [298.6176759180689, 454.83509800690354],
+                //         test_path2 = new paper.Path('M275.48356169878025 368.7534409032455 L300.59881713695455 410.0156271911363'),
+                //         p2 = [275.48356169878025, 368.7534409032455],
+                //         test_medialPath = new paper.Path(medialPath)
 
-                    let inter1 = test_medialPath.getIntersections(test_path1)
-                    let inter2 = test_medialPath.getIntersections(test_path2)
-                    paper_inter = [].concat(inter1, inter2)
-                    console.log('TEST', paper_inter)
+                //     let inter1 = test_medialPath.getIntersections(test_path1)
+                //     let inter2 = test_medialPath.getIntersections(test_path2)
+                //     paper_inter = [].concat(inter1, inter2)
+                //     console.log('TEST', paper_inter)
 
-                    let point1, dis1 = Infinity
-                    inter1.forEach((e)=>{
-                        let curr = _me.calcDistanceFromTwoPoints(p1, [e.point.x, e.point.y])
+                //     let point1, dis1 = Infinity
+                //     inter1.forEach((e)=>{
+                //         let curr = _me.calcDistanceFromTwoPoints(p1, [e.point.x, e.point.y])
 
-                        if(curr < dis1){
-                            dis1 = curr
-                            point1 = [e.point.x, e.point.y]
-                        }
-                    })
+                //         if(curr < dis1){
+                //             dis1 = curr
+                //             point1 = [e.point.x, e.point.y]
+                //         }
+                //     })
 
-                    let point2, dis2 = Infinity
-                    inter2.forEach((e)=>{
-                        let curr = _me.calcDistanceFromTwoPoints(p2, [e.point.x, e.point.y])
+                //     let point2, dis2 = Infinity
+                //     inter2.forEach((e)=>{
+                //         let curr = _me.calcDistanceFromTwoPoints(p2, [e.point.x, e.point.y])
 
-                        if(curr < dis2){
-                            dis2 = curr
-                            point2 = [e.point.x, e.point.y]
-                        }
-                    })
+                //         if(curr < dis2){
+                //             dis2 = curr
+                //             point2 = [e.point.x, e.point.y]
+                //         }
+                //     })
 
-                    test_near_points.push(point1, point2)
+                //     test_near_points.push(point1, point2)
 
-                    console.log('test_near_points', test_near_points)
-                }
+                //     console.log('test_near_points', test_near_points)
+                // }
+
+                let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
+                console.log('nk_intersect_points', nk_intersect_points)
                 
                 
                 function getIntersectPoints(arr) {  
@@ -419,11 +454,6 @@ class BaseMap extends Component {
                     let distance = Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
                     return distance
                 }
-                // console.log("interpolatePoints", interpolatePoints.length)
-                console.log("MedianVerticalPt", MedianVerticalPoints.length)
-                console.log("MedialVerticalPaths", MedialVerticalPaths.length)
-                // console.log("intersectPoints", intersectPoints)
-                
 
                 function GetClosestPoint(arr1, arr2) {
                     let segmentBorderPoints = []
@@ -455,17 +485,18 @@ class BaseMap extends Component {
                 let segmentBorderPoints = GetClosestPoint(even_points, intersectPoints)
 
                 function getLinesfromPoints(arr) {
-                    let segmentBorderPaths = []
-                    let countError = 0
-                    for (let i=0; i< arr.length-1; i++) {
-                        let x0 = arr[i][0][0], y0 = arr[i][0][1]
-                        let x1 = arr[i][1][0], y1 =arr[i][1][1]
+                    let lines = []
 
-                        segmentBorderPaths.push(`M${x0} ${y0} L${x1} ${y1}`);
-  
+                    for (let i=0; i < arr.length-1; i++) {
+                        let x0 = arr[i][0][0],
+                            y0 = arr[i][0][1],
+                            x1 = arr[i][1][0],
+                            y1 = arr[i][1][1]
+
+                        lines.push(`M${x0} ${y0} L${x1} ${y1}`)
                     }
-                    console.log(countError)
-                    return segmentBorderPaths
+
+                    return lines
                 }
 				
 				function MedianVerticalSegments(arr){
@@ -483,7 +514,8 @@ class BaseMap extends Component {
 				}
 				
 				let SegmentPoints = MedianVerticalSegments(segmentBorderPoints)
-                let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+                // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+                let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
 
                 this.setState({
                     // interpolatePoints: interpolatePoints,
@@ -492,8 +524,8 @@ class BaseMap extends Component {
                     resPaths: medialPath,
                     segmentBorderPaths: segmentBorderPaths,
                     even_points: even_points,
-                    paper_inter: paper_inter,
-                    test_near_points: test_near_points
+                    paper_inter: nk_intersect_points[1]
+                    // test_near_points: test_near_points
                 })
                 
             }
@@ -641,7 +673,7 @@ class BaseMap extends Component {
 					//SegmentDots,
                     verticalLines,
                     evenPoints,
-                    medial_vertical_paths,
+                    // medial_vertical_paths,
                     // paper_inter
                 ]
             }
@@ -679,8 +711,8 @@ class BaseMap extends Component {
                     key = {`paper_inter-${i}`}
                     r = "1"
                     fill = "#009dec"
-                    cx = {d.point.x}
-                    cy = {d.point.y}
+                    cx = {d[0]}
+                    cy = {d[1]}
                     />
                 )
             })
