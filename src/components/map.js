@@ -332,7 +332,7 @@ class BaseMap extends Component {
                 let mainArea = d.geometry.coordinates
                 // let interpolateNum = 3
 
-                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.08)
+                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
                
                 function getMedialVerticalPoints(arr) {
                     let MedianVerticalPoints = [],
