@@ -349,8 +349,9 @@ class BaseMap extends Component {
                 // compute interpolate  interpolate array with original boundary array
                 let mainArea = d.geometry.coordinates
                 // let interpolateNum = 3
+                console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
-                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
+                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0].slice(0, 20), 0.05)
             
                 let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
                 
