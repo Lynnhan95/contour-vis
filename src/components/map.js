@@ -183,7 +183,7 @@ class BaseMap extends Component {
             let δx = next[0] - prev[0]
             let δy = next[1] - prev[1]
             let tanθ = δy / δx
-            let len = .5
+            let len = 1
             let median
             let Xa = (next[0] + prev[0]) / 2,
                 Ya = (next[1] + prev[1]) / 2,
@@ -290,6 +290,25 @@ class BaseMap extends Component {
         return [intersect_paths, inter_points]
     }
 
+    getPathsfromPoints(arr) {
+        let _me = this,
+            paths = []
+
+        for (let i=0; i< arr.length; i++) {
+            // TODO: some points will lost after projection because
+            // they are a little large
+            let x0 = _me.autoProjection(arr[i][0])[0], 
+                y0 = _me.autoProjection(arr[i][0])[1]
+            let x1 = _me.autoProjection(arr[i][1])[0], 
+                y1 = _me.autoProjection(arr[i][1])[1]
+
+            paths.push(`M${x0} ${y0} L${x1} ${y1}`);
+            
+        }
+
+        return paths
+    }
+
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
@@ -332,55 +351,10 @@ class BaseMap extends Component {
                 // let interpolateNum = 3
 
                 let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
-               
-                function getMedialVerticalPoints(arr) {
-                    let MedianVerticalPoints = [],
-                        prev, next
-
-                    for (let i = 0; i < arr.length; i++) {
-                        if(i === arr.length - 1){
-                            prev = arr[arr.length - 1]
-                            next = arr[0]
-                        }else{
-                            prev = arr[i]
-                            next = arr[i + 1]
-                        }
-
-                        let thetaX = (next[0] - prev[0])
-                        let thetaY = (next[1] - prev[1])
-                        let theta_Virtical = thetaX / thetaY
-                        let extend = 2
-                        let median
-                        if(thetaY > 0){
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
-                        }else{
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
-                        }
-                        MedianVerticalPoints.push(median)
-                    }
-                    
-                    return  MedianVerticalPoints 
-                }
-                let MedianVerticalPoints = getMedialVerticalPoints(even_points)
+            
+                let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
                 
-                function getPathsfromPoints(arr) {
-                    let paths = []
-
-                    for (let i=0; i< arr.length; i++) {
-                        // TODO: some points will lost after projection because
-                        // they are a little large
-                        let x0 = _me.autoProjection(arr[i][0])[0], 
-                            y0 = _me.autoProjection(arr[i][0])[1]
-                        let x1 = _me.autoProjection(arr[i][1])[0], 
-                            y1 = _me.autoProjection(arr[i][1])[1]
-
-                        paths.push(`M${x0} ${y0} L${x1} ${y1}`);
-                        
-                    }
-
-                    return paths
-                }
-                let MedialVerticalPaths = getPathsfromPoints(MedianVerticalPoints)
+                let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
                 // console.log('MedialVerticalPaths', MedianVerticalPoints)
 
                 let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
