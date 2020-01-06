@@ -190,32 +190,6 @@ class BaseMap extends Component {
                 Xb, Yb
                 
             // TODO: 
-            // if(tanθ > 0){
-            //     Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-            // }else{
-            //     Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-            // }
-            // if(δy > 0){
-            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-            // }else{
-            //     Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-            // }
-
-            // if(δx > 0){
-            //     if(tanθ > 0){ // 同号
-            //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }else{ // 异号
-            //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }
-            // }else{
-            //     if(tanθ > 0){ // 异号
-            //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }else{ // 同号
-            //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }
-            // }
             if(tanθ > 0){
                 if(δy > 0){
                     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
@@ -351,7 +325,7 @@ class BaseMap extends Component {
                 // let interpolateNum = 3
                 console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
-                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0].slice(0, 20), 0.05)
+                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0].slice(0, 10), 0.05)
             
                 let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
                 
