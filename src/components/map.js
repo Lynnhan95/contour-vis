@@ -225,22 +225,10 @@ class BaseMap extends Component {
             // console.log('jie_x', jie_x)
                 
             // TODO: 
-            if(tanθ > 0){
-                if(δy > 0){
-                    // N.y = M.y + (len / Math.sqrt(tanθ*tanθ + 1))
-                    N.x = jie_x.pos
-                }else{
-                    // N.y = M.y - (len / Math.sqrt(tanθ*tanθ + 1))
-                    N.x = jie_x.neg
-                }
+            if(δy > 0){
+                N.x = jie_x.pos
             }else{
-                if(δy > 0){
-                    // N.y = M.y + (len / Math.sqrt(tanθ*tanθ + 1))
-                    N.x = jie_x.pos
-                }else{
-                    // N.y = M.y - (len / Math.sqrt(tanθ*tanθ + 1))
-                    N.x = jie_x.neg
-                }
+                N.x = jie_x.neg
             }
             N.y = this.getPerpendicularYfromX(A, B, N.x)
 
