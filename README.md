@@ -43,3 +43,6 @@ computes all segments —> color ranges
 
 ![even_points](./src/assets/test-intersect.jpg)
 
+3. Done: Medial axis + segmentation
+
+![segmentation](./src/assets/0108.jpg)

@@ -161,10 +161,26 @@ class BaseMap extends Component {
         return result
     }
 
-    perpendicularEquation(A, B, x){ // A, B are line end points
+    getPerpendicularYfromX(A, B, x){ // A, B are line end points
         let k = (B.x-A.x)/(B.y-A.y)
 
         return -1*k*x + k*(A.x+B.x)/2 + (A.y+B.y)/2
+    }
+
+    getPerpendicularXfromAB(A, B, len){
+        let M = {
+                x: (B.x + A.x) / 2
+            },
+            k = (B.x-A.x)/(B.y-A.y),
+            x = {
+                pos: null,
+                neg: null
+            }
+        
+        x.pos = M.x + len/Math.sqrt(k*k + 1)
+        x.neg = M.x - len/Math.sqrt(k*k + 1)
+
+        return x
     }
 
     getVerticalPathFromEvenPoint(arr){
@@ -195,12 +211,8 @@ class BaseMap extends Component {
             let δx = B.x - A.x
             let δy = B.y - A.y
             let tanθ = δy / δx
-            let len = 1
-            let median
-            let Mx = (B.x + A.x) / 2,
-                My = (B.y + A.y) / 2,
-                Nx, Ny,
-                M = {
+            let len = 2
+            let M = {
                     x: (B.x + A.x) / 2,
                     y: (B.y + A.y) / 2
                 },
@@ -208,29 +220,33 @@ class BaseMap extends Component {
                     x: null,
                     y: null
                 }
+
+            let jie_x = this.getPerpendicularXfromAB(A, B, len)
+            // console.log('jie_x', jie_x)
                 
             // TODO: 
             if(tanθ > 0){
                 if(δy > 0){
-                    Ny = My + (len / Math.sqrt(tanθ*tanθ + 1))
-                    Nx = Mx + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y + (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.pos
                 }else{
-                    Ny = My - (len / Math.sqrt(tanθ*tanθ + 1))
-                    Nx = Mx - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y - (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.neg
                 }
             }else{
                 if(δy > 0){
-                    Ny = My + (len / Math.sqrt(tanθ*tanθ + 1))
-                    Nx = Mx + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y + (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.pos
                 }else{
-                    Ny = My - (len / Math.sqrt(tanθ*tanθ + 1))
-                    Nx = Mx - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y - (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.neg
                 }
             }
+            N.y = this.getPerpendicularYfromX(A, B, N.x)
 
-            median = [
-                [Mx, My], 
-                [Nx, Ny]
+            let median = [
+                [M.x, M.y], 
+                [N.x, N.y]
             ]
 
             MedianVerticalPoints.push(median)
@@ -345,7 +361,7 @@ class BaseMap extends Component {
                     // let interpolateNum = 3
                     console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
-                    let even_points = _me.getEvenPointsFromCoordinates(mainArea[0].slice(0, 10), 0.05)
+                    let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
                 
                     let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
                     
