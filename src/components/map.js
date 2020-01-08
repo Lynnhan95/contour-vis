@@ -161,82 +161,92 @@ class BaseMap extends Component {
         return result
     }
 
-    vLineEquation(A, B, x){ // A, B are known points
+    getPerpendicularYfromX(A, B, x){ // A, B are line end points
         let k = (B.x-A.x)/(B.y-A.y)
 
         return -1*k*x + k*(A.x+B.x)/2 + (A.y+B.y)/2
     }
 
+    getPerpendicularXfromAB(A, B, len){
+        let M = {
+                x: (B.x + A.x) / 2
+            },
+            k = (B.x-A.x)/(B.y-A.y),
+            x = {
+                pos: null,
+                neg: null
+            }
+        
+        x.pos = M.x + len/Math.sqrt(k*k + 1)
+        x.neg = M.x - len/Math.sqrt(k*k + 1)
+
+        return x
+    }
+
     getVerticalPathFromEvenPoint(arr){
         // TODO:
         let MedianVerticalPoints = [],
-            prev, next
+            A, B
         
         for (let i = 0; i < arr.length; i++) {
             if(i === arr.length - 1){
-                prev = arr[arr.length-1]
-                next = arr[0]
+                A = {
+                    x: arr[arr.length-1][0],
+                    y: arr[arr.length-1][1]
+                }
+                B = {
+                    x: arr[0][0],
+                    y: arr[0][1]
+                }
             }else{
-                prev = arr[i]
-                next = arr[i + 1]
+                A = {
+                    x: arr[i][0],
+                    y: arr[i][1]
+                }
+                B = {
+                    x: arr[i+1][0],
+                    y: arr[i+1][1]
+                }
             }
-            let δx = next[0] - prev[0]
-            let δy = next[1] - prev[1]
+            let δx = B.x - A.x
+            let δy = B.y - A.y
             let tanθ = δy / δx
-            let len = .5
-            let median
-            let Xa = (next[0] + prev[0]) / 2,
-                Ya = (next[1] + prev[1]) / 2,
-                Xb, Yb
+            let len = 2
+            let M = {
+                    x: (B.x + A.x) / 2,
+                    y: (B.y + A.y) / 2
+                },
+                N = {
+                    x: null,
+                    y: null
+                }
+
+            let jie_x = this.getPerpendicularXfromAB(A, B, len)
+            // console.log('jie_x', jie_x)
                 
             // TODO: 
-            // if(tanθ > 0){
-            //     Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-            // }else{
-            //     Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-            // }
-            // if(δy > 0){
-            //     Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-            // }else{
-            //     Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-            // }
-
-            // if(δx > 0){
-            //     if(tanθ > 0){ // 同号
-            //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }else{ // 异号
-            //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }
-            // }else{
-            //     if(tanθ > 0){ // 异号
-            //         Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }else{ // 同号
-            //         Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
-            //     }
-            // }
             if(tanθ > 0){
                 if(δy > 0){
-                    Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                    Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y + (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.pos
                 }else{
-                    Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-                    Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y - (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.neg
                 }
             }else{
                 if(δy > 0){
-                    Yb = Ya + (len / Math.sqrt(tanθ*tanθ + 1))
-                    Xb = Xa + (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y + (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.pos
                 }else{
-                    Yb = Ya - (len / Math.sqrt(tanθ*tanθ + 1))
-                    Xb = Xa - (len*tanθ / Math.sqrt(tanθ*tanθ + 1))
+                    // N.y = M.y - (len / Math.sqrt(tanθ*tanθ + 1))
+                    N.x = jie_x.neg
                 }
             }
+            N.y = this.getPerpendicularYfromX(A, B, N.x)
 
-            median = [
-                [Xa, Ya], 
-                [Xb, Yb]
+            let median = [
+                [M.x, M.y], 
+                [N.x, N.y]
             ]
 
             MedianVerticalPoints.push(median)
@@ -290,131 +300,106 @@ class BaseMap extends Component {
         return [intersect_paths, inter_points]
     }
 
+    getPathsfromPoints(arr) {
+        let _me = this,
+            paths = []
+
+        for (let i=0; i< arr.length; i++) {
+            // TODO: some points will lost after projection because
+            // they are a little large
+            let x0 = _me.autoProjection(arr[i][0])[0], 
+                y0 = _me.autoProjection(arr[i][0])[1]
+            let x1 = _me.autoProjection(arr[i][1])[0], 
+                y1 = _me.autoProjection(arr[i][1])[1]
+
+            paths.push(`M${x0} ${y0} L${x1} ${y1}`);
+            
+        }
+
+        return paths
+    }
+
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
         if(prevState.outerBoundary !== this.state.outerBoundary) {
-        // store computed dots and paths 
-        let resDots = []
-        let resPaths = []
-        // loops data format
-        let resloop = this.constructList(this.state.outerBoundary[0])
-        let mats = findMats(resloop, 1)
-        //traverse
-        mats.forEach(f)
-        function f(mat){
-            let cpNode = mat.cpNode
-            if(!cpNode) { return; }
-            // let bezier = cpNode.matCurveToNextVertex
-            traverseEdges(cpNode, function(cpNode){
-                if (cpNode.isTerminating()) { return ;}
-                let bezier = cpNode.matCurveToNextVertex.map(e=>{
-                    return _me.autoProjection(e)
+            // store computed dots and paths 
+            let resDots = []
+            let resPaths = []
+            // loops data format
+            let resloop = this.constructList(this.state.outerBoundary[0])
+            let mats = findMats(resloop, 1)
+            //traverse
+            mats.forEach(f)
+            function f(mat){
+                let cpNode = mat.cpNode
+                if(!cpNode) { return; }
+                // let bezier = cpNode.matCurveToNextVertex
+                traverseEdges(cpNode, function(cpNode){
+                    if (cpNode.isTerminating()) { return ;}
+                    let bezier = cpNode.matCurveToNextVertex.map(e=>{
+                        return _me.autoProjection(e)
+                    })
+                    if(!bezier) { return; }
+                    resDots.push(bezier)
+
+                    if(bezier.length === 2){
+                        resPaths.push(_me.getLinePathStr(bezier))
+                    }else if(bezier.length === 3){
+                        resPaths.push(_me.getQuadBezierPathStr(bezier))
+                    }else if(bezier.length === 4){
+                        resPaths.push(_me.getCubicBezierPathStr(bezier))
+                    }
                 })
-                if(!bezier) { return; }
-                resDots.push(bezier)
+            }
+            let medialPath = resPaths.join(' ')
 
-                if(bezier.length === 2){
-                    resPaths.push(_me.getLinePathStr(bezier))
-                }else if(bezier.length === 3){
-                    resPaths.push(_me.getQuadBezierPathStr(bezier))
-                }else if(bezier.length === 4){
-                    resPaths.push(_me.getCubicBezierPathStr(bezier))
-                }
-            })
-        }
-        let medialPath = resPaths.join(' ')
+            this.state.chinaGeoData.map((d,i) => {
+                if (d.properties.name === '湖南'){
+                    // compute interpolate  interpolate array with original boundary array
+                    let mainArea = d.geometry.coordinates
+                    // let interpolateNum = 3
+                    console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
-        this.state.chinaGeoData.map((d,i) => {
-            if (d.properties.name === '湖南'){
-                // compute interpolate  interpolate array with original boundary array
-                let mainArea = d.geometry.coordinates
-                // let interpolateNum = 3
+                    let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
+                
+                    let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
+                    
+                    let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
+                    // console.log('MedialVerticalPaths', MedianVerticalPoints)
 
-                let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
-               
-                function getMedialVerticalPoints(arr) {
-                    let MedianVerticalPoints = [],
-                        prev, next
+                    let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
 
-                    for (let i = 0; i < arr.length; i++) {
-                        if(i === arr.length - 1){
-                            prev = arr[arr.length - 1]
-                            next = arr[0]
-                        }else{
-                            prev = arr[i]
-                            next = arr[i + 1]
+                    function getLinesfromPoints(arr) {
+                        let lines = []
+
+                        for (let i=0; i < arr.length-1; i++) {
+                            let x0 = arr[i][0][0],
+                                y0 = arr[i][0][1],
+                                x1 = arr[i][1][0],
+                                y1 = arr[i][1][1]
+
+                            lines.push(`M${x0} ${y0} L${x1} ${y1}`)
                         }
 
-                        let thetaX = (next[0] - prev[0])
-                        let thetaY = (next[1] - prev[1])
-                        let theta_Virtical = thetaX / thetaY
-                        let extend = 2
-                        let median
-                        if(thetaY > 0){
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 + extend, (next[1] + prev[1]) / 2 - extend * theta_Virtical]]
-                        }else{
-                            median = [[(next[0] + prev[0]) / 2, (next[1] + prev[1]) / 2], [(next[0] + prev[0]) / 2 - extend, (next[1] + prev[1]) / 2 + extend * theta_Virtical]]
-                        }
-                        MedianVerticalPoints.push(median)
+                        return lines
                     }
                     
-                    return  MedianVerticalPoints 
+                    // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+                    let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
+
+                    this.setState({
+                        // interpolatePoints: interpolatePoints,
+                        //SegmentPoints: SegmentPoints,
+                        MedialVerticalPaths: MedialVerticalPaths,
+                        resPaths: medialPath,
+                        segmentBorderPaths: segmentBorderPaths,
+                        even_points: even_points,
+                        paper_inter: nk_intersect_points[1]
+                    })
+                    
                 }
-                let MedianVerticalPoints = getMedialVerticalPoints(even_points)
-                
-                function getPathsfromPoints(arr) {
-                    let paths = []
-
-                    for (let i=0; i< arr.length; i++) {
-                        // TODO: some points will lost after projection because
-                        // they are a little large
-                        let x0 = _me.autoProjection(arr[i][0])[0], 
-                            y0 = _me.autoProjection(arr[i][0])[1]
-                        let x1 = _me.autoProjection(arr[i][1])[0], 
-                            y1 = _me.autoProjection(arr[i][1])[1]
-
-                        paths.push(`M${x0} ${y0} L${x1} ${y1}`);
-                        
-                    }
-
-                    return paths
-                }
-                let MedialVerticalPaths = getPathsfromPoints(MedianVerticalPoints)
-                // console.log('MedialVerticalPaths', MedianVerticalPoints)
-
-                let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
-
-                function getLinesfromPoints(arr) {
-                    let lines = []
-
-                    for (let i=0; i < arr.length-1; i++) {
-                        let x0 = arr[i][0][0],
-                            y0 = arr[i][0][1],
-                            x1 = arr[i][1][0],
-                            y1 = arr[i][1][1]
-
-                        lines.push(`M${x0} ${y0} L${x1} ${y1}`)
-                    }
-
-                    return lines
-                }
-				
-                // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
-                let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
-
-                this.setState({
-                    // interpolatePoints: interpolatePoints,
-					//SegmentPoints: SegmentPoints,
-                    MedialVerticalPaths: MedialVerticalPaths,
-                    resPaths: medialPath,
-                    segmentBorderPaths: segmentBorderPaths,
-                    even_points: even_points,
-                    paper_inter: nk_intersect_points[1]
-                })
-                
-            }
-        })
+            })
         }
     }
 
