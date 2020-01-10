@@ -222,7 +222,6 @@ class BaseMap extends Component {
                 }
 
             let jie_x = this.getPerpendicularXfromAB(A, B, len)
-            // console.log('jie_x', jie_x)
                 
             // TODO: 
             if(δy > 0){
@@ -379,7 +378,7 @@ class BaseMap extends Component {
                     this.setState({
                         // interpolatePoints: interpolatePoints,
                         //SegmentPoints: SegmentPoints,
-                        MedialVerticalPaths: MedialVerticalPaths,
+                        // MedialVerticalPaths: MedialVerticalPaths,
                         resPaths: medialPath,
                         segmentBorderPaths: segmentBorderPaths,
                         even_points: even_points,
