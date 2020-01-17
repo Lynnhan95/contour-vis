@@ -6,6 +6,8 @@ import Offset from 'polygon-offset'
 import paper from 'paper'
 const intersect = require('path-intersection')
 
+import simplify from 'simplify-geojson'
+
 console.log('paper', paper)
 
 class BaseMap extends Component {
@@ -498,7 +500,6 @@ class BaseMap extends Component {
                         return null
                     }
                 })
-
                 let innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
 
                 let paddinged = {
@@ -522,6 +523,9 @@ class BaseMap extends Component {
                     strokeWidth = "0.2"
                     fill = "#edc949"
                     />
+
+                // TODO: 
+                var simplified = simplify(geojson, tolerance)
                 
                 return [
                     outsideBoundary, 
