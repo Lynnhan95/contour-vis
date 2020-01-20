@@ -70,6 +70,19 @@ class BaseMap extends Component {
         return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
     }
 
+    // offset boundary
+    getContour(data, index) {
+        let offsetCoordinates = data.map(e=>{
+            try {
+                let temp = new Offset(e).offset(this.offsetPadding* index)
+                return temp
+            } catch (error) {
+                return null
+            }
+        })
+        return offsetCoordinates
+    }
+
     // when component will mount, fetch geojson and csv data locally
     componentDidMount(){
         let _me = this
@@ -341,7 +354,7 @@ class BaseMap extends Component {
             }
             let medialPath = resPaths.join(' ')
 
-            this.state.chinaGeoData.map((d,i) => {
+            this.state.chinaGeoData.map((d,i)=> {
                 if (d.properties.name === '湖南'){
                     // compute interpolate  interpolate array with original boundary array
                     let mainArea = d.geometry.coordinates
@@ -489,52 +502,56 @@ class BaseMap extends Component {
                     fill = "#2c75b1"
                     />
 
-                // offset boundary
-                let offsetCoordinates = d.geometry.coordinates.map(e=>{
-                    try {
-                        let temp = new Offset(e).offset(this.offsetPadding)
-                        return temp
-                    } catch (error) {
-                        return null
+                // [offsetCoordinates, offsetCoordinates2, xxx3]    
+                let contourArr = []
+                for (let i=1; i<= 10; i++ ) {
+                    contourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
+                }
+
+                let paddingedArr = contourArr.map(e => {
+                    let paddinged = {
+                        type: 'Feature',
+                        properties: {
+                            id: "33-1",
+                            latitude: 29.1084,
+                            longitude: 119.97,
+                            name: "浙江"
+                        },  
+                        geometry: {
+                          type: 'MultiPolygon',
+                          coordinates: e
+                        }
                     }
+                    return paddinged
                 })
 
-                let innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
-
-                let paddinged = {
-                    type: 'Feature',
-                    properties: {
-                        id: "33-1",
-                        latitude: 29.1084,
-                        longitude: 119.97,
-                        name: "浙江"
-                    },  
-                    geometry: {
-                      type: 'MultiPolygon',
-                      coordinates: innerBoundaryCoordinates
-                    }
-                }
+                console.log(paddingedArr)
                 
-                let innerBoundary = <path
+                let innerBoundaryArr = paddingedArr.map((e, i) => {
+                    console.log(i)
+                    return <path
                     key = {`path-${ ++i }`}
-                    d = { geoPath().projection(this.autoProjection)(paddinged) }
-                    stroke = "#fff"
+                    d = { geoPath().projection(this.autoProjection)(e) }
+                    stroke = "#000"
                     strokeWidth = "0.2"
-                    fill = "#edc949"
+                    fill = {i ==1 ? '#edc949' : 'transparent'}
                     />
-                
-                return [
-                    outsideBoundary, 
-                    innerBoundary,
-                    boundaryDots,
-					//SegmentDots,
-                    verticalLines,
-                    evenPoints,
-                    medial_vertical_paths
-                    // paper_inter
-                ]
+                }) 
+
+                return  [outsideBoundary, 
+                         boundaryDots
+                        ]
+                        .concat(innerBoundaryArr)
+                        .concat(
+                        [
+                         //SegmentDots,
+                         verticalLines,
+                         evenPoints,
+                         medial_vertical_paths,
+                         // paper_inter
+                        ]
+                        )
             }
-            
         })
 
         //draw medial axis to the map
