@@ -4,16 +4,18 @@ import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import Offset from 'polygon-offset'
 import paper from 'paper'
+import CountPoint from './countPoint'
+
 const intersect = require('path-intersection')
 
-console.log('paper', paper)
+// console.log('paper', paper)
 
 class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
             chinaGeoData: [],
-            ZhejiangData:[],
+            pointsData:[],
             resDots: null,
             segment_path_len: 0.1
         }
@@ -70,19 +72,6 @@ class BaseMap extends Component {
         return `M${x0} ${y0} C${x1} ${y1} ${x2} ${y2} ${x3} ${y3}`;
     }
 
-    // offset boundary
-    getContour(data, index) {
-        let offsetCoordinates = data.map(e=>{
-            try {
-                let temp = new Offset(e).offset(this.offsetPadding* index)
-                return temp
-            } catch (error) {
-                return null
-            }
-        })
-        return offsetCoordinates
-    }
-
     // when component will mount, fetch geojson and csv data locally
     componentDidMount(){
         let _me = this
@@ -96,7 +85,7 @@ class BaseMap extends Component {
                     return
                 }
                 response.json().then(chinaGeoData => {
-                    console.log(chinaGeoData.features)
+                    // console.log(chinaGeoData.features)
                     this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
                     this.setState ({
                         chinaGeoData:  chinaGeoData.features,
@@ -116,10 +105,16 @@ class BaseMap extends Component {
             return data
       
             }).then( data => {
-                const ZhejiangData = data.filter( (d) => {
+                const pointsData = data.filter( (d) => {
                     return d.province === "Hunan"
                 })
-                this.setState({ZhejiangData: ZhejiangData})
+                // .map( (d) => {
+                //     console.log(d)
+                //     return [ d.Longitude, d.Latitude ]
+
+                // })
+                // console.log(pointsData)
+                this.setState({pointsData: pointsData})
             })
     }
 
@@ -354,12 +349,13 @@ class BaseMap extends Component {
             }
             let medialPath = resPaths.join(' ')
 
-            this.state.chinaGeoData.map((d,i)=> {
+            this.state.chinaGeoData.map((d,i) => {
                 if (d.properties.name === '湖南'){
                     // compute interpolate  interpolate array with original boundary array
                     let mainArea = d.geometry.coordinates
+                    this.setState({mainArea: mainArea})
                     // let interpolateNum = 3
-                    console.log('mainArea[0]', mainArea[0].slice(0, 10))
+                    // console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
                     let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
                 
@@ -410,7 +406,7 @@ class BaseMap extends Component {
              * only render zhejiang for showing more detail
              */
             if(d.properties.name === '湖南'){
-                console.log('湖南', d)
+                // console.log('湖南', d)
                 // no smooth boundary anymore, because that increase complexity for now
 
                 let verticalLines
@@ -502,56 +498,52 @@ class BaseMap extends Component {
                     fill = "#2c75b1"
                     />
 
-                // [offsetCoordinates, offsetCoordinates2, xxx3]    
-                let contourArr = []
-                for (let i=1; i<= 10; i++ ) {
-                    contourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
-                }
-
-                let paddingedArr = contourArr.map(e => {
-                    let paddinged = {
-                        type: 'Feature',
-                        properties: {
-                            id: "33-1",
-                            latitude: 29.1084,
-                            longitude: 119.97,
-                            name: "浙江"
-                        },  
-                        geometry: {
-                          type: 'MultiPolygon',
-                          coordinates: e
-                        }
+                // offset boundary
+                let offsetCoordinates = d.geometry.coordinates.map(e=>{
+                    try {
+                        let temp = new Offset(e).offset(this.offsetPadding)
+                        return temp
+                    } catch (error) {
+                        return null
                     }
-                    return paddinged
                 })
 
-                console.log(paddingedArr)
-                
-                let innerBoundaryArr = paddingedArr.map((e, i) => {
-                    console.log(i)
-                    return <path
-                    key = {`path-${ ++i }`}
-                    d = { geoPath().projection(this.autoProjection)(e) }
-                    stroke = "#000"
-                    strokeWidth = "0.2"
-                    fill = {i ==1 ? '#edc949' : 'transparent'}
-                    />
-                }) 
+                let innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
 
-                return  [outsideBoundary, 
-                         boundaryDots
-                        ]
-                        .concat(innerBoundaryArr)
-                        .concat(
-                        [
-                         //SegmentDots,
-                         verticalLines,
-                         evenPoints,
-                         medial_vertical_paths,
-                         // paper_inter
-                        ]
-                        )
+                let paddinged = {
+                    type: 'Feature',
+                    properties: {
+                        id: "33-1",
+                        latitude: 29.1084,
+                        longitude: 119.97,
+                        name: "浙江"
+                    },  
+                    geometry: {
+                      type: 'MultiPolygon',
+                      coordinates: innerBoundaryCoordinates
+                    }
+                }
+                
+                let innerBoundary = <path
+                    key = {`path-${ ++i }`}
+                    d = { geoPath().projection(this.autoProjection)(paddinged) }
+                    stroke = "#fff"
+                    strokeWidth = "0.2"
+                    fill = "#edc949"
+                    />
+                
+                return [
+                    outsideBoundary, 
+                    innerBoundary,
+                    boundaryDots,
+					//SegmentDots,
+                    verticalLines,
+                    evenPoints,
+                    medial_vertical_paths
+                    // paper_inter
+                ]
             }
+            
         })
 
         //draw medial axis to the map
@@ -565,7 +557,8 @@ class BaseMap extends Component {
         }
 
         // draw dots to the map 
-        const Dots = this.state.ZhejiangData.map((d,i) => {
+        const Dots = this.state.pointsData.map((d,i) => {
+            // console.log([ d.Longitude, d.Latitude ])
             return (
             <circle 
             key = {`dot-${ i }`}
@@ -627,6 +620,7 @@ class BaseMap extends Component {
                 {test_near}
             </g>
             </svg>
+            <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/>
         </div>
         
         )
