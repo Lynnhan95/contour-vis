@@ -1,14 +1,15 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
 import { csv } from 'd3'
-import { findMats, traverseEdges } from 'flo-mat'
+import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
+// import  getThinnedPath  from './src/get-thinned-path';
 import Offset from 'polygon-offset'
 import paper from 'paper'
 import CountPoint from './countPoint'
 
 const intersect = require('path-intersection')
 
-console.log('paper', paper)
+// console.log('paper', paper)
 
 class BaseMap extends Component {
     constructor(){
@@ -98,7 +99,7 @@ class BaseMap extends Component {
                     return
                 }
                 response.json().then(chinaGeoData => {
-                    console.log(chinaGeoData.features)
+                    // console.log(chinaGeoData.features)
                     this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
                     this.setState ({
                         chinaGeoData:  chinaGeoData.features,
@@ -359,13 +360,17 @@ class BaseMap extends Component {
             }
             let medialPath = resPaths.join(' ')
 
+            let s = 2.5;
+            let sats = mats.map(mat => toScaleAxis(mat, s));
+            // let pathStr = getThinnedPath(sats, 0.3);
+
             this.state.chinaGeoData.map((d,i)=> {
                 if (d.properties.name === '湖南'){
                     // compute interpolate  interpolate array with original boundary array
                     let mainArea = d.geometry.coordinates
-                    console.log(mainArea)
+                    // console.log(mainArea)
                     // let interpolateNum = 3
-                    console.log('mainArea[0]', mainArea[0].slice(0, 10))
+                    // console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
                     let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
                 
@@ -408,6 +413,11 @@ class BaseMap extends Component {
                 }
             })
         }
+
+        if (prevState.pointsData !== this.state.pointsData) {
+            console.log(CountPoint( this.state.mainArea ,this.state.pointsData))
+        }
+        
     }
 
     render() {
@@ -417,7 +427,7 @@ class BaseMap extends Component {
              * only render zhejiang for showing more detail
              */
             if(d.properties.name === '湖南'){
-                console.log('湖南', d)
+                // console.log('湖南', d)
                 // no smooth boundary anymore, because that increase complexity for now
 
                 let verticalLines
@@ -532,10 +542,10 @@ class BaseMap extends Component {
                     return paddinged
                 })
 
-                console.log(paddingedArr)
+                // console.log(paddingedArr)
                 
                 let innerBoundaryArr = paddingedArr.map((e, i) => {
-                    console.log(i)
+                    // console.log(i)
                     return <path
                     key = {`path-${ ++i }`}
                     d = { geoPath().projection(this.autoProjection)(e) }
@@ -634,7 +644,7 @@ class BaseMap extends Component {
                 {test_near}
             </g>
             </svg>
-            <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/>
+            {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>
         
         )
