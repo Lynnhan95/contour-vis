@@ -49,4 +49,4 @@ computes all segments —> color ranges
 
 4. Count points: https://github.com/substack/point-in-polygon
 
-5. SAT
+5. SAT, Polygon clipping/ intersection
