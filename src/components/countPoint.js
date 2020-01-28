@@ -10,8 +10,8 @@ function CountPoint(region, pointsData) {
 
     let count = 0 
     for(let i=0; i< points.length; i++) {
-        let temp = inside(points[i], polygon)
-        if (temp) {
+        let res = inside(points[i], polygon)
+        if (res) {
             count += 1
         }else {
             console.log(points[i], false)

@@ -6,6 +6,7 @@ import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-
 import Offset from 'polygon-offset'
 import paper from 'paper'
 import CountPoint from './countPoint'
+import MapColor from './mapColor'
 
 const intersect = require('path-intersection')
 
@@ -417,7 +418,7 @@ class BaseMap extends Component {
         if (prevState.pointsData !== this.state.pointsData) {
             console.log(CountPoint( this.state.mainArea ,this.state.pointsData))
         }
-        
+
     }
 
     render() {
@@ -507,7 +508,6 @@ class BaseMap extends Component {
 //					)
 //				})
 
-
                 // reset projection
                 this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
 
@@ -520,12 +520,12 @@ class BaseMap extends Component {
                     />
 
                 // [offsetCoordinates, offsetCoordinates2, xxx3]    
-                let contourArr = []
-                for (let i=1; i<= 10; i++ ) {
-                    contourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
+                let innerContourArr = []
+                for (let i=0; i<= 10; i++ ) {
+                    innerContourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
                 }
-
-                let paddingedArr = contourArr.map(e => {
+                
+                let paddingedArr = innerContourArr.map(e => {
                     let paddinged = {
                         type: 'Feature',
                         properties: {
@@ -546,13 +546,16 @@ class BaseMap extends Component {
                 
                 let innerBoundaryArr = paddingedArr.map((e, i) => {
                     // console.log(i)
-                    return <path
-                    key = {`path-${ ++i }`}
-                    d = { geoPath().projection(this.autoProjection)(e) }
-                    stroke = "#fff"
-                    strokeWidth = "0.2"
-                    fill = {i ==1 ? '#edc949' : 'transparent'}
-                    />
+                    let contourColor = null
+                    if (i == 0) {
+                        contourColor = '#fff'
+                    } else if (i == 1) {
+                        contourColor = '#edc949'
+                    }
+                    else {
+                        contourColor = 'transparent'
+                    }
+                    return MapColor(e, i, geoPath().projection(this.autoProjection), contourColor, 'inner')
                 }) 
 
                 return  [outsideBoundary, 
