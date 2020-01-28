@@ -46,3 +46,7 @@ computes all segments —> color ranges
 3. Done: Medial axis + segmentation
 
 ![segmentation](./src/assets/0108.jpg)
+
+4. Count points: https://github.com/substack/point-in-polygon
+
+5. SAT
