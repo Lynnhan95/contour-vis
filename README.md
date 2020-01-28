@@ -49,4 +49,8 @@ computes all segments —> color ranges
 
 4. Count points: https://github.com/substack/point-in-polygon
 
-5. SAT, Polygon clipping/ intersection
+5. Polygon clipping/ intersection, based on A new algorithm for computing bollean operations on polugons: https://github.com/mfogel/polygon-clipping/blob/master/paper.pdf
+Implementation: 
+https://github.com/mfogel/polygon-clipping
+
+5. SAT to get thinner lines contour
