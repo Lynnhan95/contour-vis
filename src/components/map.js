@@ -4,9 +4,11 @@ import { csv } from 'd3'
 import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
 // import  getThinnedPath  from './src/get-thinned-path';
 import Offset from 'polygon-offset'
+import simplify from 'simplify-js'
 import paper from 'paper'
 import CountPoint from './countPoint'
 import MapColor from './mapColor'
+// import { getThinnedPath } from './'
 
 const intersect = require('path-intersection')
 
@@ -75,17 +77,17 @@ class BaseMap extends Component {
     }
 
     // offset boundary
-    getContour(data, index) {
-        let offsetCoordinates = data.map(e=>{
-            try {
-                let temp = new Offset(e).offset(this.offsetPadding* index)
-                return temp
-            } catch (error) {
-                return null
-            }
-        })
-        return offsetCoordinates
-    }
+    // getContour(data, index) {
+    //     let offsetCoordinates = data.map(e=>{
+    //         try {
+    //             let temp = new Offset(e).offset(this.offsetPadding* index)
+    //             return temp
+    //         } catch (error) {
+    //             return null
+    //         }
+    //     })
+    //     return offsetCoordinates
+    // }
 
     // when component will mount, fetch geojson and csv data locally
     componentDidMount(){
@@ -330,12 +332,41 @@ class BaseMap extends Component {
         let _me = this
 
         if(prevState.outerBoundary !== this.state.outerBoundary) {
+
+            this.state.chinaGeoData.map((d,i)=> {
+            if (d.properties.name === '湖南'){
             // store computed dots and paths 
+            const mainArea = d.geometry.coordinates
+            const simplifiedFactor = 1
+            // Compute simplified area
+            let res = []
+            for(let i=0; i< mainArea[0].length; i++) {
+                let temp = { }
+                temp['x'] = mainArea[0][i][0]
+                temp['y'] = mainArea[0][i][1]
+                res.push(temp)
+            }
+
+            let simplified = simplify(res, simplifiedFactor, true)
+            let simplifiedArea = [] 
+            for(let i=0; i< simplified.length; i++) {
+                let temp = [] 
+                temp.push(simplified[i].x)
+                temp.push(simplified[i].y)
+                simplifiedArea.push(temp)
+            }
+            console.log(simplifiedArea)
             let resDots = []
             let resPaths = []
             // loops data format
-            let resloop = this.constructList(this.state.outerBoundary[0])
-            let mats = findMats(resloop, 1)
+            let resloop = this.constructList(simplifiedArea)
+            
+            // s: the scale axis transform parameter
+            const s = 2.5
+
+            //get medial axis transforms
+            let mats = findMats(resloop, 3)
+
             //traverse
             mats.forEach(f)
             function f(mat){
@@ -361,55 +392,61 @@ class BaseMap extends Component {
             }
             let medialPath = resPaths.join(' ')
 
-            let s = 2.5;
-            let sats = mats.map(mat => toScaleAxis(mat, s));
-            // let pathStr = getThinnedPath(sats, 0.3);
+            //get scale axis transforms
+            let sats = mats.map(mat => toScaleAxis(mat, s))
+            // Get new thickest width
+            let thickestWidth = 0;
+            sats.forEach(sat => {
+                let r = sat.cpNode.cp.circle.radius;
+                if (r > thickestWidth) { thickestWidth = r; }
+            });
+            console.log(sats)
+            // let satPath = getThinnedPath(sats, 0.3)
 
-            this.state.chinaGeoData.map((d,i)=> {
-                if (d.properties.name === '湖南'){
-                    // compute interpolate  interpolate array with original boundary array
-                    let mainArea = d.geometry.coordinates
-                    // console.log(mainArea)
-                    // let interpolateNum = 3
-                    // console.log('mainArea[0]', mainArea[0].slice(0, 10))
+            // compute interpolate  interpolate array with original boundary array
 
-                    let even_points = _me.getEvenPointsFromCoordinates(mainArea[0], 0.05)
-                
-                    let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
-                    
-                    let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
-                    // console.log('MedialVerticalPaths', MedianVerticalPoints)
 
-                    let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
+            // console.log(mainArea)
+            // let interpolateNum = 3
+            // console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
-                    function getLinesfromPoints(arr) {
-                        let lines = []
+            let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
+        
+            let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
+            
+            let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
+            // console.log('MedialVerticalPaths', MedianVerticalPoints)
 
-                        for (let i=0; i < arr.length-1; i++) {
-                            let x0 = arr[i][0][0],
-                                y0 = arr[i][0][1],
-                                x1 = arr[i][1][0],
-                                y1 = arr[i][1][1]
+            let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
 
-                            lines.push(`M${x0} ${y0} L${x1} ${y1}`)
-                        }
+            function getLinesfromPoints(arr) {
+                let lines = []
 
-                        return lines
-                    }
-                    
-                    // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
-                    let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
+                for (let i=0; i < arr.length-1; i++) {
+                    let x0 = arr[i][0][0],
+                        y0 = arr[i][0][1],
+                        x1 = arr[i][1][0],
+                        y1 = arr[i][1][1]
 
-                    this.setState({
-                        // interpolatePoints: interpolatePoints,
-                        //SegmentPoints: SegmentPoints,
-                        // MedialVerticalPaths: MedialVerticalPaths,
-                        mainArea: mainArea,
-                        resPaths: medialPath,
-                        segmentBorderPaths: segmentBorderPaths,
-                        even_points: even_points,
-                        paper_inter: nk_intersect_points[1]
-                    })
+                    lines.push(`M${x0} ${y0} L${x1} ${y1}`)
+                }
+
+                return lines
+            }
+            
+            // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+            let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
+
+            this.setState({
+                // interpolatePoints: interpolatePoints,
+                //SegmentPoints: SegmentPoints,
+                // MedialVerticalPaths: MedialVerticalPaths,
+                mainArea: mainArea,
+                resPaths: medialPath,
+                segmentBorderPaths: segmentBorderPaths,
+                even_points: even_points,
+                paper_inter: nk_intersect_points[1]
+            })
                     
                 }
             })
@@ -519,53 +556,53 @@ class BaseMap extends Component {
                     fill = "#2c75b1"
                     />
 
-                // [offsetCoordinates, offsetCoordinates2, xxx3]    
-                let innerContourArr = []
-                for (let i=0; i<= 10; i++ ) {
-                    innerContourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
-                }
+                // // [offsetCoordinates, offsetCoordinates2, xxx3]    
+                // let innerContourArr = []
+                // for (let i=0; i<= 10; i++ ) {
+                //     innerContourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
+                // }
                 
-                let paddingedArr = innerContourArr.map(e => {
-                    let paddinged = {
-                        type: 'Feature',
-                        properties: {
-                            id: "33-1",
-                            latitude: 29.1084,
-                            longitude: 119.97,
-                            name: "浙江"
-                        },  
-                        geometry: {
-                          type: 'MultiPolygon',
-                          coordinates: e
-                        }
-                    }
-                    return paddinged
-                })
+                // let paddingedArr = innerContourArr.map(e => {
+                //     let paddinged = {
+                //         type: 'Feature',
+                //         properties: {
+                //             id: "33-1",
+                //             latitude: 29.1084,
+                //             longitude: 119.97,
+                //             name: "浙江"
+                //         },  
+                //         geometry: {
+                //           type: 'MultiPolygon',
+                //           coordinates: e
+                //         }
+                //     }
+                //     return paddinged
+                // })
 
-                // console.log(paddingedArr)
+                // // console.log(paddingedArr)
                 
-                let innerBoundaryArr = paddingedArr.map((e, i) => {
-                    // console.log(i)
-                    let contourColor = null
-                    if (i == 0) {
-                        contourColor = '#fff'
-                    } else if (i == 1) {
-                        contourColor = '#edc949'
-                    }
-                    else {
-                        contourColor = 'transparent'
-                    }
-                    return MapColor(e, i, geoPath().projection(this.autoProjection), contourColor, 'inner')
-                }) 
+                // let innerBoundaryArr = paddingedArr.map((e, i) => {
+                //     // console.log(i)
+                //     let contourColor = null
+                //     if (i == 0) {
+                //         contourColor = '#fff'
+                //     } else if (i == 1) {
+                //         contourColor = '#edc949'
+                //     }
+                //     else {
+                //         contourColor = 'transparent'
+                //     }
+                //     return MapColor(e, i, geoPath().projection(this.autoProjection), contourColor, 'inner')
+                // }) 
 
                 return  [outsideBoundary, 
                          boundaryDots
                         ]
-                        .concat(innerBoundaryArr)
+                        // .concat(innerBoundaryArr)
                         .concat(
                         [
                          //SegmentDots,
-                        //  verticalLines,
+                         verticalLines,
                          evenPoints,
                          medial_vertical_paths,
                          // paper_inter

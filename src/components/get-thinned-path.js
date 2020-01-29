@@ -1,7 +1,7 @@
 
 import { Mat, CpNode, Loop } from "flo-mat";
 
-import getMatchingBeziers from "./get-matching-beziers";
+// import { getMatchingBeziers } from "./get-matching-beziers";
 
 
 /**
@@ -12,9 +12,9 @@ import getMatchingBeziers from "./get-matching-beziers";
  * @param t The interpolation fraction in [0,1].
  */
 function interpolate(
-        p1: number[], 
-        p2: number[], 
-        t: number) {
+        p1, 
+        p2, 
+        t) {
 
     return [
         p1[0] + t*(p2[0] - p1[0]), 
@@ -28,17 +28,17 @@ function interpolate(
  * @param cpNode The CpNode representing the medial axis and boundary piece.
  * @param c The thinning factor (from 0 to 1)
  */
-function getInterpolatedCurves(cpNode: CpNode, c: number) {
-    return getMatchingBeziers(cpNode).map(curve => {
-        return [0,1,2,3].map(i =>
-            interpolate(
-                curve.boundaryBezier[i],
-                curve.medialBezier[i], 
-                c
-            )
-        )
-    });
-}
+// function getInterpolatedCurves(cpNode, c) {
+//     return getMatchingBeziers(cpNode).map(curve => {
+//         return [0,1,2,3].map(i =>
+//             interpolate(
+//                 curve.boundaryBezier[i],
+//                 curve.medialBezier[i], 
+//                 c
+//             )
+//         )
+//     });
+// }
 
 
 /**
@@ -46,10 +46,10 @@ function getInterpolatedCurves(cpNode: CpNode, c: number) {
  * @param sats Scale axis transforms of the original shape
  * @param c The thinning fraction (from 0 to 1)
  */
-function getThinnedPath(sats: Mat[], c: number) {
+function getThinnedPath(sats, c) {
     // An array of subpaths that will make up the thinned shape - for single 
     // shapes without holes it will only be a single path.
-    let pathStrs: string[] = [];
+    let pathStrs = null
 
     // Iterate through the scale axis transforms representing the shape - for
     // single shapes without holes there will be only one sat.
@@ -61,7 +61,7 @@ function getThinnedPath(sats: Mat[], c: number) {
         // We map each bezier curve of the thinned path to a specific simple 
         // closed loop - this is so we can have disjoint subpaths representing
         // the shape envelopes and holes. There is probably a simpler way.
-        let curvesMap: Map<Loop, number[][][]> = new Map();
+        let curvesMap = null
 
         // Iterate through all boundary piece curves
         let cpNode = cpStart;
@@ -74,7 +74,7 @@ function getThinnedPath(sats: Mat[], c: number) {
             if (!curves) { curves = []; curvesMap.set(loop, curves); }
 
             // Push the interpolated, i.e. thinned, curves
-            curves.push(...getInterpolatedCurves(cpNode, c));
+            // curves.push(...getInterpolatedCurves(cpNode, c));
 
             // Go to next boundary piece
             cpNode = cpNode.next;
@@ -108,4 +108,4 @@ function getThinnedPath(sats: Mat[], c: number) {
 }
 
 
-export default getThinnedPath 
+export { getThinnedPath }
