@@ -2,7 +2,7 @@ import inside from 'point-in-polygon'
 
 function CountPoint(region, pointsData) {
     // region -> mainArea[0]
-    const polygon = JSON.parse(JSON.stringify(region[0]))
+    const polygon = JSON.parse(JSON.stringify(region))
     //polygon.pop()
     const points = pointsData.map((d) => {
         return [d.Longitude, d.Latitude]
@@ -14,7 +14,8 @@ function CountPoint(region, pointsData) {
         if (res) {
             count += 1
         }else {
-            console.log(points[i], false)
+            // console.log(points[i], false)
+            
         }
     }
     return count

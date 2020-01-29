@@ -139,7 +139,7 @@ class BaseMap extends Component {
         return Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
     }
 
-    getEvenPointsFromCoordinates(coordinates, segment_len){
+    getEvenPointsFromCoordinates(coordinates, segment_len) {
         let _me = this,
             total_len = coordinates.length,
             remain_len = 0,
@@ -244,7 +244,7 @@ class BaseMap extends Component {
                 }
 
             let jie_x = this.getPerpendicularXfromAB(A, B, len)
-                
+            
             // TODO: 
             if(δy > 0){
                 N.x = jie_x.pos
@@ -403,11 +403,6 @@ class BaseMap extends Component {
             console.log(sats)
             // let satPath = getThinnedPath(sats, 0.3)
 
-            // compute interpolate  interpolate array with original boundary array
-
-
-            // console.log(mainArea)
-            // let interpolateNum = 3
             // console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
             let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
@@ -430,7 +425,6 @@ class BaseMap extends Component {
 
                     lines.push(`M${x0} ${y0} L${x1} ${y1}`)
                 }
-
                 return lines
             }
             
@@ -439,9 +433,10 @@ class BaseMap extends Component {
 
             this.setState({
                 // interpolatePoints: interpolatePoints,
-                //SegmentPoints: SegmentPoints,
-                // MedialVerticalPaths: MedialVerticalPaths,
-                mainArea: mainArea,
+                // SegmentPoints: SegmentPoints,
+                MedialVerticalPaths: MedialVerticalPaths,
+                //rea: mainArea,
+                //simplifiedArea: simplifiedArea,
                 resPaths: medialPath,
                 segmentBorderPaths: segmentBorderPaths,
                 even_points: even_points,
@@ -453,163 +448,190 @@ class BaseMap extends Component {
         }
 
         if (prevState.pointsData !== this.state.pointsData) {
-            console.log(CountPoint( this.state.mainArea ,this.state.pointsData))
+            // console.log(this.state.even_points)
+            console.log(CountPoint( this.state.even_points ,this.state.pointsData))
         }
 
     }
 
     render() {
         // define province shapes with chinaGeoData
-        const Regions = this.state.chinaGeoData.map((d, i) => {
-            /**
-             * only render zhejiang for showing more detail
-             */
-            if(d.properties.name === '湖南'){
-                // console.log('湖南', d)
-                // no smooth boundary anymore, because that increase complexity for now
-
-                let verticalLines
-                if ( this.state.segmentBorderPaths ) {
-                    verticalLines = this.state.segmentBorderPaths.map((d,i) => {
-                        return (
-                            <path 
-                            className = "segmentBorder"
-                            key = {`segmentBorder-${i}`}
-                            d = {d}
-                            stroke = "#000"
-                            strokeWidth = "0.5"
-                            />
-                        )
-                    })
-                }
-
-                let boundaryDots
-                if ( this.state.interpolatePoints ) {
-
-                    boundaryDots = this.state.interpolatePoints.map((d, i) => {
-                        return(
-                            <circle
-                            key = {`boundaryDot-${i}`}
-                            r = "1"
-                            fill = "red"
-                            cx = {this.autoProjection(d)[0] }
-                            cy = {this.autoProjection(d)[1] }
-                            />
-                        )
-                	})
-                }
-
-                let evenPoints
-                if(this.state.even_points){
-                    evenPoints = this.state.even_points.map((d, i)=>{
-                        return(
-                            <circle
-                            key = {`evenPoints-${i}`}
-                            r = "1"
-                            fill = "#33ff22"
-                            cx = {this.autoProjection(d)[0] }
-                            cy = {this.autoProjection(d)[1] }
-                            />
-                        )
-                    })
-                }
-
-                let medial_vertical_paths
-                if(this.state.MedialVerticalPaths){
-                    medial_vertical_paths = this.state.MedialVerticalPaths.map((d, i)=>{
-                        return (
-                            <path 
-                            className = "vertical-path"
-                            key = {`vertical-path-${i}`}
-                            d = {d}
-                            stroke = "#009"
-                            strokeWidth = "0.1"
-                            />
-                        )
-                    })
-                }
-
-                
-
-//				//DrawSegmentsonMedianVerticalLines
-//				let SegmentDots
-//				SegmentDots = this.state.SegmentPoints.map((d, i) => {
-//					return(
-//						<circle
-//						key = {`SegmentDot-${i}`}
-//						r = "1"
-//						fill = "green"
-//						cx = {d[0]}
-//						cy = {d[1]}
-//						/>
-//					)
-//				})
-
-                // reset projection
-                this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
-
-                let outsideBoundary = <path
-                    key = {`path-${ i }`}
-                    d = { geoPath().projection(this.autoProjection)(d) }
-                    stroke = "#fff"
-                    strokeWidth = "0.2"
-                    fill = "#2c75b1"
-                    />
-
-                // // [offsetCoordinates, offsetCoordinates2, xxx3]    
-                // let innerContourArr = []
-                // for (let i=0; i<= 10; i++ ) {
-                //     innerContourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
-                // }
-                
-                // let paddingedArr = innerContourArr.map(e => {
-                //     let paddinged = {
-                //         type: 'Feature',
-                //         properties: {
-                //             id: "33-1",
-                //             latitude: 29.1084,
-                //             longitude: 119.97,
-                //             name: "浙江"
-                //         },  
-                //         geometry: {
-                //           type: 'MultiPolygon',
-                //           coordinates: e
-                //         }
-                //     }
-                //     return paddinged
-                // })
-
-                // // console.log(paddingedArr)
-                
-                // let innerBoundaryArr = paddingedArr.map((e, i) => {
-                //     // console.log(i)
-                //     let contourColor = null
-                //     if (i == 0) {
-                //         contourColor = '#fff'
-                //     } else if (i == 1) {
-                //         contourColor = '#edc949'
-                //     }
-                //     else {
-                //         contourColor = 'transparent'
-                //     }
-                //     return MapColor(e, i, geoPath().projection(this.autoProjection), contourColor, 'inner')
-                // }) 
-
-                return  [outsideBoundary, 
-                         boundaryDots
-                        ]
-                        // .concat(innerBoundaryArr)
-                        .concat(
-                        [
-                         //SegmentDots,
-                         verticalLines,
-                         evenPoints,
-                         medial_vertical_paths,
-                         // paper_inter
-                        ]
-                        )
+        let getRegionElements =() =>{
+            let verticalLines
+            if ( this.state.segmentBorderPaths ) {
+                verticalLines = this.state.segmentBorderPaths.map((d,i) => {
+                    return (
+                        <path 
+                        className = "segmentBorder"
+                        key = {`segmentBorder-${i}`}
+                        d = {d}
+                        stroke = "#000"
+                        strokeWidth = "0.5"
+                        />
+                    )
+                })
             }
-        })
+
+            let boundaryDots
+            if ( this.state.interpolatePoints ) {
+
+                boundaryDots = this.state.interpolatePoints.map((d, i) => {
+                    return(
+                        <circle
+                        key = {`boundaryDot-${i}`}
+                        r = "1"
+                        fill = "red"
+                        cx = {this.autoProjection(d)[0] }
+                        cy = {this.autoProjection(d)[1] }
+                        />
+                    )
+                })
+            }
+
+            let evenPoints
+            if(this.state.even_points) {
+                evenPoints = this.state.even_points.map((d, i)=>{
+                    return(
+                        <circle
+                        key = {`evenPoints-${i}`}
+                        r = "1"
+                        fill = "#33ff22"
+                        cx = {this.autoProjection(d)[0] }
+                        cy = {this.autoProjection(d)[1] }
+                        />
+                    )
+                })
+            }
+
+            let medial_vertical_paths
+            if(this.state.MedialVerticalPaths) {
+                medial_vertical_paths = this.state.MedialVerticalPaths.map((d, i)=>{
+                    return (
+                        <path 
+                        className = "vertical-path"
+                        key = {`vertical-path-${i}`}
+                        d = {d}
+                        stroke = "#009"
+                        strokeWidth = "0.1"
+                        />
+                    )
+                })
+            }
+            let simplified_boundary
+            if( this.state.even_points ) {
+                let temp = JSON.parse(JSON.stringify(this.state.even_points))
+                temp.push(this.state.even_points[0])
+                let geoSimplified = {
+                    type: "Feature",
+                    "properties": {
+                        id: "43",
+                        name: "hunan",
+                        latitude: 27.6667,
+                        longtitude:111.712
+                    },
+                    "geometry": {
+                        type: "Polygon",
+                        coordinates: [temp]
+                    }
+                }
+                console.log(geoSimplified)
+                simplified_boundary = 
+                        <path
+                        key = "boundary"
+                        d = { geoPath().projection(this.autoProjection)(geoSimplified) }
+                        stroke = "#fff"
+                        strokeWidth = "0.2"
+                        fill = "#2c75b1"
+                        />
+    
+            }
+
+            //DrawSegmentsonMedianVerticalLines
+            // let SegmentDots
+            // SegmentDots = this.state.SegmentPoints.map((d, i) => {
+            //     return(
+            //         <circle
+            //         key = {`SegmentDot-${i}`}
+            //         r = "1"
+            //         fill = "green"
+            //         cx = {d[0]}
+            //         cy = {d[1]}
+            //         />
+            //     )
+            // })
+
+            // No longer draw boundary from original chinaGeoData
+            let outsideBoundary 
+
+            this.state.chinaGeoData.map((d, i) => {
+                if(d.properties.name === '湖南'){
+                    console.log(d)
+                    this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
+                    outsideBoundary = <path
+                        key = {`path-${ i }`}
+                        d = { geoPath().projection(this.autoProjection)(d) }
+                        stroke = "#eee"
+                        strokeWidth = "2"
+                        fill="none"
+                        />
+                    
+                    // [offsetCoordinates, offsetCoordinates2, xxx3]    
+                    // let innerContourArr = []
+                    // for (let i=0; i<= 10; i++ ) {
+                    //     innerContourArr.push(this.getContour(d.geometry.coordinates, i).filter(e => !!e))
+                    // }
+                    
+                    // let paddingedArr = innerContourArr.map(e => {
+                    //     let paddinged = {
+                    //         type: 'Feature',
+                    //         properties: {
+                    //             id: "33-1",
+                    //             latitude: 29.1084,
+                    //             longitude: 119.97,
+                    //             name: "浙江"
+                    //         },  
+                    //         geometry: {
+                    //           type: 'MultiPolygon',
+                    //           coordinates: e
+                    //         }
+                    //     }
+                    //     return paddinged
+                    // })
+
+                    // // console.log(paddingedArr)
+                    
+                    // let innerBoundaryArr = paddingedArr.map((e, i) => {
+                    //     // console.log(i)
+                    //     let contourColor = null
+                    //     if (i == 0) {
+                    //         contourColor = '#fff'
+                    //     } else if (i == 1) {
+                    //         contourColor = '#edc949'
+                    //     }
+                    //     else {
+                    //         contourColor = 'transparent'
+                    //     }
+                    //     return MapColor(e, i, geoPath().projection(this.autoProjection), contourColor, 'inner')
+                    // }) 
+                }
+            })
+            return [
+                    //outsideBoundary, 
+                    simplified_boundary,
+                    boundaryDots
+               ]
+               // .concat(innerBoundaryArr)
+               .concat(
+               [
+                //SegmentDots,
+                verticalLines,
+                evenPoints,
+                // medial_vertical_paths,
+                // paper_inter
+               ]
+               )
+        }
+        const Regions = getRegionElements()
 
         //draw medial axis to the map
         let MedialAxis
@@ -620,6 +642,7 @@ class BaseMap extends Component {
             stroke = "#e56048"
             />
         }
+        
 
         // draw dots to the map 
         const Dots = this.state.pointsData.map((d,i) => {
