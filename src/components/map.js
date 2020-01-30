@@ -112,7 +112,7 @@ class BaseMap extends Component {
             })
 
         csv('/religious_data.csv').then( data => {
-            //string to number
+            // string to number
             data.forEach( (d) => {
               d["id"] = +d["id"];
               d["Latitude"] = +d["Latitude"]
@@ -125,9 +125,7 @@ class BaseMap extends Component {
                 const pointsData = data.filter( (d) => {
                     return d.province === "Hunan"
                 })
-                // pointsData.map( (d) => {
-                //     return [d.Longitude, d.Latitude]
-                // })
+
                 this.setState({pointsData: pointsData})
             })
     }
@@ -205,6 +203,46 @@ class BaseMap extends Component {
         return x
     }
 
+    getMedianPointsFromEvenPoint(arr){
+        let _me = this
+        let MedianPoints = [],
+        A, B 
+
+        for (let i = 0; i< arr.length; i++) {
+            if(i === arr.length -1){
+                A = {
+                    x: arr[arr.length-1][0],
+                    y: arr[arr.length-1][1]
+                }
+                B = {
+                    x: arr[0][0],
+                    y: arr[0][1]
+                }
+            }else{
+                A = {
+                    x: arr[i][0],
+                    y: arr[i][1]
+                }
+                B = {
+                    x: arr[i+1][0],
+                    y: arr[i+1][1]
+                }
+            }
+
+            let M = {
+                x: (B.x + A.x) / 2,
+                y: (B.y + A.y) / 2
+            }
+
+            let median = _me.autoProjection([M.x, M.y])
+            //console.log(median)
+    
+            //[_me.autoProjection(M.x), _me.autoProjection(M.y)]
+            MedianPoints.push(median)
+        }
+        return MedianPoints
+
+    }
     getVerticalPathFromEvenPoint(arr){
         // TODO:
         let MedianVerticalPoints = [],
@@ -328,6 +366,63 @@ class BaseMap extends Component {
         return paths
     }
 
+    getRegionFromPoints(medianPoints, InterPoints) {
+        //console.log(InterPoints)
+        let _me = this
+        let segments = [],
+        A1, A2, B1, B2
+    
+    for (let i = 0; i < medianPoints.length; i++) {
+        if(i === medianPoints.length - 1){
+            A1 = {
+                x: medianPoints[i][0],
+                y: medianPoints[i][1]
+            }
+            A2 = {
+                x: medianPoints[0][0],
+                y: medianPoints[0][1]
+            }
+            B1 = {
+                x: InterPoints[i][0],
+                y: InterPoints[i][1]
+            }
+            B2 = {
+                x: InterPoints[0][0],
+                y: InterPoints[0][1]
+            }
+        }else{
+            A1 = {
+                x: medianPoints[i][0],
+                y: medianPoints[i][1]
+            }
+            A2 = {
+                x: medianPoints[i+1][0],
+                y: medianPoints[i+1][1]
+            }
+            B1 = {
+                x: InterPoints[i][0],
+                y: InterPoints[i][1]
+            }
+            B2 = {
+                x: InterPoints[i+1][0],
+                y: InterPoints[i+1][1]
+            }
+        }
+
+        let segment = [
+            [A1.x, A1.y],
+            [A2.x, A2.y],
+            [B2.x, B2.y],
+            [B1.x, B1.y],
+            [A1.x, A1.y]
+        ]
+
+        segments.push(segment)
+
+    }
+    return segments
+    }
+
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
@@ -355,7 +450,6 @@ class BaseMap extends Component {
                 temp.push(simplified[i].y)
                 simplifiedArea.push(temp)
             }
-            console.log(simplifiedArea)
             let resDots = []
             let resPaths = []
             // loops data format
@@ -400,19 +494,31 @@ class BaseMap extends Component {
                 let r = sat.cpNode.cp.circle.radius;
                 if (r > thickestWidth) { thickestWidth = r; }
             });
-            console.log(sats)
             // let satPath = getThinnedPath(sats, 0.3)
 
             // console.log('mainArea[0]', mainArea[0].slice(0, 10))
 
             let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
-        
+            
+            let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
+            console.log(MedianPoints)
+
             let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
+            //console.log(MedianVerticalPoints)
             
             let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
             // console.log('MedialVerticalPaths', MedianVerticalPoints)
 
             let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
+            //console.log(MedianPoints)
+
+            //let intersection_points = getSecondElements(nk_intersect_points[0])
+            
+            // ISSUE:
+            // len(Median Points) !== len(nk_intersect_points[1])
+            console.log(nk_intersect_points[1])
+            let segments = _me.getRegionFromPoints(MedianPoints, nk_intersect_points[1])
+            console.log(segments)
 
             function getLinesfromPoints(arr) {
                 let lines = []
@@ -427,10 +533,18 @@ class BaseMap extends Component {
                 }
                 return lines
             }
+
+            function getSecondElements(arr) {
+                let temp = [] 
+                for(let i=0; i< arr.length; i++) {
+                    temp.push(arr[i][1])
+                }
+                return temp
+            }
             
             // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
             let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
-
+            //console.log(nk_intersect_points[0])
             this.setState({
                 // interpolatePoints: interpolatePoints,
                 // SegmentPoints: SegmentPoints,
@@ -440,7 +554,9 @@ class BaseMap extends Component {
                 resPaths: medialPath,
                 segmentBorderPaths: segmentBorderPaths,
                 even_points: even_points,
-                paper_inter: nk_intersect_points[1]
+                MedianPoints: MedianPoints,
+                paper_inter: nk_intersect_points[1],
+                segments:segments
             })
                     
                 }
@@ -503,6 +619,59 @@ class BaseMap extends Component {
                 })
             }
 
+
+            let MedianPoints
+            if(this.state.MedianPoints) {
+
+                MedianPoints= this.state.MedianPoints.map((d, i)=>{
+                    if (i <2 ){
+                        console.log(d)
+                        return(
+                            <circle
+                            key = {`evenPoints-${i}`}
+                            r = "1"
+                            fill = "purple"
+                            cx = {d[0] }
+                            cy = {d[1] }
+                            />
+                        )
+                    } 
+
+                })
+            }
+
+            let testPoints
+            if(this.state.segments) {
+
+                testPoints= this.state.segments.map((d, i)=>{
+                    if (i <1 ){
+                        console.log(d[2])
+                        return(
+                            <circle
+                            key = {`evenPoints-${i}`}
+                            r = "1"
+                            fill = "red"
+                            cx = {d[2][0] }
+                            cy = {d[2][1]}
+                            />
+                        )
+                    } 
+
+                })
+            }
+
+
+            let segments
+            if(this.state.segments) {
+                segments = this.state.segments.map((d, i)=>{
+                    if (i <2) {
+                        console.log(d)
+                        return MapColor(d, i, geoPath().projection(this.autoProjection), '#2c75b1', 'try' )         
+                    }
+                })
+                
+            }
+
             let medial_vertical_paths
             if(this.state.MedialVerticalPaths) {
                 medial_vertical_paths = this.state.MedialVerticalPaths.map((d, i)=>{
@@ -521,29 +690,9 @@ class BaseMap extends Component {
             if( this.state.even_points ) {
                 let temp = JSON.parse(JSON.stringify(this.state.even_points))
                 temp.push(this.state.even_points[0])
-                let geoSimplified = {
-                    type: "Feature",
-                    "properties": {
-                        id: "43",
-                        name: "hunan",
-                        latitude: 27.6667,
-                        longtitude:111.712
-                    },
-                    "geometry": {
-                        type: "Polygon",
-                        coordinates: [temp]
-                    }
-                }
-                console.log(geoSimplified)
-                simplified_boundary = 
-                        <path
-                        key = "boundary"
-                        d = { geoPath().projection(this.autoProjection)(geoSimplified) }
-                        stroke = "#fff"
-                        strokeWidth = "0.2"
-                        fill = "#2c75b1"
-                        />
-    
+                // temp: [coordinate1, coordinate2, ..., coordinate1]
+                simplified_boundary = MapColor(temp, 1, geoPath().projection(this.autoProjection), '#2c75b1', 'outBoundary' )
+
             }
 
             //DrawSegmentsonMedianVerticalLines
@@ -565,7 +714,7 @@ class BaseMap extends Component {
 
             this.state.chinaGeoData.map((d, i) => {
                 if(d.properties.name === '湖南'){
-                    console.log(d)
+                    //console.log(d)
                     this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
                     outsideBoundary = <path
                         key = {`path-${ i }`}
@@ -626,8 +775,10 @@ class BaseMap extends Component {
                 //SegmentDots,
                 verticalLines,
                 evenPoints,
+                MedianPoints,
+                segments,
+                testPoints
                 // medial_vertical_paths,
-                // paper_inter
                ]
                )
         }
@@ -660,15 +811,19 @@ class BaseMap extends Component {
         let paper_inter
         if(this.state.paper_inter){
             paper_inter = this.state.paper_inter.map((d, i)=>{
-                return(
-                    <circle
-                    key = {`paper_inter-${i}`}
-                    r = "1"
-                    fill = "#009dec"
-                    cx = {d[0]}
-                    cy = {d[1]}
-                    />
-                )
+                if (i<2) {
+                    console.log(d)
+                    return(
+                        <circle
+                        key = {`paper_inter-${i}`}
+                        r = "1"
+                        fill = "orange"
+                        cx = {d[0]}
+                        cy = {d[1]}
+                        />
+                    )
+                }
+
             })
         }
 
