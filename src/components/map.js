@@ -366,7 +366,7 @@ class BaseMap extends Component {
         return paths
     }
 
-    getRegionFromPoints(medianPoints, InterPoints) {
+    getSegmentFromPoints(medianPoints, InterPoints) {
         //console.log(InterPoints)
         let _me = this
         let segments = [],
@@ -413,14 +413,17 @@ class BaseMap extends Component {
             [A1.x, A1.y],
             [A2.x, A2.y],
             [B2.x, B2.y],
-            [B1.x, B1.y],
-            [A1.x, A1.y]
+            [B1.x, B1.y]
         ]
 
         segments.push(segment)
 
     }
     return segments
+    }
+
+    getSubsegmentFromSegment() {
+
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -517,8 +520,8 @@ class BaseMap extends Component {
             // ISSUE:
             // len(Median Points) !== len(nk_intersect_points[1])
             console.log(nk_intersect_points[1])
-            let segments = _me.getRegionFromPoints(MedianPoints, nk_intersect_points[1])
-            console.log(segments)
+            let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
+            // console.log(segments)
 
             function getLinesfromPoints(arr) {
                 let lines = []
@@ -660,13 +663,26 @@ class BaseMap extends Component {
                 })
             }
 
+            function getLinePathStr(arr) {
+                let [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = arr
+                return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3}`;
+            }
 
             let segments
             if(this.state.segments) {
                 segments = this.state.segments.map((d, i)=>{
-                    if (i <2) {
+                    if (i < 10) {
                         console.log(d)
-                        return MapColor(d, i, geoPath().projection(this.autoProjection), '#2c75b1', 'try' )         
+                        let pathStr = getLinePathStr(d)
+                        return (
+                            <path 
+                            key = {`path-${ i}`}
+                            d = {pathStr}
+                            stroke = "#fff"
+                            strokeWidth = "0.2"
+                            fill = 'blue'
+                            />
+                        )
                     }
                 })
                 
@@ -686,6 +702,7 @@ class BaseMap extends Component {
                     )
                 })
             }
+
             let simplified_boundary
             if( this.state.even_points ) {
                 let temp = JSON.parse(JSON.stringify(this.state.even_points))
