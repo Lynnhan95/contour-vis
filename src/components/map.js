@@ -422,8 +422,8 @@ class BaseMap extends Component {
     return segments
     }
 
-    getSubsegmentFromSegment() {
-
+    getSubsegmentFromSegment(segments, interpolateNum) {
+        
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -521,6 +521,7 @@ class BaseMap extends Component {
             // len(Median Points) !== len(nk_intersect_points[1])
             console.log(nk_intersect_points[1])
             let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
+            let subSegments = _me.getSubsegmentFromSegment(segments, 3)
             // console.log(segments)
 
             function getLinesfromPoints(arr) {
