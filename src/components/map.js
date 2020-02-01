@@ -9,6 +9,7 @@ import paper from 'paper'
 import CountPoint from './countPoint'
 import MapColor from './mapColor'
 // import { getThinnedPath } from './'
+import polygonClipping from 'polygon-clipping'
 
 const intersect = require('path-intersection')
 
@@ -21,7 +22,8 @@ class BaseMap extends Component {
             chinaGeoData: [],
             pointsData:[],
             resDots: null,
-            segment_path_len: 0.1
+            segment_path_len: 0.1,
+            simplifiedCoordinates: null
         }
 
         this.autoProjection = null
@@ -31,7 +33,7 @@ class BaseMap extends Component {
         // offset
         this.offset = new Offset()
         this.offsetPadding = -0.2
-
+        this.innerBoundaryCoordinates = null
     }
 
     // projection function with empirical params
@@ -209,7 +211,7 @@ class BaseMap extends Component {
         A, B 
 
         for (let i = 0; i< arr.length; i++) {
-            if(i === arr.length -1){
+            if(i === arr.length - 1){
                 A = {
                     x: arr[arr.length-1][0],
                     y: arr[arr.length-1][1]
@@ -337,9 +339,10 @@ class BaseMap extends Component {
                         temp_point = [e.point.x, e.point.y]
                     }
 
-                    inter_points.push([e.point.x, e.point.y])
+                    // inter_points.push([e.point.x, e.point.y])
                 })
     
+                inter_points.push([temp_point[0], temp_point[1]])
                 intersect_paths.push([p0, temp_point])
             }
         })
@@ -372,58 +375,100 @@ class BaseMap extends Component {
         let segments = [],
         A1, A2, B1, B2
     
-    for (let i = 0; i < medianPoints.length; i++) {
-        if(i === medianPoints.length - 1){
-            A1 = {
-                x: medianPoints[i][0],
-                y: medianPoints[i][1]
+        for (let i = 0; i < medianPoints.length; i++) {
+            if(i === medianPoints.length - 1){
+                A1 = {
+                    x: medianPoints[i][0],
+                    y: medianPoints[i][1]
+                }
+                A2 = {
+                    x: medianPoints[0][0],
+                    y: medianPoints[0][1]
+                }
+                B1 = {
+                    x: InterPoints[i][0],
+                    y: InterPoints[i][1]
+                }
+                B2 = {
+                    x: InterPoints[0][0],
+                    y: InterPoints[0][1]
+                }
+            }else{
+                A1 = {
+                    x: medianPoints[i][0],
+                    y: medianPoints[i][1]
+                }
+                A2 = {
+                    x: medianPoints[i+1][0],
+                    y: medianPoints[i+1][1]
+                }
+                B1 = {
+                    x: InterPoints[i][0],
+                    y: InterPoints[i][1]
+                }
+                B2 = {
+                    x: InterPoints[i+1][0],
+                    y: InterPoints[i+1][1]
+                }
             }
-            A2 = {
-                x: medianPoints[0][0],
-                y: medianPoints[0][1]
-            }
-            B1 = {
-                x: InterPoints[i][0],
-                y: InterPoints[i][1]
-            }
-            B2 = {
-                x: InterPoints[0][0],
-                y: InterPoints[0][1]
-            }
-        }else{
-            A1 = {
-                x: medianPoints[i][0],
-                y: medianPoints[i][1]
-            }
-            A2 = {
-                x: medianPoints[i+1][0],
-                y: medianPoints[i+1][1]
-            }
-            B1 = {
-                x: InterPoints[i][0],
-                y: InterPoints[i][1]
-            }
-            B2 = {
-                x: InterPoints[i+1][0],
-                y: InterPoints[i+1][1]
-            }
+
+            let segment = [
+                [A1.x, A1.y],
+                [A2.x, A2.y],
+                [B2.x, B2.y],
+                [B1.x, B1.y]
+            ]
+
+            segments.push(segment)
+
         }
-
-        let segment = [
-            [A1.x, A1.y],
-            [A2.x, A2.y],
-            [B2.x, B2.y],
-            [B1.x, B1.y]
-        ]
-
-        segments.push(segment)
-
-    }
-    return segments
+        return segments
     }
 
     getSubsegmentFromSegment(segments, interpolateNum) {
         
+    }
+
+    getInnerBoundaryCoordinates(coordinates){
+        let offsetCoordinates = new Offset(coordinates).offset(this.offsetPadding)
+
+        this.innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
+
+        let paddinged = {
+            type: 'Feature',
+            properties: {
+            },  
+            geometry: {
+                type: 'Polygon',
+                coordinates: this.innerBoundaryCoordinates
+            }
+        }
+
+        return paddinged
+    }
+
+    getBoundarySegments(segments){
+        let temp_segments = [],
+            clip_boundary
+
+        clip_boundary = this.innerBoundaryCoordinates[0].map(e=>{
+            return this.autoProjection(e)
+        })
+        // console.log('clip_boundary', clip_boundary)
+        segments.forEach((e, i)=>{
+            e.push(e[0])
+
+            // if(i === 50){
+            //     let test = polygonClipping.difference([e], [clip_boundary])
+
+            //     console.log('test....', [e], [clip_boundary], test)
+            // }
+            let test = polygonClipping.difference([e], [clip_boundary])
+
+            temp_segments.push(test[0][0])
+        })
+
+        return temp_segments
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -433,137 +478,144 @@ class BaseMap extends Component {
 
             this.state.chinaGeoData.map((d,i)=> {
             if (d.properties.name === '湖南'){
-            // store computed dots and paths 
-            const mainArea = d.geometry.coordinates
-            const simplifiedFactor = 1
-            // Compute simplified area
-            let res = []
-            for(let i=0; i< mainArea[0].length; i++) {
-                let temp = { }
-                temp['x'] = mainArea[0][i][0]
-                temp['y'] = mainArea[0][i][1]
-                res.push(temp)
-            }
+                // store computed dots and paths 
+                const mainArea = d.geometry.coordinates
+                const simplifiedFactor = 1
+                
+                // Compute simplified area
+                let res = []
+                for(let i=0; i< mainArea[0].length; i++) {
+                    let temp = { }
+                    temp['x'] = mainArea[0][i][0]
+                    temp['y'] = mainArea[0][i][1]
+                    res.push(temp)
+                }
 
-            let simplified = simplify(res, simplifiedFactor, true)
-            let simplifiedArea = [] 
-            for(let i=0; i< simplified.length; i++) {
-                let temp = [] 
-                temp.push(simplified[i].x)
-                temp.push(simplified[i].y)
-                simplifiedArea.push(temp)
-            }
-            let resDots = []
-            let resPaths = []
-            // loops data format
-            let resloop = this.constructList(simplifiedArea)
-            
-            // s: the scale axis transform parameter
-            const s = 2.5
+                let simplified = simplify(res, simplifiedFactor, true)
+                let simplifiedArea = [] 
+                for(let i=0; i< simplified.length; i++) {
+                    let temp = [] 
+                    temp.push(simplified[i].x)
+                    temp.push(simplified[i].y)
+                    simplifiedArea.push(temp)
+                }
 
-            //get medial axis transforms
-            let mats = findMats(resloop, 3)
+                _me.state.simplifiedCoordinates = _me.getInnerBoundaryCoordinates(simplifiedArea)
+                console.log('mainArea', _me.state.simplifiedCoordinates)
+                let resDots = []
+                let resPaths = []
+                // loops data format
+                let resloop = this.constructList(simplifiedArea)
+                
+                // s: the scale axis transform parameter
+                const s = 2.5
 
-            //traverse
-            mats.forEach(f)
-            function f(mat){
-                let cpNode = mat.cpNode
-                if(!cpNode) { return; }
-                // let bezier = cpNode.matCurveToNextVertex
-                traverseEdges(cpNode, function(cpNode){
-                    if (cpNode.isTerminating()) { return ;}
-                    let bezier = cpNode.matCurveToNextVertex.map(e=>{
-                        return _me.autoProjection(e)
+                //get medial axis transforms
+                let mats = findMats(resloop, 3)
+
+                //traverse
+                mats.forEach(f)
+                function f(mat){
+                    let cpNode = mat.cpNode
+                    if(!cpNode) { return; }
+                    // let bezier = cpNode.matCurveToNextVertex
+                    traverseEdges(cpNode, function(cpNode){
+                        if (cpNode.isTerminating()) { return ;}
+                        let bezier = cpNode.matCurveToNextVertex.map(e=>{
+                            return _me.autoProjection(e)
+                        })
+                        if(!bezier) { return; }
+                        resDots.push(bezier)
+
+                        if(bezier.length === 2){
+                            resPaths.push(_me.getLinePathStr(bezier))
+                        }else if(bezier.length === 3){
+                            resPaths.push(_me.getQuadBezierPathStr(bezier))
+                        }else if(bezier.length === 4){
+                            resPaths.push(_me.getCubicBezierPathStr(bezier))
+                        }
                     })
-                    if(!bezier) { return; }
-                    resDots.push(bezier)
+                }
+                let medialPath = resPaths.join(' ')
 
-                    if(bezier.length === 2){
-                        resPaths.push(_me.getLinePathStr(bezier))
-                    }else if(bezier.length === 3){
-                        resPaths.push(_me.getQuadBezierPathStr(bezier))
-                    }else if(bezier.length === 4){
-                        resPaths.push(_me.getCubicBezierPathStr(bezier))
+                //get scale axis transforms
+                let sats = mats.map(mat => toScaleAxis(mat, s))
+                // Get new thickest width
+                let thickestWidth = 0;
+                sats.forEach(sat => {
+                    let r = sat.cpNode.cp.circle.radius;
+                    if (r > thickestWidth) { thickestWidth = r; }
+                });
+                // let satPath = getThinnedPath(sats, 0.3)
+
+                // console.log('mainArea[0]', mainArea[0].slice(0, 10))
+
+                let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
+                
+                let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
+                // console.log(MedianPoints)
+
+                let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
+                //console.log(MedianVerticalPoints)
+                
+                let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
+                // console.log('MedialVerticalPaths', MedianVerticalPoints)
+
+                let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
+                console.log('nk_intersect_points', nk_intersect_points)
+
+                //let intersection_points = getSecondElements(nk_intersect_points[0])
+                
+                // ISSUE: -> Fixed
+                // len(Median Points) !== len(nk_intersect_points[1])
+                console.log('len(Median Points)', MedianPoints.length, 'len(nk_intersect_points[1])', nk_intersect_points[1].length)
+                let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
+                let subSegments = _me.getSubsegmentFromSegment(segments, 3)
+                console.log('segments', segments)
+
+                // calc boundary segments
+                let boundary_segments = _me.getBoundarySegments(segments)
+
+                function getLinesfromPoints(arr) {
+                    let lines = []
+
+                    for (let i=0; i <= arr.length-1; i++) {
+                        let x0 = arr[i][0][0],
+                            y0 = arr[i][0][1],
+                            x1 = arr[i][1][0],
+                            y1 = arr[i][1][1]
+
+                        lines.push(`M${x0} ${y0} L${x1} ${y1}`)
                     }
-                })
-            }
-            let medialPath = resPaths.join(' ')
-
-            //get scale axis transforms
-            let sats = mats.map(mat => toScaleAxis(mat, s))
-            // Get new thickest width
-            let thickestWidth = 0;
-            sats.forEach(sat => {
-                let r = sat.cpNode.cp.circle.radius;
-                if (r > thickestWidth) { thickestWidth = r; }
-            });
-            // let satPath = getThinnedPath(sats, 0.3)
-
-            // console.log('mainArea[0]', mainArea[0].slice(0, 10))
-
-            let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
-            
-            let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
-            console.log(MedianPoints)
-
-            let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
-            //console.log(MedianVerticalPoints)
-            
-            let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
-            // console.log('MedialVerticalPaths', MedianVerticalPoints)
-
-            let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
-            //console.log(MedianPoints)
-
-            //let intersection_points = getSecondElements(nk_intersect_points[0])
-            
-            // ISSUE:
-            // len(Median Points) !== len(nk_intersect_points[1])
-            console.log(nk_intersect_points[1])
-            let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
-            let subSegments = _me.getSubsegmentFromSegment(segments, 3)
-            // console.log(segments)
-
-            function getLinesfromPoints(arr) {
-                let lines = []
-
-                for (let i=0; i < arr.length-1; i++) {
-                    let x0 = arr[i][0][0],
-                        y0 = arr[i][0][1],
-                        x1 = arr[i][1][0],
-                        y1 = arr[i][1][1]
-
-                    lines.push(`M${x0} ${y0} L${x1} ${y1}`)
+                    return lines
                 }
-                return lines
-            }
 
-            function getSecondElements(arr) {
-                let temp = [] 
-                for(let i=0; i< arr.length; i++) {
-                    temp.push(arr[i][1])
+                function getSecondElements(arr) {
+                    let temp = [] 
+                    for(let i=0; i< arr.length; i++) {
+                        temp.push(arr[i][1])
+                    }
+                    return temp
                 }
-                return temp
+                
+                // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
+                let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
+                //console.log(nk_intersect_points[0])
+                this.setState({
+                    // interpolatePoints: interpolatePoints,
+                    // SegmentPoints: SegmentPoints,
+                    MedialVerticalPaths: MedialVerticalPaths,
+                    //rea: mainArea,
+                    //simplifiedArea: simplifiedArea,
+                    resPaths: medialPath,
+                    segmentBorderPaths: segmentBorderPaths,
+                    even_points: even_points,
+                    MedianPoints: MedianPoints,
+                    paper_inter: nk_intersect_points[1],
+                    segments: segments,
+                    boundary_segments: boundary_segments
+                })   
             }
-            
-            // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
-            let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
-            //console.log(nk_intersect_points[0])
-            this.setState({
-                // interpolatePoints: interpolatePoints,
-                // SegmentPoints: SegmentPoints,
-                MedialVerticalPaths: MedialVerticalPaths,
-                //rea: mainArea,
-                //simplifiedArea: simplifiedArea,
-                resPaths: medialPath,
-                segmentBorderPaths: segmentBorderPaths,
-                even_points: even_points,
-                MedianPoints: MedianPoints,
-                paper_inter: nk_intersect_points[1],
-                segments:segments
-            })
-                    
-                }
             })
         }
 
@@ -582,7 +634,7 @@ class BaseMap extends Component {
                 verticalLines = this.state.segmentBorderPaths.map((d,i) => {
                     return (
                         <path 
-                        className = "segmentBorder"
+                        className = "vertical-line"
                         key = {`segmentBorder-${i}`}
                         d = {d}
                         stroke = "#000"
@@ -614,7 +666,7 @@ class BaseMap extends Component {
                     return(
                         <circle
                         key = {`evenPoints-${i}`}
-                        r = "1"
+                        r = ".5"
                         fill = "#33ff22"
                         cx = {this.autoProjection(d)[0] }
                         cy = {this.autoProjection(d)[1] }
@@ -623,61 +675,103 @@ class BaseMap extends Component {
                 })
             }
 
-
             let MedianPoints
             if(this.state.MedianPoints) {
 
                 MedianPoints= this.state.MedianPoints.map((d, i)=>{
-                    if (i <2 ){
-                        console.log(d)
-                        return(
-                            <circle
-                            key = {`evenPoints-${i}`}
-                            r = "1"
-                            fill = "purple"
-                            cx = {d[0] }
-                            cy = {d[1] }
-                            />
-                        )
-                    } 
-
+                    // if (i <2 ){
+                    //     console.log(d)
+                    //     return(
+                    //         <circle
+                    //         key = {`evenPoints-${i}`}
+                    //         r = "1"
+                    //         fill = "purple"
+                    //         cx = {d[0] }
+                    //         cy = {d[1] }
+                    //         />
+                    //     )
+                    // } 
+                    return(
+                        <circle
+                        key = {`medianPoints-${i}`}
+                        className = {`medianPoints-${i}`}
+                        r = ".5"
+                        fill = "purple"
+                        cx = {d[0] }
+                        cy = {d[1] }
+                        />
+                    )
                 })
             }
 
-            let testPoints
-            if(this.state.segments) {
+            // let testPoints
+            // if(this.state.segments) {
 
-                testPoints= this.state.segments.map((d, i)=>{
-                    if (i <1 ){
-                        console.log(d[2])
-                        return(
-                            <circle
-                            key = {`evenPoints-${i}`}
-                            r = "1"
-                            fill = "red"
-                            cx = {d[2][0] }
-                            cy = {d[2][1]}
-                            />
-                        )
-                    } 
-
-                })
-            }
+            //     testPoints= this.state.segments.map((d, i)=>{
+            //         // if (i <1 ){
+            //         //     console.log(d[2])
+            //         //     return(
+            //         //         <circle
+            //         //         key = {`segments-${i}`}
+            //         //         className = {`segments-${i}`}
+            //         //         r = "1"
+            //         //         fill = "red"
+            //         //         cx = {d[2][0] }
+            //         //         cy = {d[2][1]}
+            //         //         />
+            //         //     )
+            //         // } 
+            //         return(
+            //             <circle
+            //             key = {`segments-${i}`}
+            //             className = {`segments-${i}`}
+            //             r = "1"
+            //             fill = "red"
+            //             cx = {d[2][0] }
+            //             cy = {d[2][1]}
+            //             />
+            //         )
+            //     })
+            // }
 
             function getLinePathStr(arr) {
-                let [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = arr
-                return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3}`;
+                switch (arr.length) {
+                    case 4:
+                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = arr
+                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3}`
+                        break;
+
+                    case 5:
+                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3], [x4, y4]] = arr
+                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4}`
+                        break;
+
+                    case 6:
+                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3], [x4, y4], [x5, y5]] = arr
+                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4} L${x5} ${y5}`
+                        break;
+
+                    case 7:
+                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3], [x4, y4], [x5, y5], [x6, y6]] = arr
+                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4} L${x5} ${y5} L${x6} ${y6}`
+                        break;
+                
+                    default:
+                        break;
+                }
+                
             }
 
             let segments
             if(this.state.segments) {
                 segments = this.state.segments.map((d, i)=>{
                     if (i < 10) {
-                        console.log(d)
+                        // console.log(d)
                         let pathStr = getLinePathStr(d)
                         return (
                             <path 
-                            key = {`path-${ i}`}
+                            key = {`path-${i}`}
+                            className = {`Segment-${i}`}
                             d = {pathStr}
                             stroke = "#fff"
                             strokeWidth = "0.2"
@@ -687,6 +781,25 @@ class BaseMap extends Component {
                     }
                 })
                 
+            }
+
+            let boundary_segments
+            if(this.state.boundary_segments){
+                boundary_segments = this.state.boundary_segments.map((d, i)=>{
+                    // console.log(d)
+                    let pathStr = getLinePathStr(d)
+                    console.log('ddddddd', d)
+                    return (
+                        <path 
+                        key = {`boundary_segments-${i}`}
+                        className = {`boundary_segments-${i}`}
+                        d = {pathStr}
+                        stroke = "#fff"
+                        strokeWidth = "0.2"
+                        fill = '#f00'
+                        />
+                    )
+                })
             }
 
             let medial_vertical_paths
@@ -742,6 +855,7 @@ class BaseMap extends Component {
                         fill="none"
                         />
                     
+                    // console.log('dddddd', d)
                     // [offsetCoordinates, offsetCoordinates2, xxx3]    
                     // let innerContourArr = []
                     // for (let i=0; i<= 10; i++ ) {
@@ -795,7 +909,8 @@ class BaseMap extends Component {
                 evenPoints,
                 MedianPoints,
                 segments,
-                testPoints
+                boundary_segments
+                // testPoints
                 // medial_vertical_paths,
                ]
                )
@@ -829,19 +944,29 @@ class BaseMap extends Component {
         let paper_inter
         if(this.state.paper_inter){
             paper_inter = this.state.paper_inter.map((d, i)=>{
-                if (i<2) {
-                    console.log(d)
-                    return(
-                        <circle
-                        key = {`paper_inter-${i}`}
-                        r = "1"
-                        fill = "orange"
-                        cx = {d[0]}
-                        cy = {d[1]}
-                        />
-                    )
-                }
-
+                // if (i<2) {
+                //     console.log(d)
+                //     return(
+                //         <circle
+                //         key = {`paper_inter-${i}`}
+                //         className = {`paper_inter-${i}`}
+                //         r = "1"
+                //         fill = "orange"
+                //         cx = {d[0]}
+                //         cy = {d[1]}
+                //         />
+                //     )
+                // }
+                return(
+                    <circle
+                    key = {`paper_inter-${i}`}
+                    className = {`paper_inter-${i}`}
+                    r = ".5"
+                    fill = "orange"
+                    cx = {d[0]}
+                    cy = {d[1]}
+                    />
+                )
             })
         }
 
@@ -858,6 +983,19 @@ class BaseMap extends Component {
                     />
                 )
             })
+        }
+
+        let innerBoundary
+        if(this.state.simplifiedCoordinates){
+            console.log('render simplifiedCoordinates', this.state.simplifiedCoordinates)
+            innerBoundary = <path
+                d = { geoPath().projection(this.autoProjection)(this.state.simplifiedCoordinates) }
+                stroke = "#fff"
+                strokeWidth = "0.2"
+                fill = "#edc949"
+                fillOpacity = "0.5"
+                className = "inner-boundary"
+                />
         }
 
         return (
@@ -878,6 +1016,9 @@ class BaseMap extends Component {
             </g>
             <g className="test_near">
                 {test_near}
+            </g>
+            <g className="innerBoundary">
+                {innerBoundary}
             </g>
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
