@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv } from 'd3'
+import { csv, extent, scaleSequential, interpolateOrRd } from 'd3'
 import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
 // import  getThinnedPath  from './src/get-thinned-path';
 import Offset from 'polygon-offset'
@@ -10,6 +10,7 @@ import CountPoint from './countPoint'
 import MapColor from './mapColor'
 // import { getThinnedPath } from './'
 import polygonClipping from 'polygon-clipping'
+import { polygonContains } from 'd3-polygon'
 
 const intersect = require('path-intersection')
 
@@ -23,7 +24,9 @@ class BaseMap extends Component {
             pointsData:[],
             resDots: null,
             segment_path_len: 0.1,
-            simplifiedCoordinates: null
+            simplifiedCoordinates: null,
+
+            segmentBoxObjArray: null
         }
 
         this.autoProjection = null
@@ -34,6 +37,9 @@ class BaseMap extends Component {
         this.offset = new Offset()
         this.offsetPadding = -0.2
         this.innerBoundaryCoordinates = null
+
+        // segment
+        this.segmentBoxObjArray = []
     }
 
     // projection function with empirical params
@@ -129,6 +135,7 @@ class BaseMap extends Component {
                 })
 
                 this.setState({pointsData: pointsData})
+                // console.log('this.state.pointsData', pointsData)
             })
     }
 
@@ -448,26 +455,30 @@ class BaseMap extends Component {
     }
 
     getBoundarySegments(segments){
-        let temp_segments = [],
+        let _me = this,
+            temp_segments = [],
             clip_boundary
 
         clip_boundary = this.innerBoundaryCoordinates[0].map(e=>{
             return this.autoProjection(e)
         })
-        // console.log('clip_boundary', clip_boundary)
+
         segments.forEach((e, i)=>{
             e.push(e[0])
 
-            // if(i === 50){
-            //     let test = polygonClipping.difference([e], [clip_boundary])
-
-            //     console.log('test....', [e], [clip_boundary], test)
-            // }
             let test = polygonClipping.difference([e], [clip_boundary])
 
             temp_segments.push(test[0][0])
-        })
 
+            // push data
+            let segmentBoxObj = {}
+            segmentBoxObj.segmentCoor = e
+            segmentBoxObj.boundarySegmentCoor = test[0][0]
+            segmentBoxObj.dotCount = 0
+
+            _me.segmentBoxObjArray.push(segmentBoxObj)
+        })
+        // console.log('_me.segmentBoxObjArray', _me.segmentBoxObjArray)
         return temp_segments
     }
 
@@ -571,7 +582,7 @@ class BaseMap extends Component {
                 console.log('len(Median Points)', MedianPoints.length, 'len(nk_intersect_points[1])', nk_intersect_points[1].length)
                 let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
                 let subSegments = _me.getSubsegmentFromSegment(segments, 3)
-                console.log('segments', segments)
+                // console.log('segments', segments)
 
                 // calc boundary segments
                 let boundary_segments = _me.getBoundarySegments(segments)
@@ -622,6 +633,31 @@ class BaseMap extends Component {
         if (prevState.pointsData !== this.state.pointsData) {
             // console.log(this.state.even_points)
             console.log(CountPoint( this.state.even_points ,this.state.pointsData))
+
+            this.state.pointsData.forEach(e=>{
+                let point = _me.autoProjection([ e.Longitude, e.Latitude ])
+
+                try {
+                    _me.segmentBoxObjArray.forEach((e, i)=>{
+                        let contain = polygonContains(e.segmentCoor, point)
+                        // console.log(contain)
+                        if(contain){
+                            e.dotCount += 1
+                            throw new Error('End')
+                        }
+                    })
+                } catch (error) {}
+            })
+
+            let boundary_segment_extent = extent(_me.segmentBoxObjArray, (d)=>{
+                return d.dotCount
+            })
+            this.color_scale = scaleSequential(interpolateOrRd).domain(boundary_segment_extent)
+            console.log('boundary_segment_extent', this.color_scale(20))
+
+            this.setState({
+                segmentBoxObjArray: _me.segmentBoxObjArray
+            })
         }
 
     }
@@ -679,18 +715,6 @@ class BaseMap extends Component {
             if(this.state.MedianPoints) {
 
                 MedianPoints= this.state.MedianPoints.map((d, i)=>{
-                    // if (i <2 ){
-                    //     console.log(d)
-                    //     return(
-                    //         <circle
-                    //         key = {`evenPoints-${i}`}
-                    //         r = "1"
-                    //         fill = "purple"
-                    //         cx = {d[0] }
-                    //         cy = {d[1] }
-                    //         />
-                    //     )
-                    // } 
                     return(
                         <circle
                         key = {`medianPoints-${i}`}
@@ -735,31 +759,15 @@ class BaseMap extends Component {
             // }
 
             function getLinePathStr(arr) {
-                switch (arr.length) {
-                    case 4:
-                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3]] = arr
-                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3}`
-                        break;
-
-                    case 5:
-                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3], [x4, y4]] = arr
-                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4}`
-                        break;
-
-                    case 6:
-                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3], [x4, y4], [x5, y5]] = arr
-                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4} L${x5} ${y5}`
-                        break;
-
-                    case 7:
-                        var [[x0, y0], [x1, y1], [x2, y2], [x3, y3], [x4, y4], [x5, y5], [x6, y6]] = arr
-                        return `M${x0} ${y0} L${x1} ${y1} L${x2} ${y2} L${x3} ${y3} L${x4} ${y4} L${x5} ${y5} L${x6} ${y6}`
-                        break;
-                
-                    default:
-                        break;
-                }
-                
+                let path_str = []
+                arr.forEach((e, i)=>{
+                    if (i === 0) {
+                        path_str.push(`M${e[0]} ${e[1]}`)
+                    }else{
+                        path_str.push(`L${e[0]} ${e[1]}`)
+                    }
+                })
+                return path_str.join(' ')
             }
 
             let segments
@@ -784,11 +792,13 @@ class BaseMap extends Component {
             }
 
             let boundary_segments
-            if(this.state.boundary_segments){
-                boundary_segments = this.state.boundary_segments.map((d, i)=>{
-                    // console.log(d)
-                    let pathStr = getLinePathStr(d)
-                    console.log('ddddddd', d)
+            if(this.state.segmentBoxObjArray){
+                console.log('render segmentBoxObjArray', this.state.segmentBoxObjArray)
+                boundary_segments = this.state.segmentBoxObjArray.map((d, i)=>{
+                    let boundarySegmentCoor = d.boundarySegmentCoor
+
+                    let pathStr = getLinePathStr(boundarySegmentCoor)
+
                     return (
                         <path 
                         key = {`boundary_segments-${i}`}
@@ -796,7 +806,8 @@ class BaseMap extends Component {
                         d = {pathStr}
                         stroke = "#fff"
                         strokeWidth = "0.2"
-                        fill = '#f00'
+                        // fill = '#f00'
+                        fill = {this.color_scale(d.dotCount)}
                         />
                     )
                 })
@@ -993,7 +1004,7 @@ class BaseMap extends Component {
                 stroke = "#fff"
                 strokeWidth = "0.2"
                 fill = "#edc949"
-                fillOpacity = "0.5"
+                fillOpacity = "0.8"
                 className = "inner-boundary"
                 />
         }
