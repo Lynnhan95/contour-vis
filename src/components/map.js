@@ -24,7 +24,7 @@ class BaseMap extends Component {
             pointsData:[],
             resDots: null,
             segment_path_len: 0.1,
-            simplifiedCoordinates: null,
+            simplifiedContours: null,
 
             segmentBoxObjArray: null
         }
@@ -35,7 +35,6 @@ class BaseMap extends Component {
 
         // offset
         this.offset = new Offset()
-        this.offsetPadding = -0.2
         this.innerBoundaryCoordinates = null
 
         // segment
@@ -432,26 +431,35 @@ class BaseMap extends Component {
         return segments
     }
 
-    getSubsegmentFromSegment(segments, interpolateNum) {
-        
-    }
+    getInnerBoundaryContours(coordinates, num) {        
 
-    getInnerBoundaryCoordinates(coordinates){
-        let offsetCoordinates = new Offset(coordinates).offset(this.offsetPadding)
+        let contours = []
+        // HARDCODE 1.89: Api confusion 
+        // let dist = 0.1/ (num) 
+        for(let i=1; i< num+1 ; i++) {
 
-        this.innerBoundaryCoordinates = offsetCoordinates.filter(e => !!e)
-
-        let paddinged = {
-            type: 'Feature',
-            properties: {
-            },  
-            geometry: {
-                type: 'Polygon',
-                coordinates: this.innerBoundaryCoordinates
+            const padding = (-1.6/num)
+            console.log(padding)
+            let offsetContour = new Offset(coordinates).offset(padding* i)
+            if (i == 1) {
+                this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
             }
-        }
 
-        return paddinged
+            let innerBoundaryCoordinates = offsetContour.filter(e => !!e)
+    
+            let paddinged = {
+                type: 'Feature',
+                properties: {
+                },  
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: innerBoundaryCoordinates
+                }
+            }
+            contours.push(paddinged)
+        }
+        
+        return contours
     }
 
     getBoundarySegments(segments){
@@ -491,7 +499,7 @@ class BaseMap extends Component {
             if (d.properties.name === '湖南'){
                 // store computed dots and paths 
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 1
+                const simplifiedFactor = 0.5
                 
                 // Compute simplified area
                 let res = []
@@ -511,8 +519,8 @@ class BaseMap extends Component {
                     simplifiedArea.push(temp)
                 }
 
-                _me.state.simplifiedCoordinates = _me.getInnerBoundaryCoordinates(simplifiedArea)
-                console.log('mainArea', _me.state.simplifiedCoordinates)
+                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
+                console.log('mainArea', _me.state.simplifiedContours)
                 let resDots = []
                 let resPaths = []
                 // loops data format
@@ -575,17 +583,15 @@ class BaseMap extends Component {
                 let nk_intersect_points = _me.getClosestIntersectPoints(MedianVerticalPoints, resPaths)
                 console.log('nk_intersect_points', nk_intersect_points)
 
-                //let intersection_points = getSecondElements(nk_intersect_points[0])
                 
                 // ISSUE: -> Fixed
                 // len(Median Points) !== len(nk_intersect_points[1])
-                console.log('len(Median Points)', MedianPoints.length, 'len(nk_intersect_points[1])', nk_intersect_points[1].length)
-                let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
-                let subSegments = _me.getSubsegmentFromSegment(segments, 3)
-                // console.log('segments', segments)
+
+                // Get segments
+                //let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
 
                 // calc boundary segments
-                let boundary_segments = _me.getBoundarySegments(segments)
+                //let boundary_segments = _me.getBoundarySegments(segments)
 
                 function getLinesfromPoints(arr) {
                     let lines = []
@@ -623,8 +629,8 @@ class BaseMap extends Component {
                     even_points: even_points,
                     MedianPoints: MedianPoints,
                     paper_inter: nk_intersect_points[1],
-                    segments: segments,
-                    boundary_segments: boundary_segments
+                    //segments: segments,
+                    //boundary_segments: boundary_segments
                 })   
             }
             })
@@ -910,16 +916,16 @@ class BaseMap extends Component {
             return [
                     //outsideBoundary, 
                     simplified_boundary,
-                    boundaryDots
+                    //boundaryDots
                ]
                // .concat(innerBoundaryArr)
                .concat(
                [
                 //SegmentDots,
-                verticalLines,
-                evenPoints,
-                MedianPoints,
-                segments,
+                //verticalLines,
+                //evenPoints,
+                //MedianPoints,
+                //segments,
                 boundary_segments
                 // testPoints
                 // medial_vertical_paths,
@@ -997,16 +1003,23 @@ class BaseMap extends Component {
         }
 
         let innerBoundary
-        if(this.state.simplifiedCoordinates){
-            console.log('render simplifiedCoordinates', this.state.simplifiedCoordinates)
-            innerBoundary = <path
-                d = { geoPath().projection(this.autoProjection)(this.state.simplifiedCoordinates) }
+        if(this.state.simplifiedContours){
+            console.log('render simplifiedContours', this.state.simplifiedContours)
+            innerBoundary = 
+            this.state.simplifiedContours.map((d, i) => {
+            return (
+            <path
+                key = {`contours-${i}`}
+                d = { geoPath().projection(this.autoProjection)(d) }
                 stroke = "#fff"
                 strokeWidth = "0.2"
                 fill = "#edc949"
                 fillOpacity = "0.8"
                 className = "inner-boundary"
                 />
+                )
+            })
+
         }
 
         return (
@@ -1018,12 +1031,6 @@ class BaseMap extends Component {
             </g>
              <g className="Dots"> 
                 {Dots}
-            </g>
-            <g className="MedialAxis"> 
-                {MedialAxis}
-            </g>
-            <g className="paper_inter">
-                {paper_inter}
             </g>
             <g className="test_near">
                 {test_near}
