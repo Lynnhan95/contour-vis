@@ -433,6 +433,49 @@ class BaseMap extends Component {
     }
 
     getSubsegmentFromSegment(segments, interpolateNum) {
+        let interpolatePairs = []
+        segments.forEach( (e) => {
+            //console.log(e)
+            let [ A1, A2, B2, B1] = e
+            
+            let interpolatePair = [ [A1, A2] ] 
+            for (let i=1; i< interpolateNum; i++) {
+                // [M, N]
+                let temp = []
+                let Mx, My 
+                Mx = (1 - i/ interpolateNum) * A1[0] + ( i/ interpolateNum ) * B1[0]
+                My = (1 - i/ interpolateNum) * A1[1] + ( i/ interpolateNum ) * B1[1]
+                let tempM = [Mx, My]
+                temp.push(tempM)
+
+                let Nx, Ny 
+                Nx = (1 - i/ interpolateNum) * A2[0] + ( i/ interpolateNum ) * B2[0]
+                Ny = (1 - i/ interpolateNum) * A2[1] + ( i/ interpolateNum ) * B2[1]
+                let tempN = [Nx, Ny]
+                temp.push(tempN)
+
+                interpolatePair.push(temp)
+            }
+            interpolatePair.push( [B1, B2])
+
+            interpolatePairs.push(interpolatePair)
+        })
+        console.log(interpolatePairs[0])
+
+        let interpolateRegions = []
+        interpolatePairs.forEach( (e) => {
+            let subRegion = []
+            for (let i=0; i< e.length-1; i++) {
+                let firstPair = e[i]
+                let secondPair = e[i+1]
+                let singleRegion = [ firstPair[0], secondPair[0], secondPair[1], firstPair[1] ] 
+                subRegion.push(singleRegion)
+
+            }
+            interpolateRegions.push(subRegion)
+        })
+        console.log(interpolateRegions)
+        return interpolateRegions
         
     }
 
@@ -491,7 +534,7 @@ class BaseMap extends Component {
             if (d.properties.name === '湖南'){
                 // store computed dots and paths 
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 1
+                const simplifiedFactor = 1   
                 
                 // Compute simplified area
                 let res = []
@@ -582,7 +625,8 @@ class BaseMap extends Component {
                 console.log('len(Median Points)', MedianPoints.length, 'len(nk_intersect_points[1])', nk_intersect_points[1].length)
                 let segments = _me.getSegmentFromPoints(MedianPoints, nk_intersect_points[1])
                 let subSegments = _me.getSubsegmentFromSegment(segments, 3)
-                // console.log('segments', segments)
+              
+                console.log('segments', subSegments)
 
                 // calc boundary segments
                 let boundary_segments = _me.getBoundarySegments(segments)
@@ -624,6 +668,7 @@ class BaseMap extends Component {
                     MedianPoints: MedianPoints,
                     paper_inter: nk_intersect_points[1],
                     segments: segments,
+                    subSegments:subSegments,
                     boundary_segments: boundary_segments
                 })   
             }
@@ -791,6 +836,33 @@ class BaseMap extends Component {
                 
             }
 
+            let subSegments 
+            if(this.state.subSegments) {
+                subSegments = [] // [strPath, strPath]
+                console.log(this.state.subSegments[0]) //[region, region, region]
+                let temp = []
+                this.state.subSegments.forEach((e) => {
+                    for(let i=0; i< e.length; i++) {
+                        temp.push(e[i])
+                    }
+                })
+
+
+                subSegments = temp.map((d,i) => {
+                    let pathStr = getLinePathStr(d)
+                    return (
+                        <path 
+                        key = {`path-${i}`}
+                        className = {`Segment-${i}`}
+                        d = {pathStr}
+                        stroke = "#fff"
+                        strokeWidth = "0.2"
+                        fill = 'blue'
+                        />
+                    )
+                })
+            }
+
             let boundary_segments
             if(this.state.segmentBoxObjArray){
                 console.log('render segmentBoxObjArray', this.state.segmentBoxObjArray)
@@ -920,6 +992,7 @@ class BaseMap extends Component {
                 evenPoints,
                 MedianPoints,
                 segments,
+                subSegments,
                 boundary_segments
                 // testPoints
                 // medial_vertical_paths,
