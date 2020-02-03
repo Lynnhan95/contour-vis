@@ -9,10 +9,14 @@ import CountPoint from './countPoint'
 import MapColor from './mapColor'
 import polygonClipping from 'polygon-clipping'
 import { polygonContains } from 'd3-polygon'
+import {getDensity} from "./getDensity";
 
 const intersect = require('path-intersection')
 
-// console.log('paper', paper)
+
+// global varibales:
+
+let set_segment = 10000;
 
 class BaseMap extends Component {
     constructor(){
@@ -54,7 +58,7 @@ class BaseMap extends Component {
         fetch("/chinaGeo.geojson")
             .then(response => {
                 if (response.status !== 200){
-                    console.log('can not load geojson file')
+                    //console.log('can not load geojson file')
                     return
                 }
                 response.json().then(chinaGeoData => {
@@ -73,7 +77,7 @@ class BaseMap extends Component {
               d["year"] = +d["year"]
             })
             return data
-      
+
             }).then( data => {
                 const pointsData = data.filter( (d) => {
                     return d.province === "Hunan"
@@ -81,6 +85,7 @@ class BaseMap extends Component {
                 this.setState({pointsData: pointsData})
             })
     }
+
     /* Helper function for getting even_point */
     calcDistanceFromTwoPoints(point1, point2) {
         let [x0, y0] = point1,
@@ -149,7 +154,7 @@ class BaseMap extends Component {
     //             pos: null,
     //             neg: null
     //         }
-        
+
     //     x.pos = M.x + len/Math.sqrt(k*k + 1)
     //     x.neg = M.x - len/Math.sqrt(k*k + 1)
 
@@ -159,7 +164,7 @@ class BaseMap extends Component {
     getMedianPointsFromEvenPoint(arr) {
         let _me = this
         let MedianPoints = [],
-        A, B 
+        A, B
 
         for (let i = 0; i< arr.length; i++) {
             if(i === arr.length - 1){
@@ -188,53 +193,33 @@ class BaseMap extends Component {
             }
 
             let median = _me.autoProjection([M.x, M.y])
-            //console.log(median)
+            ////console.log(median)
                 MedianPoints.push(median)
         }
         return MedianPoints
 
     }
 
-    getPathsfromPoints(arr) {
-        let _me = this,
-            paths = []
-
-        for (let i=0; i< arr.length; i++) {
-            // TODO: some points will lost after projection because
-            // they are a little large
-            let x0 = _me.autoProjection(arr[i][0])[0], 
-                y0 = _me.autoProjection(arr[i][0])[1]
-            let x1 = _me.autoProjection(arr[i][1])[0], 
-                y1 = _me.autoProjection(arr[i][1])[1]
-
-            paths.push(`M${x0} ${y0} L${x1} ${y1}`);
-            
-        }
-
-        return paths
-    }
-
-
-    getInnerBoundaryContours(coordinates, num) {        
+    getInnerBoundaryContours(coordinates, num) {
 
         let contours = []
-        // HARDCODE 1.89: Api confusion 
-        // let dist = 0.1/ (num) 
+        // HARDCODE 1.89: Api confusion
+        // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
             const padding = (-1.6/num)
-            console.log(padding)
+            //console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             if (i == 1) {
                 this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
             }
 
             let innerBoundaryCoordinates = offsetContour.filter(e => !!e)
-    
+
             let paddinged = {
                 type: 'Feature',
                 properties: {
-                },  
+                },
                 geometry: {
                     type: 'Polygon',
                     coordinates: innerBoundaryCoordinates
@@ -242,7 +227,7 @@ class BaseMap extends Component {
             }
             contours.push(paddinged)
         }
-        
+
         return contours
     }
 
@@ -270,7 +255,7 @@ class BaseMap extends Component {
 
             _me.segmentBoxObjArray.push(segmentBoxObj)
         })
-        // console.log('_me.segmentBoxObjArray', _me.segmentBoxObjArray)
+        // //console.log('_me.segmentBoxObjArray', _me.segmentBoxObjArray)
         return temp_segments
     }
 
@@ -281,10 +266,10 @@ class BaseMap extends Component {
 
             this.state.chinaGeoData.map((d,i)=> {
             if (d.properties.name === '湖南'){
-                // store computed dots and paths 
+                // store computed dots and paths
                 const mainArea = d.geometry.coordinates
                 const simplifiedFactor = 0
-                
+
                 // Compute simplified area
                 let res = []
                 for(let i=0; i< mainArea[0].length; i++) {
@@ -295,26 +280,33 @@ class BaseMap extends Component {
                 }
 
                 let simplified = simplify(res, simplifiedFactor, true)
-                let simplifiedArea = [] 
+                let simplifiedArea = []
                 for(let i=0; i< simplified.length; i++) {
-                    let temp = [] 
+                    let temp = []
                     temp.push(simplified[i].x)
                     temp.push(simplified[i].y)
                     simplifiedArea.push(temp)
                 }
-                
+
                 _me.state.simplifiedArea = simplifiedArea
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // convert boundary to path for computing.
+
+                getDensity(simplifiedArea)
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
-                console.log('mainArea', _me.state.simplifiedContours)
+                //console.log('mainArea', _me.state.simplifiedContours)
 
                 let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
-                
+
                 let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
-                // console.log(MedianPoints)
+                // //console.log(MedianPoints)
 
                 // let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
-                //console.log(MedianVerticalPoints)
-                
+                ////console.log(MedianVerticalPoints)
+
                 // let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
 
                 function getLinesfromPoints(arr) {
@@ -332,13 +324,13 @@ class BaseMap extends Component {
                 }
 
                 function getSecondElements(arr) {
-                    let temp = [] 
+                    let temp = []
                     for(let i=0; i< arr.length; i++) {
                         temp.push(arr[i][1])
                     }
                     return temp
                 }
-                
+
                 // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
                 // let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
                 this.setState({
@@ -354,14 +346,14 @@ class BaseMap extends Component {
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
                     //boundary_segments: boundary_segments
-                })   
+                })
             }
             })
         }
 
         if (prevState.pointsData !== this.state.pointsData) {
-            // console.log(this.state.even_points)
-            console.log(CountPoint( this.state.even_points ,this.state.pointsData))
+            // //console.log(this.state.even_points)
+            //console.log(CountPoint( this.state.even_points ,this.state.pointsData))
 
             this.state.pointsData.forEach(e=>{
                 let point = _me.autoProjection([ e.Longitude, e.Latitude ])
@@ -369,7 +361,7 @@ class BaseMap extends Component {
                 try {
                     _me.segmentBoxObjArray.forEach((e, i)=>{
                         let contain = polygonContains(e.segmentCoor, point)
-                        // console.log(contain)
+                        // //console.log(contain)
                         if(contain){
                             e.dotCount += 1
                             throw new Error('End')
@@ -382,7 +374,7 @@ class BaseMap extends Component {
                 return d.dotCount
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(boundary_segment_extent)
-            console.log('boundary_segment_extent', this.color_scale(20))
+            //console.log('boundary_segment_extent', this.color_scale(20))
 
             this.setState({
                 segmentBoxObjArray: _me.segmentBoxObjArray
@@ -398,7 +390,7 @@ class BaseMap extends Component {
             if ( this.state.segmentBorderPaths ) {
                 verticalLines = this.state.segmentBorderPaths.map((d,i) => {
                     return (
-                        <path 
+                        <path
                         className = "vertical-line"
                         key = {`segmentBorder-${i}`}
                         d = {d}
@@ -437,10 +429,10 @@ class BaseMap extends Component {
                 return path_str.join(' ')
             }
 
-            /* Map segments and belt segments (denoted as boundary_segments) 
+            /* Map segments and belt segments (denoted as boundary_segments)
             With this.state.segments and this.state.segmentBoxObjArray data
             Notice: segmentBoxObjArray contains:
-                    - boundarySegmentCoordinate 
+                    - boundarySegmentCoordinate
                     - dotCount (dots amount per segment)
             */
             let segments
@@ -448,7 +440,7 @@ class BaseMap extends Component {
                 segments = this.state.segments.map((d, i)=>{
                         let pathStr = getLinePathStr(d)
                         return (
-                            <path 
+                            <path
                             key = {`path-${i}`}
                             className = {`Segment-${i}`}
                             d = {pathStr}
@@ -459,19 +451,19 @@ class BaseMap extends Component {
                         )
 
                 })
-                
+
             }
 
             let boundary_segments
             if(this.state.segmentBoxObjArray){
-                console.log('render segmentBoxObjArray', this.state.segmentBoxObjArray)
+                //console.log('render segmentBoxObjArray', this.state.segmentBoxObjArray)
                 boundary_segments = this.state.segmentBoxObjArray.map((d, i)=>{
                     let boundarySegmentCoor = d.boundarySegmentCoor
 
                     let pathStr = getLinePathStr(boundarySegmentCoor)
 
                     return (
-                        <path 
+                        <path
                         key = {`boundary_segments-${i}`}
                         className = {`boundary_segments-${i}`}
                         d = {pathStr}
@@ -511,11 +503,11 @@ class BaseMap extends Component {
             // })
 
             // No longer draw boundary from original chinaGeoData
-            let outsideBoundary 
+            let outsideBoundary
 
             this.state.chinaGeoData.map((d, i) => {
                 if(d.properties.name === '湖南'){
-                    //console.log(d)
+                    ////console.log(d)
                     this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
                     outsideBoundary = <path
                         key = {`path-${ i }`}
@@ -524,11 +516,11 @@ class BaseMap extends Component {
                         strokeWidth = "2"
                         fill="none"
                         />
-                    
+
                 }
             })
             return [
-                    //outsideBoundary, 
+                    //outsideBoundary,
                     simplified_Outboundary,
                     //boundaryDots
                ]
@@ -547,11 +539,11 @@ class BaseMap extends Component {
                )
         }
         const Regions = getRegionElements()
-        
-        // draw dots to the map 
+
+        // draw dots to the map
         const Dots = this.state.pointsData.map((d,i) => {
             return (
-            <circle 
+            <circle
             key = {`dot-${ i }`}
             cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
             cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
@@ -578,8 +570,8 @@ class BaseMap extends Component {
 
         let innerBoundary
         if(this.state.simplifiedContours){
-            console.log('render simplifiedContours', this.state.simplifiedContours)
-            innerBoundary = 
+            //console.log('render simplifiedContours', this.state.simplifiedContours)
+            innerBoundary =
             this.state.simplifiedContours.map((d, i) => {
             return (
             <path
@@ -603,7 +595,7 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots"> 
+             <g className="Dots">
                 {Dots}
             </g>
             <g className="test_near">
@@ -615,7 +607,7 @@ class BaseMap extends Component {
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>
-        
+
         )
 
     }

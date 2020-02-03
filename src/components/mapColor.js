@@ -17,14 +17,13 @@ function MapColor(region, index, projection, color, name) {
             coordinates: [temp]
         }
     }
-    console.log(geoObj)
     return <path
     key = {`${ name }-path-${ index }`}
     d = {projection(geoObj)}
     stroke = "#fff"
     strokeWidth = "0.2"
     fill = { color }
-    /> 
+    />
 }
 
 export default MapColor
