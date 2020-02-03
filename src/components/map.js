@@ -291,8 +291,11 @@ class BaseMap extends Component {
                 _me.state.simplifiedArea = simplifiedArea
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // convert boundary to path for computing.
+                // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
-                getDensity(simplifiedArea)
+                let circleAry = getDensity(simplifiedArea)
+
+                this.setState({inscribledCircles :circleAry })
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -400,6 +403,11 @@ class BaseMap extends Component {
                     )
                 })
             }
+
+        if (this.state.inscribledCircles != undefined) {
+                  console.log(this.state.inscribledCircles[0]);
+        }
+
 
             // let evenPoints
             // if(this.state.even_points) {
