@@ -64,17 +64,17 @@ export function getDensity (pts_ary,segment_num = 3000){
 
   let segPolyList = []
   for (var i = 0; i < new_pts.length; i++) {
-    var center1 = {x:dictAllmin[i].centerX, y:dictAllmin[i].centerY}
-    var pt1 = {x:new_pts[i].x,y:new_pts[i].y }
+    var center1 = [dictAllmin[i].centerX, dictAllmin[i].centerY]
+    var pt1 = [new_pts[i].x,new_pts[i].y]
 
     var center2,pt2;
     if (i !== new_pts.length-1) {
-      center2 = {x:dictAllmin[i+1].centerX, y:dictAllmin[i+1].centerY}
-      pt2     = {x:new_pts[i+1].x,y:new_pts[i+1].y}
+      center2 = [dictAllmin[i+1].centerX, dictAllmin[i+1].centerY]
+      pt2     = [new_pts[i+1].x,new_pts[i+1].y]
     }
     if (i === new_pts.length-1 ) {
-    center2 = {x:dictAllmin[0].centerX, y:dictAllmin[0].centerY}
-      pt2   = {x:new_pts[0].x,y:new_pts[0].y}
+    center2 = [dictAllmin[0].centerX, dictAllmin[0].centerY]
+      pt2   = [new_pts[0].x,new_pts[0].y]
     }
 
     var polygon = [pt1,pt2,center2,center1]
