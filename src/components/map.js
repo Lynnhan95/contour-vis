@@ -20,8 +20,6 @@ const intersect = require('path-intersection')
 
 // global varibales:
 
-
-
 class BaseMap extends Component {
     constructor(){
         super();
@@ -233,34 +231,6 @@ class BaseMap extends Component {
         return contours
     }
 
-    getBoundarySegments(segments){
-        let _me = this,
-            temp_segments = [],
-            clip_boundary
-
-        clip_boundary = this.innerBoundaryCoordinates[0].map(e=>{
-            return this.autoProjection(e)
-        })
-
-        segments.forEach((e, i)=>{
-            e.push(e[0])
-
-            let test = polygonClipping.difference([e], [clip_boundary])
-
-            temp_segments.push(test[0][0])
-
-            // push data
-            let segmentBoxObj = {}
-            segmentBoxObj.segmentCoor = e
-            segmentBoxObj.boundarySegmentCoor = test[0][0]
-            segmentBoxObj.dotCount = 0
-
-            _me.segmentBoxObjArray.push(segmentBoxObj)
-        })
-        // //console.log('_me.segmentBoxObjArray', _me.segmentBoxObjArray)
-        return temp_segments
-    }
-
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
@@ -303,6 +273,7 @@ class BaseMap extends Component {
                 // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
+
                 let [circleAry,segPolyList] = getDensity(simplifiedAreaProjected)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -326,6 +297,27 @@ class BaseMap extends Component {
 /*
             belt
 */
+                // console.log(this.innerBoundaryCoordinates)
+                let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
+                    return this.autoProjection(d)
+                })
+                let beltSegList = []
+                segPolyList.forEach((d) => {
+                    let beltSeg = getBeltSegment(d, clip_boundary)
+                    beltSegList.push(beltSeg)
+                })
+
+                //console.log(beltSegList)
+/*
+            belt cells
+                
+*/
+                let beltCellList = []
+                beltSegList.forEach((d) => {
+                    let subCell = interpolateSegment(d, subSegNum)
+                    beltCellList.push(subCell)
+                })
+
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
 
