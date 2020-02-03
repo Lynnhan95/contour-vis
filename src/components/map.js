@@ -296,7 +296,7 @@ class BaseMap extends Component {
 
                 let circleAry = getInscribed(simplifiedArea)
 
-                this.setState({inscribledCircles :circleAry })
+                //this.setState({  })
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -347,6 +347,7 @@ class BaseMap extends Component {
                     // segmentBorderPaths: segmentBorderPaths,
                     even_points: even_points,
                     MedianPoints: MedianPoints,
+                    inscribledCircles :circleAry
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
                     //boundary_segments: boundary_segments
@@ -405,14 +406,27 @@ class BaseMap extends Component {
                 })
             }
 
-        if (this.state.inscribledCircles != undefined) {
-                  console.log(this.state.inscribledCircles[0]);
-        }
+            let inscribledCircles
+            if(this.state.inscribledCircles) {
+                console.log(this.state.inscribledCircles)
+                inscribledCircles = this.state.inscribledCircles.map((d,i) => {
+                    return (
+                        <circle
+                        cx = {this.autoProjection([d.centerX , d.centerY])[0] }
+                        cy = {this.autoProjection([d.centerX , d.centerY])[1] }
+                        r = {d.radius}
+                        stoke = "#000"
+                        strokeWdith = "0.5"
+                        />
+                    )
+                })
+            }
 
 
-            // let evenPoints
+            let evenPoints
             // if(this.state.even_points) {
             //     evenPoints = this.state.even_points.map((d, i)=>{
+            //         console.log(d)
             //         return(
             //             <circle
             //             key = {`evenPoints-${i}`}
@@ -493,7 +507,7 @@ class BaseMap extends Component {
              */
             let simplified_Outboundary
             if( this.state.simplifiedArea ) {
-                simplified_Outboundary = MapColor(this.state.simplifiedArea, 1, geoPath().projection(this.autoProjection), '#2c75b1', 'outBoundary' )
+                simplified_Outboundary = MapColor(this.state.simplifiedArea, 1, geoPath().projection(this.autoProjection), 'transparent', 'outBoundary' )
 
             }
 
@@ -531,6 +545,7 @@ class BaseMap extends Component {
             return [
                     //outsideBoundary,
                     simplified_Outboundary,
+                    inscribledCircles
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)
@@ -586,10 +601,11 @@ class BaseMap extends Component {
             <path
                 key = {`contours-${i}`}
                 d = { geoPath().projection(this.autoProjection)(d) }
-                stroke = "#fff"
+                stroke = "#000"
                 strokeWidth = "0.2"
-                fill = "#edc949"
-                fillOpacity = "0.8"
+                //fill = "#edc949"
+                fill = "transparent"
+                //fillOpacity = "0.8"
                 className = "inner-boundary"
                 />
                 )

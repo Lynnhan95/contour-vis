@@ -20,9 +20,10 @@ function MapColor(region, index, projection, color, name) {
     return <path
     key = {`${ name }-path-${ index }`}
     d = {projection(geoObj)}
-    stroke = "#fff"
-    strokeWidth = "0.2"
+    stroke = "#000"
+    strokeWidth = "0.8"
     fill = { color }
+
     />
 }
 
