@@ -10,6 +10,8 @@ import MapColor from './mapColor'
 import polygonClipping from 'polygon-clipping'
 import { polygonContains } from 'd3-polygon'
 import {getDensity} from "./getDensity";
+import {interpolateSegment} from './interpolateSegment'
+import {getBeltSegment} from './getBeltSegment'
 
 
 const intersect = require('path-intersection')
@@ -208,6 +210,7 @@ class BaseMap extends Component {
             const padding = (-1.6/num)
             //console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
+            // Set the first contour as clipping_boundary
             if (i == 1) {
                 this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
             }
@@ -287,6 +290,13 @@ class BaseMap extends Component {
                 }
 
                 _me.state.simplifiedArea = simplifiedArea
+
+                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
+                //console.log('mainArea', _me.state.simplifiedContours)
+
+                let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
+
+                let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // convert boundary to path for computing.
                 // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
@@ -295,16 +305,27 @@ class BaseMap extends Component {
                 let [circleAry,segPolyList] = getDensity(simplifiedAreaProjected)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+            subseg
+*/
 
-                console.log(segPolyList);
+                let subSegList = []
+                const subSegNum = 8
+                segPolyList.forEach((d) => {
+
+                    let subSeg = interpolateSegment(d, subSegNum)
+                    subSegList.push(subSeg)
+
+                })
+/*
+            belt 
+*/
+
+                //let beltSeg = getBeltSegment(segPoly, clip_boundary)
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
-                //console.log('mainArea', _me.state.simplifiedContours)
 
-                let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
-
-                let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
                 // //console.log(MedianPoints)
 
                 // let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
