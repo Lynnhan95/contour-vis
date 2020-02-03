@@ -4,7 +4,7 @@ import {Point,Path} from 'paper'
 params: points array of boundary
 */
 
-export function getDensity (pts_ary,segment_num = 1000){
+export function getDensity (pts_ary,segment_num = 3000){
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
@@ -56,6 +56,7 @@ export function getDensity (pts_ary,segment_num = 1000){
 
   let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q,dictAllmin3Q,dictAllmin4Q)
 
+  return dictAllmin;
 
   /*
     return dictAllmin as all maxinscribled circles
