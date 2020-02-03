@@ -12,6 +12,7 @@ import { polygonContains } from 'd3-polygon'
 import {getDensity} from "./getDensity";
 import {interpolateSegment} from './interpolateSegment'
 import {getBeltSegment} from './getBeltSegment'
+import {insideCounter} from './insideCounter'
 
 
 const intersect = require('path-intersection')
@@ -306,19 +307,24 @@ class BaseMap extends Component {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-            subseg
+            subsegments
 */
 
                 let subSegList = []
-                const subSegNum = 8
+                const subSegNum = 3 // set how many subsegments we divide each seg
                 segPolyList.forEach((d) => {
 
                     let subSeg = interpolateSegment(d, subSegNum)
                     subSegList.push(subSeg)
 
                 })
+
+
+                // console.log(insideCounter(subSegList,this.state.pointsData));
+
+
 /*
-            belt 
+            belt
 */
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
@@ -368,7 +374,8 @@ class BaseMap extends Component {
                     even_points: even_points,
                     MedianPoints: MedianPoints,
                     inscribledCircles :circleAry,
-                    linePts : simplifiedAreaProjected
+                    linePts : simplifiedAreaProjected,
+                    subSegList:subSegList
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
                     //boundary_segments: boundary_segments
@@ -376,37 +383,17 @@ class BaseMap extends Component {
             }
             })
         }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.pointsData !== this.state.pointsData) {
-            // //console.log(this.state.even_points)
-            //console.log(CountPoint( this.state.even_points ,this.state.pointsData))
 
-            this.state.pointsData.forEach(e=>{
-                let point = _me.autoProjection([ e.Longitude, e.Latitude ])
-
-                try {
-                    _me.segmentBoxObjArray.forEach((e, i)=>{
-                        let contain = polygonContains(e.segmentCoor, point)
-                        // //console.log(contain)
-                        if(contain){
-                            e.dotCount += 1
-                            throw new Error('End')
-                        }
-                    })
-                } catch (error) {}
+            var pointsDataProjected = this.state.pointsData.map((e)=>{
+                return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            let boundary_segment_extent = extent(_me.segmentBoxObjArray, (d)=>{
-                return d.dotCount
-            })
-            this.color_scale = scaleSequential(interpolateOrRd).domain(boundary_segment_extent)
-            //console.log('boundary_segment_extent', this.color_scale(20))
+            var densityGroup = insideCounter(this.state.subSegList,pointsDataProjected)
 
-            this.setState({
-                segmentBoxObjArray: _me.segmentBoxObjArray
-            })
         }
-
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     render() {

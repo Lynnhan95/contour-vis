@@ -1,23 +1,48 @@
 
-export function insideCounter (centerDict,curvePtList,dotsList){
+/*
+  params: subseglist is the list containing all subsegments divided from each segment
+          dataPts: all data points inside the outline/boundary
+*/
 
-        var inside_point_density_list = [];
-        var inside_point_numb_list = [];
+export function insideCounter (subSegGroup_ary, dataPts){
+        // for each subseg
 
-        var area_list=[]
+        var densityGroup = []
 
+        for (var i = 0; i < subSegGroup_ary.length; i++) {
+
+
+          var subSegGroup  = subSegGroup_ary[i] // it has four points
+          var subDensityGroup = []
+          for (var j = 0; j < subSegGroup.length; j++) {
+            var subSeg = subSegGroup[j]
+            var counter = 0 // init the counter
+            dataPts.forEach((pt, i) => {
+              if (inside(pt,subSeg) == true) {
+                counter ++ ;
+              }
+            });
+            var area = getArea (subSeg)
+            var density = counter/area
+            subDensityGroup.push(density)
+          }
+          densityGroup.push (subDensityGroup)
+        }
+
+        return densityGroup;
     }
 
 
-    function getArea(curvept1,curvept2,centerpt1,centerpt2){
-        var x1 = curvept1.x
-        var x2 = curvept2.x
-        var x3 = centerpt1.centerX
-        var x4 = centerpt2.centerX
-        var y1 = curvept1.y
-        var y2 = curvept2.y
-        var y3 = centerpt1.centerY
-        var y4 = centerpt2.centerY
+    function getArea(poly){
+
+        var x1 = poly[0][0]
+        var x2 = poly[1][0]
+        var x3 = poly[2][0]
+        var x4 = poly[3][0]
+        var y1 = poly[0][1]
+        var y2 = poly[1][1]
+        var y3 = poly[2][1]
+        var y4 = poly[3][1]
 
 
         var area1 = Math.abs(0.5*(Number(x1)*Number(y2)+Number(x2)*Number(y3)+Number(x3)*Number(y1)-Number(x1)*Number(y3)-Number(x2)*Number(y1)- Number(x3)*Number(y2)))
@@ -32,12 +57,12 @@ export function insideCounter (centerDict,curvePtList,dotsList){
         // ray-casting algorithm based on
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
 
-        var x = point.x, y = point.y;
+        var x = point[0], y = point[1];
 
         var inside = false;
         for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-            var xi = vs[i].x, yi = vs[i].y;
-            var xj = vs[j].x, yj = vs[j].y;
+            var xi = vs[i][0], yi = vs[i][1];
+            var xj = vs[j][0], yj = vs[j][1];
 
             var intersect = ((yi >= y) != (yj >= y))
                 && (x <= (xj - xi) * (y - yi) / (yj - yi) + xi);
