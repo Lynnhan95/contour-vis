@@ -506,7 +506,7 @@ class BaseMap extends Component {
              */
             let simplified_Outboundary
             if( this.state.simplifiedArea ) {
-                simplified_Outboundary = MapColor(this.state.simplifiedArea, 1, geoPath().projection(this.autoProjection), '#2c75b1', 'outBoundary' )
+                simplified_Outboundary = MapColor(this.state.simplifiedArea, 1, geoPath().projection(this.autoProjection), 'transparent', 'outBoundary' )
 
             }
 
@@ -600,10 +600,11 @@ class BaseMap extends Component {
             <path
                 key = {`contours-${i}`}
                 d = { geoPath().projection(this.autoProjection)(d) }
-                stroke = "#fff"
+                stroke = "#000"
                 strokeWidth = "0.2"
-                fill = "#edc949"
-                fillOpacity = "0.8"
+                //fill = "#edc949"
+                fill = "transparent"
+                //fillOpacity = "0.8"
                 className = "inner-boundary"
                 />
                 )
