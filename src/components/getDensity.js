@@ -14,9 +14,11 @@ export function getDensity (pts_ary,segment_num = 3000){
 
   for (var i = 0; i < pts_ary.length; i++) {
     var temp_point = new Point (pts_ary[i][0],pts_ary[i][1])
-    path.add (temp_point)
-  }
 
+    path.add (temp_point)
+
+  }
+  console.log(path.length);
   let widget = path.length/segment_num, new_pts = []
 
   for (var i = 0; i < segment_num; i++) {
@@ -56,7 +58,7 @@ export function getDensity (pts_ary,segment_num = 3000){
     }
 
   let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q,dictAllmin3Q,dictAllmin4Q)
-
+  console.log(dictAllmin);
   return dictAllmin;
 
   /*
@@ -244,7 +246,6 @@ function getThirdPoint(pt1,pt2,dist) {
     var perp_vector = [dist*Multi_result[0][0],dist*Multi_result[1][0]]
     var mid_point = [((pt1.x+pt2.x)/2),((pt1.y+pt2.y)/2)]
     var third_point = {x:(perp_vector[0]+mid_point[0]),y:(perp_vector[1]+mid_point[1])}
-
     return third_point;
 }
 

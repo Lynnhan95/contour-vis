@@ -294,9 +294,9 @@ class BaseMap extends Component {
                 // convert boundary to path for computing.
                 // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
-                let circleAry = getInscribed(simplifiedArea)
-
-                //this.setState({  })
+                let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
+                console.log(simplifiedAreaProjected);
+                let circleAry = getDensity(simplifiedAreaProjected)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,15 +408,17 @@ class BaseMap extends Component {
 
             let inscribledCircles
             if(this.state.inscribledCircles) {
-                console.log(this.state.inscribledCircles)
+
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
+                  console.log(d.centerX);
                     return (
                         <circle
-                        cx = {this.autoProjection([d.centerX , d.centerY])[0] }
-                        cy = {this.autoProjection([d.centerX , d.centerY])[1] }
+                        cx = {d.centerY }
+                        cy = {d.centerX }
                         r = {d.radius}
-                        stoke = "#000"
-                        strokeWdith = "0.5"
+                        stroke = "#000"
+                        fill = "none"
+                        strokeWidth = "0.1"
                         />
                     )
                 })
