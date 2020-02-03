@@ -195,7 +195,7 @@ class BaseMap extends Component {
         return -1*k*x + k*(A.x+B.x)/2 + (A.y+B.y)/2
     }
 
-    getPerpendicularXfromAB(A, B, len){
+    getPerpendicularXfromAB(A, B, len) {
         let M = {
                 x: (B.x + A.x) / 2
             },
@@ -211,7 +211,7 @@ class BaseMap extends Component {
         return x
     }
 
-    getMedianPointsFromEvenPoint(arr){
+    getMedianPointsFromEvenPoint(arr) {
         let _me = this
         let MedianPoints = [],
         A, B 
