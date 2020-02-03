@@ -40,6 +40,7 @@ class BaseMap extends Component {
 
         // segment
         this.segmentBoxObjArray = []
+        this.splitObjArray = []
     }
 
     // projection function with empirical params
@@ -460,7 +461,7 @@ class BaseMap extends Component {
 
             interpolatePairs.push(interpolatePair)
         })
-        console.log(interpolatePairs[0])
+        console.log('interpolatePairs[0]', interpolatePairs[0])
 
         let interpolateRegions = []
         interpolatePairs.forEach( (e) => {
@@ -474,7 +475,7 @@ class BaseMap extends Component {
             }
             interpolateRegions.push(subRegion)
         })
-        console.log(interpolateRegions)
+        console.log('interpolateRegions', interpolateRegions)
         return interpolateRegions
         
     }
@@ -497,32 +498,134 @@ class BaseMap extends Component {
         return paddinged
     }
 
+    interpolateSegment(segment, num){
+        /**
+         * A: median point
+         * B: intersect point
+         */
+        let [ A1, A2, B2, B1] = segment
+            
+        let interpolatePair = [ [A1, A2] ] 
+        for (let i=1; i< num; i++) {
+            // [M, N]
+            let Mx, My 
+            Mx = (1 - i/ num) * A1[0] + ( i/ num ) * B1[0]
+            My = (1 - i/ num) * A1[1] + ( i/ num ) * B1[1]
+
+            let Nx, Ny 
+            Nx = (1 - i/ num) * A2[0] + ( i/ num ) * B2[0]
+            Ny = (1 - i/ num) * A2[1] + ( i/ num ) * B2[1]
+
+            interpolatePair.push([[Mx, My], [Nx, Ny]])
+        }
+        interpolatePair.push( [B1, B2])
+
+        let subSegments = []
+        for (let i=0; i< interpolatePair.length-1; i++) {
+            let firstPair = interpolatePair[i]
+            let secondPair = interpolatePair[i+1]
+            let singleRegion = [ firstPair[0], secondPair[0], secondPair[1], firstPair[1] ] 
+            subSegments.push(singleRegion)
+        }
+
+        return subSegments
+    }
+
+    calcBoundarySegment(segment, len){
+        /**
+         * A: median point - M
+         * B: intersect point - N
+         */
+        let [ A1, A2, B2, B1] = segment,
+            b_segment, N1, N2,
+            len_A1_B1 = this.calcDistanceFromTwoPoints(A1, B1),
+            len_A2_B2 = this.calcDistanceFromTwoPoints(A2, B2)
+            
+        if(len_A1_B1 <= len){
+            N1 = B1
+        }else{
+            let factor = len / len_A1_B1,
+                x, y
+            
+            x = (1 - factor) * A1[0] + factor * B1[0]
+            y = (1 - factor) * A1[1] + factor * B1[1]
+
+            N1 = [x, y]
+        }
+
+        if(len_A2_B2 <= len){
+            N2 = B2
+        }else{
+            let factor = len / len_A2_B2,
+                x, y
+
+            x = (1 - factor) * A2[0] + factor * B2[0]
+            y = (1 - factor) * A2[1] + factor * B2[1]
+
+            N2 = [x, y]
+        }
+
+        b_segment = [A1, A2, N2, N1]
+
+        return b_segment
+    }
+
+    // process data modal
     getBoundarySegments(segments){
         let _me = this,
-            temp_segments = [],
+            boundary_segments = [],
             clip_boundary
 
         clip_boundary = this.innerBoundaryCoordinates[0].map(e=>{
             return this.autoProjection(e)
         })
 
-        segments.forEach((e, i)=>{
-            e.push(e[0])
+        segments.forEach((segment, i)=>{
+            let split_num = 3
 
-            let test = polygonClipping.difference([e], [clip_boundary])
+            // split segment
+            let split_segments = _me.interpolateSegment(segment, split_num)
+            i === 20 && console.warn('split_segments', split_segments)
 
-            temp_segments.push(test[0][0])
+            // calc diff
+            // segment.push(segment[0])
+            // let boundary_segment = polygonClipping.difference([segment], [clip_boundary])[0][0]
+            let boundary_segment = _me.calcBoundarySegment(segment, 15)
+
+            // split boundary segment
+            let temp_segment = boundary_segment.slice(0,4)
+            let split_boundary_segment = _me.interpolateSegment(temp_segment, split_num)
+            i === 20 && console.warn('boundary_segment', split_boundary_segment, segment)
+
+            // let splitObjArray = []
+            for (let i = 0; i < split_num; i++) {
+                let splitObj = {}
+                split_segments[i].push(split_segments[i][0])
+                split_boundary_segment[i].push(split_boundary_segment[i][0])
+
+                splitObj.seg = split_segments[i]
+                splitObj.boundarySeg = split_boundary_segment[i]
+                splitObj.dotCount = 0
+
+                // splitObjArray.push(splitObj)
+                _me.splitObjArray.push(splitObj)
+
+                boundary_segments.push(split_boundary_segment[i])
+            }
 
             // push data
+            // boundary_segments.push(boundary_segment)
+
             let segmentBoxObj = {}
-            segmentBoxObj.segmentCoor = e
-            segmentBoxObj.boundarySegmentCoor = test[0][0]
+            segmentBoxObj.segmentCoor = segment
+            segmentBoxObj.boundarySegmentCoor = boundary_segment
             segmentBoxObj.dotCount = 0
+            // segmentBoxObj.splitObjArray = splitObjArray
 
             _me.segmentBoxObjArray.push(segmentBoxObj)
         })
         // console.log('_me.segmentBoxObjArray', _me.segmentBoxObjArray)
-        return temp_segments
+        return boundary_segments
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -683,8 +786,17 @@ class BaseMap extends Component {
                 let point = _me.autoProjection([ e.Longitude, e.Latitude ])
 
                 try {
-                    _me.segmentBoxObjArray.forEach((e, i)=>{
-                        let contain = polygonContains(e.segmentCoor, point)
+                    // _me.segmentBoxObjArray.forEach((e, i)=>{
+                    //     let contain = polygonContains(e.segmentCoor, point)
+                    //     // console.log(contain)
+                    //     if(contain){
+                    //         e.dotCount += 1
+                    //         throw new Error('End')
+                    //     }
+                    // })
+
+                    _me.splitObjArray.forEach((e, i)=>{
+                        let contain = polygonContains(e.seg, point)
                         // console.log(contain)
                         if(contain){
                             e.dotCount += 1
@@ -694,14 +806,14 @@ class BaseMap extends Component {
                 } catch (error) {}
             })
 
-            let boundary_segment_extent = extent(_me.segmentBoxObjArray, (d)=>{
+            let boundary_segment_extent = extent(_me.splitObjArray, (d)=>{
                 return d.dotCount
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(boundary_segment_extent)
-            console.log('boundary_segment_extent', this.color_scale(20))
 
             this.setState({
-                segmentBoxObjArray: _me.segmentBoxObjArray
+                segmentBoxObjArray: _me.segmentBoxObjArray,
+                splitObjArray: _me.splitObjArray
             })
         }
 
@@ -816,47 +928,67 @@ class BaseMap extends Component {
             }
 
             let segments
-            if(this.state.segments) {
-                segments = this.state.segments.map((d, i)=>{
-                    if (i < 10) {
-                        // console.log(d)
-                        let pathStr = getLinePathStr(d)
-                        return (
-                            <path 
-                            key = {`path-${i}`}
-                            className = {`Segment-${i}`}
-                            d = {pathStr}
-                            stroke = "#fff"
-                            strokeWidth = "0.2"
-                            fill = 'blue'
-                            />
-                        )
-                    }
-                })
+            // if(this.state.segments) {
+            //     segments = this.state.segments.map((d, i)=>{
+            //         if (i < 10) {
+            //             // console.log(d)
+            //             let pathStr = getLinePathStr(d)
+            //             return (
+            //                 <path 
+            //                 key = {`path-${i}`}
+            //                 className = {`Segment-${i}`}
+            //                 d = {pathStr}
+            //                 stroke = "#fff"
+            //                 strokeWidth = "0.2"
+            //                 fill = 'blue'
+            //                 />
+            //             )
+            //         }
+            //     })
                 
-            }
+            // }
 
             let subSegments 
-            if(this.state.subSegments) {
-                subSegments = [] // [strPath, strPath]
-                console.log(this.state.subSegments[0]) //[region, region, region]
-                let temp = []
-                this.state.subSegments.forEach((e) => {
-                    for(let i=0; i< e.length; i++) {
-                        temp.push(e[i])
-                    }
-                })
+            // if(this.state.subSegments) {
+            //     subSegments = [] // [strPath, strPath]
+            //     console.log(this.state.subSegments[0]) //[region, region, region]
+            //     let temp = []
+            //     this.state.subSegments.forEach((e) => {
+            //         for(let i=0; i< e.length; i++) {
+            //             temp.push(e[i])
+            //         }
+            //     })
 
 
-                subSegments = temp.map((d,i) => {
-                    let pathStr = getLinePathStr(d)
+            //     subSegments = temp.map((d,i) => {
+            //         let pathStr = getLinePathStr(d)
+            //         return (
+            //             <path 
+            //             key = {`path-${i}`}
+            //             className = {`subSegments-${i}`}
+            //             d = {pathStr}
+            //             stroke = "#fff"
+            //             strokeWidth = "0.2"
+            //             fill = 'blue'
+            //             />
+            //         )
+            //     })
+            // }
+            if(this.state.splitObjArray){
+                console.log('render splitObjArray', this.state.splitObjArray)
+                subSegments = this.state.splitObjArray.map((d, i)=>{
+                    let boundarySegmentCoor = d.seg
+
+                    let pathStr = getLinePathStr(boundarySegmentCoor)
+
                     return (
                         <path 
-                        key = {`path-${i}`}
-                        className = {`Segment-${i}`}
+                        key = {`split_segments-${i}`}
+                        className = {`split_segments-${i}`}
                         d = {pathStr}
-                        stroke = "#fff"
-                        strokeWidth = "0.2"
+                        stroke = "#000"
+                        strokeWidth = "0.3"
+                        // fill = '#f00'
                         fill = 'blue'
                         />
                     )
@@ -864,20 +996,20 @@ class BaseMap extends Component {
             }
 
             let boundary_segments
-            if(this.state.segmentBoxObjArray){
-                console.log('render segmentBoxObjArray', this.state.segmentBoxObjArray)
-                boundary_segments = this.state.segmentBoxObjArray.map((d, i)=>{
-                    let boundarySegmentCoor = d.boundarySegmentCoor
+            if(this.state.splitObjArray){
+                console.log('render splitObjArray', this.state.splitObjArray)
+                boundary_segments = this.state.splitObjArray.map((d, i)=>{
+                    let boundarySegmentCoor = d.boundarySeg
 
                     let pathStr = getLinePathStr(boundarySegmentCoor)
 
                     return (
                         <path 
-                        key = {`boundary_segments-${i}`}
-                        className = {`boundary_segments-${i}`}
+                        key = {`split_boundary_segments-${i}`}
+                        className = {`split_boundary_segments-${i}`}
                         d = {pathStr}
-                        stroke = "#fff"
-                        strokeWidth = "0.2"
+                        stroke = "#000"
+                        strokeWidth = "0.3"
                         // fill = '#f00'
                         fill = {this.color_scale(d.dotCount)}
                         />
@@ -1074,10 +1206,10 @@ class BaseMap extends Component {
             console.log('render simplifiedCoordinates', this.state.simplifiedCoordinates)
             innerBoundary = <path
                 d = { geoPath().projection(this.autoProjection)(this.state.simplifiedCoordinates) }
-                stroke = "#fff"
-                strokeWidth = "0.2"
+                stroke = "#20ae3c"
+                strokeWidth = "3"
                 fill = "#edc949"
-                fillOpacity = "0.8"
+                fillOpacity = "0"
                 className = "inner-boundary"
                 />
         }
