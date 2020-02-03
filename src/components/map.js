@@ -10,14 +10,14 @@ import MapColor from './mapColor'
 import polygonClipping from 'polygon-clipping'
 import { polygonContains } from 'd3-polygon'
 import {getDensity} from "./getDensity";
-import {insideCounter} from './insideCounter'
+
 
 const intersect = require('path-intersection')
 
 
 // global varibales:
 
-let set_segment = 10000;
+
 
 class BaseMap extends Component {
     constructor(){
@@ -32,6 +32,7 @@ class BaseMap extends Component {
             segmentBoxObjArray: null
         }
 
+        this.svgMargin = 20;
         this.autoProjection = null
         this.svg_w = 960
         this.svg_h = 600
@@ -44,10 +45,6 @@ class BaseMap extends Component {
         this.segmentBoxObjArray = []
     }
 
-    // projection function with empirical params
-    projection() {
-        return geoMercator().scale(500).center([110,36])
-    }
 
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
@@ -63,7 +60,7 @@ class BaseMap extends Component {
                     return
                 }
                 response.json().then(chinaGeoData => {
-                    this.autoProjection = geoMercator().fitSize([_me.svg_w, _me.svg_h], chinaGeoData)
+                    this.autoProjection = geoMercator().fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], chinaGeoData)
                     this.setState ({
                         chinaGeoData:  chinaGeoData.features                    })
                 })
@@ -295,9 +292,11 @@ class BaseMap extends Component {
                 // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
-                console.log(simplifiedAreaProjected);
-                let circleAry = getDensity(simplifiedAreaProjected)
+                let [circleAry,segPolyList] = getDensity(simplifiedAreaProjected)
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                console.log(segPolyList);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
@@ -347,7 +346,8 @@ class BaseMap extends Component {
                     // segmentBorderPaths: segmentBorderPaths,
                     even_points: even_points,
                     MedianPoints: MedianPoints,
-                    inscribledCircles :circleAry
+                    inscribledCircles :circleAry,
+                    linePts : simplifiedAreaProjected
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
                     //boundary_segments: boundary_segments
@@ -410,11 +410,11 @@ class BaseMap extends Component {
             if(this.state.inscribledCircles) {
 
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
-                  console.log(d.centerX);
+
                     return (
                         <circle
-                        cx = {d.centerY }
-                        cy = {d.centerX }
+                        cx = {d.centerX }
+                        cy = {d.centerY}
                         r = {d.radius}
                         stroke = "#000"
                         fill = "none"
@@ -440,6 +440,22 @@ class BaseMap extends Component {
             //         )
             //     })
             // }
+
+            let linePts
+            if (this.state.linePts) {
+              linePts = this.state.linePts.map((d,i) => {
+                  return (
+                  <circle
+                  key = {`dot-${ i }`}
+                  cx = { d[0]}
+                  cy = { d[1]}
+                  fill = "#33ff22"
+                  r = "2"
+                  />
+                  )
+              })
+            }
+
 
 
             function getLinePathStr(arr) {
@@ -532,8 +548,8 @@ class BaseMap extends Component {
 
             this.state.chinaGeoData.map((d, i) => {
                 if(d.properties.name === '湖南'){
-                    ////console.log(d)
-                    this.autoProjection.fitSize([this.svg_w, this.svg_h], d)
+                    ////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
+                    this.autoProjection.fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], d)
                     outsideBoundary = <path
                         key = {`path-${ i }`}
                         d = { geoPath().projection(this.autoProjection)(d) }
@@ -547,7 +563,8 @@ class BaseMap extends Component {
             return [
                     //outsideBoundary,
                     simplified_Outboundary,
-                    inscribledCircles
+                    inscribledCircles,
+                    linePts
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)
