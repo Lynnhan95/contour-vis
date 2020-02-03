@@ -10,6 +10,7 @@ import MapColor from './mapColor'
 import polygonClipping from 'polygon-clipping'
 import { polygonContains } from 'd3-polygon'
 import {getDensity} from "./getDensity";
+import {insideCounter} from './insideCounter'
 
 const intersect = require('path-intersection')
 
@@ -293,7 +294,7 @@ class BaseMap extends Component {
                 // convert boundary to path for computing.
                 // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
-                let circleAry = getDensity(simplifiedArea)
+                let circleAry = getInscribed(simplifiedArea)
 
                 this.setState({inscribledCircles :circleAry })
 

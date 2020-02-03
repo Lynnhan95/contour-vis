@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import {Point,Path} from 'paper'
+
 /*
 params: points array of boundary
 */
