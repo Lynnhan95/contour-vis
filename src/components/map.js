@@ -310,7 +310,7 @@ class BaseMap extends Component {
                 //console.log(beltSegList)
 /*
             belt cells
-                
+
 */
                 let beltCellList = []
                 beltSegList.forEach((d) => {
