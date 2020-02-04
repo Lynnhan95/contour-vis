@@ -601,7 +601,7 @@ class BaseMap extends Component {
                     inscribledCircles,
                     linePts,
                     cells,
-                    //segPoly
+                    segPoly
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)
