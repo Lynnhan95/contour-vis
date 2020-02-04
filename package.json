@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "babylonjs": "^4.0.3",
     "d3": "^5.14.1",
     "d3-dsv": "^1.2.0",
     "d3-geo": "^1.11.9",

@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv, extent, scaleSequential, interpolateOrRd } from 'd3'
+import { csv, extent, scaleSequential, interpolateOrRd, select} from 'd3'
 import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -240,7 +240,7 @@ class BaseMap extends Component {
             if (d.properties.name === '湖南'){
                 // store computed dots and paths
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 0
+                const simplifiedFactor = 0.1
 
                 // Compute simplified area
                 let res = []
@@ -274,7 +274,7 @@ class BaseMap extends Component {
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
 
-                let [circleAry,segPolyList] = getDensity(simplifiedAreaProjected)
+                let [circleAry,segPolyList] = getDensity(select("#myCanvas"),simplifiedAreaProjected)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -393,7 +393,7 @@ class BaseMap extends Component {
                 for(let j=0; j< densityGroup[i].length; j++) {
                     let cellObj = {}
                     cellObj.coor = cellGroup[i][j]
-                    cellObj.dens = densityGroup[i][j] 
+                    cellObj.dens = densityGroup[i][j]
                     cellObjArr.push(cellObj)
                 }
             }
@@ -403,7 +403,7 @@ class BaseMap extends Component {
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
             this.setState({cellObjArr: cellObjArr })
-           
+
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -538,7 +538,7 @@ class BaseMap extends Component {
                     let pathStr = getLinePathStr(d.coor)
 
                     return (
-                        <path 
+                        <path
                         key = {`split_boundary_segments-${i}`}
                         className = {`split_boundary_segments-${i}`}
                         d = {pathStr}
@@ -601,7 +601,7 @@ class BaseMap extends Component {
                     inscribledCircles,
                     linePts,
                     cells,
-                    segPoly
+                    // segPoly
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)

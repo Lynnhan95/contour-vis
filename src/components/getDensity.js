@@ -6,25 +6,37 @@ import {insideCounter} from './insideCounter'
 params: points array of boundary
 */
 
-export function getDensity (pts_ary,segment_num = 6000){
+export function getDensity (svg,pts_ary,segment_num = 7500){
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
 
-  var path = new Path();
+  var line0 = d3.line()
+                .x(function(d) { return d[0]})
+                .y(function(d) { return d[1]})
+                .curve(d3.curveCatmullRomClosed);
 
-  for (var i = 0; i < pts_ary.length; i++) {
-    var temp_point = new Point (pts_ary[i][0],pts_ary[i][1])
-    path.add (temp_point)
+  var p = svg.append("path")
+                  .style("fill","none")
+                  .style("stroke","none")
+                  .style("stroke-width","1px")
+                  .attr("d",line0(pts_ary));
 
-  }
-  console.log(path.length);
-  let widget = path.length/segment_num, new_pts = []
+  var path = p.node();
+
+    // create fake d3 svg for computing spling
+  console.log(path.getTotalLength());
+  let widget = path.getTotalLength()/segment_num, new_pts = []
 
   for (var i = 0; i < segment_num; i++) {
-    var point  = path.getPointAt(i*widget);
+    var point  = path.getPointAtLength(i*widget);
      new_pts.push(point)
   }
+
+
+
+
+
 
   // quarterly split the list to advoid max exceeding
   let dictAllmin1Q= [];
