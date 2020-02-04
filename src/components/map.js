@@ -367,7 +367,10 @@ class BaseMap extends Component {
                     MedianPoints: MedianPoints,
                     inscribledCircles :circleAry,
                     linePts : simplifiedAreaProjected,
-                    subSegList:subSegList
+                    subSegList:subSegList,
+                    beltCellList: beltCellList,
+                    segPolyList: segPolyList
+
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
                     //boundary_segments: boundary_segments
@@ -383,7 +386,24 @@ class BaseMap extends Component {
             })
 
             var densityGroup = insideCounter(this.state.subSegList,pointsDataProjected)
-
+            var cellGroup = this.state.beltCellList
+            //console.log(cellGroup[0], densityGroup[0])
+            let cellObjArr = []
+            for(let i=0; i< densityGroup.length; i++) {
+                for(let j=0; j< densityGroup[i].length; j++) {
+                    let cellObj = {}
+                    cellObj.coor = cellGroup[i][j]
+                    cellObj.dens = densityGroup[i][j] 
+                    cellObjArr.push(cellObj)
+                }
+            }
+            //console.log(cellObjArr)
+            let cell_extent = extent(cellObjArr, (d)=>{
+                return d.dens
+            })
+            this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
+            this.setState({cellObjArr: cellObjArr })
+           
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     }
@@ -419,6 +439,23 @@ class BaseMap extends Component {
                         stroke = "#000"
                         fill = "none"
                         strokeWidth = "0.1"
+                        />
+                    )
+                })
+            }
+
+            let segPoly
+            if(this.state.segPolyList) {
+                segPoly = this.state.segPolyList.map((d, i) => {
+                    let pathStr = getLinePathStr(d)
+                    return (
+                        <path
+                        key = {`path-${i}`}
+                        className = {`Segment-${i}`}
+                        d = {pathStr}
+                        stroke = "#fff"
+                        strokeWidth = "0.2"
+                        fill = 'blue'
                         />
                     )
                 })
@@ -495,26 +532,24 @@ class BaseMap extends Component {
 
             }
 
-            let boundary_segments
-            if(this.state.segmentBoxObjArray){
-                //console.log('render segmentBoxObjArray', this.state.segmentBoxObjArray)
-                boundary_segments = this.state.segmentBoxObjArray.map((d, i)=>{
-                    let boundarySegmentCoor = d.boundarySegmentCoor
-
-                    let pathStr = getLinePathStr(boundarySegmentCoor)
+            let cells
+            if(this.state.cellObjArr){
+                cells = this.state.cellObjArr.map((d, i) => {
+                    let pathStr = getLinePathStr(d.coor)
 
                     return (
-                        <path
-                        key = {`boundary_segments-${i}`}
-                        className = {`boundary_segments-${i}`}
+                        <path 
+                        key = {`split_boundary_segments-${i}`}
+                        className = {`split_boundary_segments-${i}`}
                         d = {pathStr}
-                        stroke = "#fff"
-                        strokeWidth = "0.2"
+                        stroke = "#000"
+                        strokeWidth = "0"
                         // fill = '#f00'
-                        fill = {this.color_scale(d.dotCount)}
+                        fill = {this.color_scale(d.dens)}
                         />
                     )
                 })
+
             }
 
             /*
@@ -564,7 +599,9 @@ class BaseMap extends Component {
                     //outsideBoundary,
                     simplified_Outboundary,
                     inscribledCircles,
-                    linePts
+                    linePts,
+                    cells,
+                    segPoly
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)
