@@ -59,7 +59,7 @@ export function getDensity (pts_ary,segment_num = 3000){
 
   let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q,dictAllmin3Q,dictAllmin4Q)
 
-  console.log(dictAllmin);
+  //console.log(dictAllmin);
 
 
   let segPolyList = []
