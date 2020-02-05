@@ -15,6 +15,7 @@ import {getBeltSegment} from './getBeltSegment'
 import {insideCounter} from './insideCounter'
 
 
+
 const intersect = require('path-intersection')
 
 
@@ -240,7 +241,7 @@ class BaseMap extends Component {
             if (d.properties.name === '湖南'){
                 // store computed dots and paths
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 0.1
+                const simplifiedFactor = 0.3
 
                 // Compute simplified area
                 let res = []
@@ -435,6 +436,7 @@ class BaseMap extends Component {
                         <circle
                         cx = {d.centerX }
                         cy = {d.centerY}
+                      //  r =  {0.1}// only plot the centers
                         r = {d.radius}
                         stroke = "#000"
                         fill = "none"
@@ -453,7 +455,7 @@ class BaseMap extends Component {
                         key = {`path-${i}`}
                         className = {`Segment-${i}`}
                         d = {pathStr}
-                        stroke = "#fff"
+                        stroke = "none"
                         strokeWidth = "0.2"
                         fill = 'blue'
                         />
@@ -525,6 +527,7 @@ class BaseMap extends Component {
                             stroke = "#fff"
                             strokeWidth = "0.2"
                             fill = 'blue'
+                            fill-opacity = '0.2'
                             />
                         )
 
@@ -588,7 +591,7 @@ class BaseMap extends Component {
                     outsideBoundary = <path
                         key = {`path-${ i }`}
                         d = { geoPath().projection(this.autoProjection)(d) }
-                        stroke = "#eee"
+                        stroke = "black"
                         strokeWidth = "2"
                         fill="none"
                         />
@@ -600,8 +603,8 @@ class BaseMap extends Component {
                     simplified_Outboundary,
                     inscribledCircles,
                     linePts,
-                    cells,
-                    // segPoly
+                    // cells,
+                    segPoly
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)

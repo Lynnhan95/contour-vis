@@ -4,13 +4,15 @@
           dataPts: all data points inside the outline/boundary
 */
 
+
 export function insideCounter (subSegGroup_ary, dataPts){
         // for each subseg
 
         var densityGroup = []
+        var density_min = 0
+        var density_max = 0
 
         for (var i = 0; i < subSegGroup_ary.length; i++) {
-
 
           var subSegGroup  = subSegGroup_ary[i] // it has four points
           var subDensityGroup = []
@@ -24,11 +26,19 @@ export function insideCounter (subSegGroup_ary, dataPts){
             });
             var area = getArea (subSeg)
             var density = counter/area
+
+            if (density>density_max) {
+              density_min = density
+            }
+            if (density<density_min) {
+              density_max = density
+            }
             subDensityGroup.push(density)
           }
           densityGroup.push (subDensityGroup)
         }
 
+        console.log(density_min+"<<<<"+density_max);
         return densityGroup;
     }
 

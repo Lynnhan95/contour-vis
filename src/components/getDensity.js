@@ -6,7 +6,7 @@ import {insideCounter} from './insideCounter'
 params: points array of boundary
 */
 
-export function getDensity (svg,pts_ary,segment_num = 7500){
+export function getDensity (svg,pts_ary,segment_num = 7000){
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
@@ -23,19 +23,19 @@ export function getDensity (svg,pts_ary,segment_num = 7500){
                   .attr("d",line0(pts_ary));
 
   var path = p.node();
+  // var path_line = new Path ();
+  //
+  // for (var i = 0; i < pts_ary.length; i++) {
+  //   var temp_point = new Point (pts_ary[i][0],pts_ary[i][1])
+  //   path_line.add (temp_point)}
+  //let widget_line = path_line.length/segment_num, new_pts_line = []
 
-    // create fake d3 svg for computing spling
-  console.log(path.getTotalLength());
   let widget = path.getTotalLength()/segment_num, new_pts = []
 
   for (var i = 0; i < segment_num; i++) {
     var point  = path.getPointAtLength(i*widget);
      new_pts.push(point)
-  }
-
-
-
-
+    }
 
 
   // quarterly split the list to advoid max exceeding
@@ -89,8 +89,18 @@ export function getDensity (svg,pts_ary,segment_num = 7500){
       pt2   = [new_pts[0].x,new_pts[0].y]
     }
 
-    var polygon = [pt1,pt2,center2,center1]
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+  refactor the polygon. extend the edges for intersecting with the outline
+*/
 
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    var new_pt1 = [2*pt1[0]+100-center1[0],2*pt1[1]+100-center1[1]]
+    var new_pt2 = [2*pt2[0]+100-center2[0],2*pt2[1]+100-center2[1]]
+
+    var polygon = [new_pt1,new_pt2,center2,center1]
     segPolyList.push(polygon)}
 
   /*
@@ -161,60 +171,6 @@ function squareMatrixMultiply(A, B) {
     return C;
 }
 
-function weightedMean (list,areaList,stride) {
-
-    var productList = []
-
-    // this operation gets the result of all products
-    for (var i = 0; i < list.length; i++) {
-      productList.push(list[i]*areaList[i])
-    }
-    //this part gets initial upper
-    var array_up_list     = productList.slice(0,stride+1)
-    var array_down_list   = productList.slice((productList.length-stride),(productList.length+1))
-    var array_list = array_down_list.concat(array_up_list);
-    // this part gets initial lower
-    var array_up_area     = areaList.slice(0,stride+1)
-    var array_down_area   = areaList.slice((areaList.length-stride),(areaList.length+1))
-    var array_area = array_down_area.concat(array_up_area);
-
-    var init_list = getSum(array_list)
-    var init_area = getSum(array_area)
-    var init_weight = Number(init_list)/Number(init_area)
-
-    var weighted_result = []
-    weighted_result.push(init_weight)
-
-    for (var i = 1; i < list.length-stride; i++) {
-      array_list.shift();
-      array_area.shift();
-      var value1 = productList[i+stride];
-      array_list.push(value1);
-      var value2 = areaList[i+stride];
-      array_area.push(value2);
-
-      var new_list = getSum(array_list)
-      var new_area = getSum(array_area)
-      var newvalue = Number(new_list)/Number(new_area)
-        weighted_result.push(newvalue)
-    }
-    for (var i = 0; i < stride; i++) {
-      array_list.shift();
-      array_area.shift();
-      var value1 = productList[i];
-      var value2 = areaList[i];
-      array_list.push(value1);
-      array_area.push(value2);
-
-      var new_list = getSum(array_list)
-      var new_area = getSum(array_area)
-
-      var newvalue = Number(new_list)/Number(new_area)
-        weighted_result.push(newvalue)
-    }
-
-    return weighted_result;
-  }
 
 
 
@@ -298,46 +254,7 @@ function threePointsCircle (pt1,pt2,pt3){
     return [circleRadius,centerX,centerY];
 }
 
-function slidingCalSum(widget,segment_num,sliding,ary) {
 
-    var countList = [];
-    var quotient = Math.floor(segment_num/sliding);
-    var half_arS = (Math.floor(sliding/2));
-
-  // initialize starting from index 0
-      var init_array_up = ary.slice(0,half_arS+1)
-      var init_array_down = ary.slice((ary.length-half_arS),(ary.length+1))
-
-
-      var init_array = init_array_down.concat(init_array_up);
-
-      var init_sum = init_array.reduce(function(s,x) {return (s + x)}, 0)
-
-      countList.push(init_sum)
-
-      for (var i = 1; i < ary.length-half_arS; i++) {
-
-        init_array.shift();
-        var value = ary[i+half_arS];
-        init_array.push(value);
-        var sum = init_array.reduce(function(s,x) {return (s + x)}, 0)
-        sum = 100* sum/sliding
-
-        countList.push(sum)
-
-      }
-
-      for (var i = 0; i < half_arS; i++) {
-        // var sum = init_sum - init_array[0]
-        init_array.shift();
-        var value = ary[i];
-        init_array.push(value)
-        sum = init_array.reduce(function(s,x) {return (s + x)}, 0)
-        sum = 100* sum/sliding
-        countList.push(sum)
-      }
-      return countList;
-}
 
 function getSum(ary){
   var sum = ary.reduce(function(s,x) {return (s + x)}, 0);
