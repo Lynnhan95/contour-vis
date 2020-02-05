@@ -451,10 +451,7 @@ class BaseMap extends Component {
                 segPoly = this.state.segPolyList.map((d, i) => {
 
                     let pathStr = getLinePathStr(d)
-                    if(i < 1){
-                        
-                        console.log(d);
-                        
+
                     return (
                         <path
                         key = {`path-${i}`}
@@ -464,7 +461,7 @@ class BaseMap extends Component {
                         strokeWidth = "0.2"
                         fill = 'blue'
                         />
-                    )}
+                    )
                 })
             }
 
