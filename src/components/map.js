@@ -13,6 +13,7 @@ import {getDensity} from "./getDensity";
 import {interpolateSegment} from './interpolateSegment'
 import {getBeltSegment} from './getBeltSegment'
 import {insideCounter} from './insideCounter'
+import {getNewSeg} from './getNewSeg.js'
 
 
 
@@ -278,46 +279,61 @@ class BaseMap extends Component {
                 let [circleAry,segPolyList] = getDensity(select("#myCanvas"),simplifiedAreaProjected)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                // create new segList by clipping from mainArea polygon
+                let clip_outBoundary = simplifiedArea.map((d) => {
+                    return this.autoProjection(d)
+                })
+
+                let newSegPolyList = []
+                segPolyList.forEach((d) => {
+                  let newSegPoly = getNewSeg(d, clip_outBoundary)
+                  newSegPolyList.push(newSegPoly)
+                })
+
+                console.log(newSegPolyList)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
             subsegments
 */
 
-                // let subSegList = []
-                // const subSegNum = 3 // set how many subsegments we divide each seg
-                // segPolyList.forEach((d) => {
+                let subSegList = []
+                const subSegNum = 3 // set how many subsegments we divide each seg
+                newSegPolyList.forEach((d) => {
 
-                //     let subSeg = interpolateSegment(d, subSegNum)
-                //     subSegList.push(subSeg)
+                    let subSeg = interpolateSegment(d, subSegNum)
+                    subSegList.push(subSeg)
 
-                // })
+                })
 
-
-                // console.log(insideCounter(subSegList,this.state.pointsData));
+                console.log(subSegList)
+                console.log(insideCounter(subSegList,this.state.pointsData));
 
 
 /*
             belt
 */
                 // console.log(this.innerBoundaryCoordinates)
-                // let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
-                //     return this.autoProjection(d)
-                // })
-                // let beltSegList = []
-                // segPolyList.forEach((d) => {
-                //     let beltSeg = getBeltSegment(d, clip_boundary)
-                //     beltSegList.push(beltSeg)
-                // })
-
-                //console.log(beltSegList)
+                // Compute belt from newSegPolyList
+                let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
+                    return this.autoProjection(d)
+                })
+                let beltSegList = []
+                newSegPolyList.forEach((d) => {
+                    let beltSeg = getBeltSegment(d, clip_boundary)
+                    beltSegList.push(beltSeg)
+                })
+                console.log(beltSegList)
 /*
             belt cells
 
 */
-                // let beltCellList = []
-                // beltSegList.forEach((d) => {
-                //     let subCell = interpolateSegment(d, subSegNum)
-                //     beltCellList.push(subCell)
-                // })
+                let beltCellList = []
+                beltSegList.forEach((d) => {
+                    let subCell = interpolateSegment(d, subSegNum)
+                    beltCellList.push(subCell)
+                })
+
+                console.log(beltCellList)
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
@@ -368,9 +384,11 @@ class BaseMap extends Component {
                     MedianPoints: MedianPoints,
                     inscribledCircles :circleAry,
                     linePts : simplifiedAreaProjected,
-                    //subSegList:subSegList,
-                    //beltCellList: beltCellList,
-                    segPolyList: segPolyList
+                    subSegList:subSegList,
+                    beltCellList: beltCellList,
+                    beltSegList:beltSegList,
+                    // segPolyList: segPolyList
+                    newSegPolyList:newSegPolyList
 
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
@@ -538,9 +556,9 @@ class BaseMap extends Component {
             }
 
             let cells
-            if(this.state.cellObjArr){
-                cells = this.state.cellObjArr.map((d, i) => {
-                    let pathStr = getLinePathStr(d.coor)
+            if(this.state.subSegList){
+                cells = this.state.subSegList.map((d, i) => {
+                    let pathStr = getLinePathStr(d[2])
 
                     return (
                         <path
@@ -549,8 +567,8 @@ class BaseMap extends Component {
                         d = {pathStr}
                         stroke = "#000"
                         strokeWidth = "0"
-                        // fill = '#f00'
-                        fill = {this.color_scale(d.dens)}
+                        fill = '#f00'
+                        // fill = {this.color_scale(d.dens)}
                         />
                     )
                 })
@@ -603,10 +621,10 @@ class BaseMap extends Component {
             return [
                     //outsideBoundary,
                     simplified_Outboundary,
-                    inscribledCircles,
+                    // inscribledCircles,
                     linePts,
-                    // cells,
-                    segPoly
+                    cells,
+                    // segPoly
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)
