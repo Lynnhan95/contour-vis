@@ -6,7 +6,7 @@ import {insideCounter} from './insideCounter'
 params: points array of boundary
 */
 
-export function getDensity (svg,pts_ary,segment_num = 7000){
+export function getDensity (svg,pts_ary,segment_num = 5000){
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
@@ -97,10 +97,20 @@ export function getDensity (svg,pts_ary,segment_num = 7000){
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    var new_pt1 = [2*pt1[0]+100-center1[0],2*pt1[1]+100-center1[1]]
-    var new_pt2 = [2*pt2[0]+100-center2[0],2*pt2[1]+100-center2[1]]
+    var d1 = Math.pow(((center1[0]-pt1[0])*(center1[0]-pt1[0])+(center1[1]-pt1[1])*(center1[1]-pt1[1])),0.5)
+    var d2 = Math.pow(((center2[0]-pt2[0])*(center2[0]-pt2[0])+(center2[1]-pt2[1])*(center2[1]-pt2[1])),0.5)
 
-    var polygon = [new_pt1,new_pt2,center2,center1]
+    var scale1 = (d1+1)/d1
+    var scale2 = (d2+1)/d2
+
+
+    var new_pt1 = [(scale1*(center1[0]-pt1[0])+center1[0]),(scale1*(center1[0]-pt1[0])+center1[0])]
+    var new_pt2 = [(scale2*(center2[0]-pt2[0])+center2[0]),(scale2*(center2[0]-pt2[0])+center2[0])]
+   
+    if (i == 0) {
+      console.log([new_pt1,new_pt2]);
+    }
+    var polygon = [pt1,pt2,center2,center1]
     segPolyList.push(polygon)}
 
   /*

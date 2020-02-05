@@ -282,14 +282,14 @@ class BaseMap extends Component {
             subsegments
 */
 
-                let subSegList = []
-                const subSegNum = 3 // set how many subsegments we divide each seg
-                segPolyList.forEach((d) => {
+                // let subSegList = []
+                // const subSegNum = 3 // set how many subsegments we divide each seg
+                // segPolyList.forEach((d) => {
 
-                    let subSeg = interpolateSegment(d, subSegNum)
-                    subSegList.push(subSeg)
+                //     let subSeg = interpolateSegment(d, subSegNum)
+                //     subSegList.push(subSeg)
 
-                })
+                // })
 
 
                 // console.log(insideCounter(subSegList,this.state.pointsData));
@@ -299,25 +299,25 @@ class BaseMap extends Component {
             belt
 */
                 // console.log(this.innerBoundaryCoordinates)
-                let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
-                    return this.autoProjection(d)
-                })
-                let beltSegList = []
-                segPolyList.forEach((d) => {
-                    let beltSeg = getBeltSegment(d, clip_boundary)
-                    beltSegList.push(beltSeg)
-                })
+                // let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
+                //     return this.autoProjection(d)
+                // })
+                // let beltSegList = []
+                // segPolyList.forEach((d) => {
+                //     let beltSeg = getBeltSegment(d, clip_boundary)
+                //     beltSegList.push(beltSeg)
+                // })
 
                 //console.log(beltSegList)
 /*
             belt cells
 
 */
-                let beltCellList = []
-                beltSegList.forEach((d) => {
-                    let subCell = interpolateSegment(d, subSegNum)
-                    beltCellList.push(subCell)
-                })
+                // let beltCellList = []
+                // beltSegList.forEach((d) => {
+                //     let subCell = interpolateSegment(d, subSegNum)
+                //     beltCellList.push(subCell)
+                // })
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
@@ -368,8 +368,8 @@ class BaseMap extends Component {
                     MedianPoints: MedianPoints,
                     inscribledCircles :circleAry,
                     linePts : simplifiedAreaProjected,
-                    subSegList:subSegList,
-                    beltCellList: beltCellList,
+                    //subSegList:subSegList,
+                    //beltCellList: beltCellList,
                     segPolyList: segPolyList
 
                     // paper_inter: nk_intersect_points[1],
@@ -382,28 +382,28 @@ class BaseMap extends Component {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.pointsData !== this.state.pointsData) {
 
-            var pointsDataProjected = this.state.pointsData.map((e)=>{
-                return _me.autoProjection([ e.Longitude, e.Latitude ])
-            })
+            // var pointsDataProjected = this.state.pointsData.map((e)=>{
+            //     return _me.autoProjection([ e.Longitude, e.Latitude ])
+            // })
 
-            var densityGroup = insideCounter(this.state.subSegList,pointsDataProjected)
-            var cellGroup = this.state.beltCellList
-            //console.log(cellGroup[0], densityGroup[0])
-            let cellObjArr = []
-            for(let i=0; i< densityGroup.length; i++) {
-                for(let j=0; j< densityGroup[i].length; j++) {
-                    let cellObj = {}
-                    cellObj.coor = cellGroup[i][j]
-                    cellObj.dens = densityGroup[i][j]
-                    cellObjArr.push(cellObj)
-                }
-            }
-            //console.log(cellObjArr)
-            let cell_extent = extent(cellObjArr, (d)=>{
-                return d.dens
-            })
-            this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
-            this.setState({cellObjArr: cellObjArr })
+            // var densityGroup = insideCounter(this.state.subSegList,pointsDataProjected)
+            // var cellGroup = this.state.beltCellList
+            // //console.log(cellGroup[0], densityGroup[0])
+            // let cellObjArr = []
+            // for(let i=0; i< densityGroup.length; i++) {
+            //     for(let j=0; j< densityGroup[i].length; j++) {
+            //         let cellObj = {}
+            //         cellObj.coor = cellGroup[i][j]
+            //         cellObj.dens = densityGroup[i][j]
+            //         cellObjArr.push(cellObj)
+            //     }
+            // }
+            // //console.log(cellObjArr)
+            // let cell_extent = extent(cellObjArr, (d)=>{
+            //     return d.dens
+            // })
+            // this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
+            // this.setState({cellObjArr: cellObjArr })
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -449,7 +449,12 @@ class BaseMap extends Component {
             let segPoly
             if(this.state.segPolyList) {
                 segPoly = this.state.segPolyList.map((d, i) => {
+
                     let pathStr = getLinePathStr(d)
+                    if(i < 1){
+                        
+                        console.log(d);
+                        
                     return (
                         <path
                         key = {`path-${i}`}
@@ -459,7 +464,7 @@ class BaseMap extends Component {
                         strokeWidth = "0.2"
                         fill = 'blue'
                         />
-                    )
+                    )}
                 })
             }
 
