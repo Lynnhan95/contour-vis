@@ -100,8 +100,8 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
     var d1 = Math.pow(((center1[0]-pt1[0])*(center1[0]-pt1[0])+(center1[1]-pt1[1])*(center1[1]-pt1[1])),0.5)
     var d2 = Math.pow(((center2[0]-pt2[0])*(center2[0]-pt2[0])+(center2[1]-pt2[1])*(center2[1]-pt2[1])),0.5)
 
-    var scale1 = (d1+6.2)/d1
-    var scale2 = (d2+6.2)/d2
+    var scale1 = (d1+6.3)/d1
+    var scale2 = (d2+6.3)/d2
 
 
     var new_pt1 = [(scale1*(pt1[0]-center1[0])+center1[0]),(scale1*(pt1[1]-center1[1])+center1[1])]

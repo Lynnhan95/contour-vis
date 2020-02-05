@@ -285,12 +285,45 @@ class BaseMap extends Component {
                 })
 
                 let newSegPolyList = []
-                segPolyList.forEach((d) => {
+                let noConvert = []
+                console.log(segPolyList);
+                segPolyList.forEach((d,i) => {
                   let newSegPoly = getNewSeg(d, clip_outBoundary)
-                  newSegPolyList.push(newSegPoly)
+
+                  if (newSegPoly.length != 4) {
+                    newSegPoly.pop()
+                    if (newSegPoly.length !=4 && newSegPoly.length!=5) {
+
+                    }
+                  }
+                  if (newSegPoly.length == 5) {
+
+                    newSegPoly.splice(2,1)
+                  }
+
+                  noConvert.push(newSegPoly)
+               //    // only first four items
+
+                  if (Math.abs(newSegPoly[0][0]-newSegPoly[1][0])< Math.abs(newSegPoly[1][0]-newSegPoly[2][0])) {
+                    if (newSegPoly[0][0] != d[2][0] ) {
+                      newSegPoly = [newSegPoly[2],newSegPoly[3],newSegPoly[0],newSegPoly[1]]
+                    }
+                    newSegPolyList.push(newSegPoly)
+                  }
+                  else if (Math.abs(newSegPoly[0][0]-newSegPoly[1][0]) >= Math.abs(newSegPoly[1][0]-newSegPoly[2][0])) {
+
+                    let newSeg = [newSegPoly[3],newSegPoly[0],newSegPoly[1],newSegPoly[2]]
+                    if (newSeg[0][0] != d[2][0] ) {
+
+                    }
+
+                    newSegPolyList.push(newSeg)
+                  }
+
                 })
 
                 console.log(newSegPolyList)
+                console.log(noConvert);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
             subsegments
@@ -298,15 +331,15 @@ class BaseMap extends Component {
 
                 let subSegList = []
                 const subSegNum = 3 // set how many subsegments we divide each seg
-                newSegPolyList.forEach((d) => {
+                newSegPolyList.forEach((d,i) => {
 
-                    let subSeg = interpolateSegment(d, subSegNum)
+                    let subSeg = interpolateSegment(d, subSegNum,i)
                     subSegList.push(subSeg)
 
                 })
 
                 console.log(subSegList)
-                console.log(insideCounter(subSegList,this.state.pointsData));
+                // console.log(insideCounter(subSegList,this.state.pointsData));
 
 
 /*
@@ -322,7 +355,7 @@ class BaseMap extends Component {
                     let beltSeg = getBeltSegment(d, clip_boundary)
                     beltSegList.push(beltSeg)
                 })
-                console.log(beltSegList)
+                // console.log(beltSegList)
 /*
             belt cells
 
@@ -333,7 +366,7 @@ class BaseMap extends Component {
                     beltCellList.push(subCell)
                 })
 
-                console.log(beltCellList)
+                // console.log(beltCellList)
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
@@ -559,18 +592,20 @@ class BaseMap extends Component {
             if(this.state.subSegList){
                 cells = this.state.subSegList.map((d, i) => {
                     let pathStr = getLinePathStr(d[2])
+                    if (i<2500 && i>3000) {
+                      return (
+                          <path
+                          key = {`split_boundary_segments-${i}`}
+                          className = {`split_boundary_segments-${i}`}
+                          d = {pathStr}
+                          stroke = "#000"
+                          strokeWidth = "0"
+                          fill = '#f00'
+                          // fill = {this.color_scale(d.dens)}
+                          />
+                      )
+                    }
 
-                    return (
-                        <path
-                        key = {`split_boundary_segments-${i}`}
-                        className = {`split_boundary_segments-${i}`}
-                        d = {pathStr}
-                        stroke = "#000"
-                        strokeWidth = "0"
-                        fill = '#f00'
-                        // fill = {this.color_scale(d.dens)}
-                        />
-                    )
                 })
 
             }
