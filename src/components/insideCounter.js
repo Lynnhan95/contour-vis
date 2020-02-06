@@ -5,7 +5,7 @@
 */
 
 
-export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,scaleFactor = 2){
+export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,scaleFactor = 100){
         // for each subseg
 
         var densityGroup = []

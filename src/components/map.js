@@ -58,7 +58,7 @@ class BaseMap extends Component {
           inputValue: value,
         });
         console.log(value)
-      };    
+      };
 
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
@@ -674,7 +674,7 @@ class BaseMap extends Component {
                     linePts,
                     cells0,
                     // cells1,
-                    cells2,
+                    // cells2,
                     // segPoly
                     //boundaryDots
                ]
