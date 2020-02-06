@@ -310,7 +310,7 @@ class BaseMap extends Component {
 
                 })
 
-                console.log(subSegList)
+                //console.log(subSegList)
                 // console.log(insideCounter(subSegList,this.state.pointsData));
 
 
@@ -332,13 +332,13 @@ class BaseMap extends Component {
             belt cells
 
 */
-                // let beltCellList = []
-                // beltSegList.forEach((d) => {
-                //     let subCell = interpolateSegment(d, subSegNum)
-                //     beltCellList.push(subCell)
-                // })
+                let beltCellList = []
+                beltSegList.forEach((d) => {
+                    let subCell = interpolateSegment(d, subSegNum)
+                    beltCellList.push(subCell)
+                })
 
-                // console.log(beltCellList)
+                //console.log(beltCellList)
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)

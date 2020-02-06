@@ -30,6 +30,7 @@ export function getNewSeg(segPoly, clip_boundary ,index) {
     let interSect2 = polyPath.getIntersections(segPath2)
 
 
+
     let newPt1 = interSect1[0]
     let newPt2 = interSect2[0]
 

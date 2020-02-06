@@ -6,7 +6,7 @@ import {insideCounter} from './insideCounter'
 params: points array of boundary
 */
 
-export function getDensity (svg,pts_ary,segment_num =8000){
+export function getDensity (svg,pts_ary,segment_num =5000){
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
