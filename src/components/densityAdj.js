@@ -1,6 +1,6 @@
 
 
-export function densityAdj (counterL,sliding,segment_num,gadget,factor){
+export function densityAdj (counterL,sliding,segment_num,gadget,factor=2){
 
     var countDensity = counterL[0]
     var countInteger = counterL[1]

@@ -16,7 +16,8 @@ import {insideCounter} from './insideCounter'
 import {getNewSeg} from './getNewSeg.js'
 import {getBeltSeg} from './getBeltSeg.js'
 
-
+const setSegNumb = 5000
+const slidingBins = 100
 
 const intersect = require('path-intersection')
 
@@ -277,7 +278,7 @@ class BaseMap extends Component {
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
 
-                let [circleAry,segPolyList] = getDensity(select("#myCanvas"),simplifiedAreaProjected)
+                let [circleAry,segPolyList] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // create new segList by clipping from mainArea polygon
@@ -390,7 +391,7 @@ class BaseMap extends Component {
                     inscribledCircles :circleAry,
                     linePts : simplifiedAreaProjected,
                     subSegList:subSegList,
-                    // beltCellList: beltCellList,
+                    beltCellList: beltCellList,
                     beltSegList:beltSegList,
                     // segPolyList: segPolyList
                     newSegPolyList:newSegPolyList
@@ -405,28 +406,34 @@ class BaseMap extends Component {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.pointsData !== this.state.pointsData) {
 
-            // var pointsDataProjected = this.state.pointsData.map((e)=>{
-            //     return _me.autoProjection([ e.Longitude, e.Latitude ])
-            // })
+            var pointsDataProjected = this.state.pointsData.map((e)=>{
+                return _me.autoProjection([ e.Longitude, e.Latitude ])
+            })
 
-            // var densityGroup = insideCounter(this.state.subSegList,pointsDataProjected)
-            // var cellGroup = this.state.beltCellList
-            // //console.log(cellGroup[0], densityGroup[0])
-            // let cellObjArr = []
-            // for(let i=0; i< densityGroup.length; i++) {
-            //     for(let j=0; j< densityGroup[i].length; j++) {
-            //         let cellObj = {}
-            //         cellObj.coor = cellGroup[i][j]
-            //         cellObj.dens = densityGroup[i][j]
-            //         cellObjArr.push(cellObj)
-            //     }
-            // }
-            // //console.log(cellObjArr)
-            // let cell_extent = extent(cellObjArr, (d)=>{
-            //     return d.dens
-            // })
-            // this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
-            // this.setState({cellObjArr: cellObjArr })
+            var [densityGroup,areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
+            console.log(densityGroup);
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////after getting the density, we need to adjust the values based on empirical settings/////
+///////////////slidng window and scaler are applied
+
+
+            var cellGroup = this.state.beltCellList
+            //console.log(cellGroup[0], densityGroup[0])
+            let cellObjArr = []
+            for(let i=0; i< densityGroup.length; i++) {
+                for(let j=0; j< densityGroup[i].length; j++) {
+                    let cellObj = {}
+                    cellObj.coor = cellGroup[i][j]
+                    cellObj.dens = densityGroup[i][j]
+                    cellObjArr.push(cellObj)
+                }
+            }
+            //console.log(cellObjArr)
+            let cell_extent = extent(cellObjArr, (d)=>{
+                return d.dens
+            })
+            this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
+            this.setState({cellObjArr: cellObjArr })
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
