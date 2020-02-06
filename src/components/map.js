@@ -15,6 +15,9 @@ import {getBeltSegment} from './getBeltSegment'
 import {insideCounter} from './insideCounter'
 import {getNewSeg} from './getNewSeg.js'
 import {getBeltSeg} from './getBeltSeg.js'
+import {Slider} from 'antd'
+import "antd/dist/antd.css";
+import "./style.css"
 
 
 
@@ -49,6 +52,12 @@ class BaseMap extends Component {
         this.segmentBoxObjArray = []
     }
 
+    onAfterChange = value => {
+        this.setState({
+          inputValue: value,
+        });
+        console.log(value)
+      };    
 
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
@@ -430,6 +439,9 @@ class BaseMap extends Component {
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (prevState.inputValue !== this.state.inputValue) {
+            console.log(this.state.inputValue)
+        }
     }
 
     render() {
@@ -655,7 +667,7 @@ class BaseMap extends Component {
                     linePts,
                     cells0,
                     // cells1,
-                    // cells2,
+                    cells2,
                     // segPoly
                     //boundaryDots
                ]
@@ -725,8 +737,13 @@ class BaseMap extends Component {
         }
 
         return (
+
         <div>
-            <p>Basemap</p>
+            <div className="Control">
+                <p>Basemap</p>
+                <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
+
+            </div>
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
             <g className="Regions">
                 {Regions}
