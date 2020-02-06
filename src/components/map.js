@@ -15,6 +15,9 @@ import {getBeltSegment} from './getBeltSegment'
 import {insideCounter} from './insideCounter'
 import {getNewSeg} from './getNewSeg.js'
 import {getBeltSeg} from './getBeltSeg.js'
+import {Slider} from 'antd'
+import "antd/dist/antd.css";
+import "./style.css"
 
 const setSegNumb = 5000
 const slidingBins = 100
@@ -50,6 +53,12 @@ class BaseMap extends Component {
         this.segmentBoxObjArray = []
     }
 
+    onAfterChange = value => {
+        this.setState({
+          inputValue: value,
+        });
+        console.log(value)
+      };    
 
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
@@ -393,7 +402,7 @@ class BaseMap extends Component {
                     subSegList:subSegList,
                     beltCellList: beltCellList,
                     beltSegList:beltSegList,
-                    // segPolyList: segPolyList
+                    segPolyList: segPolyList,
                     newSegPolyList:newSegPolyList
 
                     // paper_inter: nk_intersect_points[1],
@@ -437,6 +446,9 @@ class BaseMap extends Component {
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if (prevState.inputValue !== this.state.inputValue) {
+            console.log(this.state.inputValue)
+        }
     }
 
     render() {
@@ -568,9 +580,9 @@ class BaseMap extends Component {
             }
 
             let cells0,cells1,cells2
-            if(this.state.beltSegList){
-                cells0 = this.state.beltSegList.map((d, i) => {
-                    let pathStr0 = getLinePathStr(d)
+            if(this.state.beltCellList){
+                cells0 = this.state.beltCellList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d[2])
                       return (
                           <path
                           key = {`split_boundary_segments-${i}`}
@@ -662,7 +674,7 @@ class BaseMap extends Component {
                     linePts,
                     cells0,
                     // cells1,
-                    // cells2,
+                    cells2,
                     // segPoly
                     //boundaryDots
                ]
@@ -732,8 +744,13 @@ class BaseMap extends Component {
         }
 
         return (
+
         <div>
-            <p>Basemap</p>
+            <div className="Control">
+                <p>Basemap</p>
+                <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
+
+            </div>
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
             <g className="Regions">
                 {Regions}
