@@ -390,7 +390,7 @@ class BaseMap extends Component {
                     inscribledCircles :circleAry,
                     linePts : simplifiedAreaProjected,
                     subSegList:subSegList,
-                    // beltCellList: beltCellList,
+                    beltCellList: beltCellList,
                     beltSegList:beltSegList,
                     segPolyList: segPolyList,
                     newSegPolyList:newSegPolyList
@@ -561,9 +561,9 @@ class BaseMap extends Component {
             }
 
             let cells0,cells1,cells2
-            if(this.state.newSegPolyList){
-                cells0 = this.state.newSegPolyList.map((d, i) => {
-                    let pathStr0 = getLinePathStr(d)
+            if(this.state.beltCellList){
+                cells0 = this.state.beltCellList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d[2])
                       return (
                           <path
                           key = {`split_boundary_segments-${i}`}
