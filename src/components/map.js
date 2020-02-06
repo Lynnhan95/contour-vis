@@ -285,45 +285,16 @@ class BaseMap extends Component {
                 })
 
                 let newSegPolyList = []
-                let noConvert = []
-                console.log(segPolyList);
+
                 segPolyList.forEach((d,i) => {
-                  let newSegPoly = getNewSeg(d, clip_outBoundary)
+                  let newSegPoly = getNewSeg(d, clip_outBoundary,i)
 
-                  if (newSegPoly.length != 4) {
-                    newSegPoly.pop()
-                    if (newSegPoly.length !=4 && newSegPoly.length!=5) {
-
-                    }
-                  }
-                  if (newSegPoly.length == 5) {
-
-                    newSegPoly.splice(2,1)
-                  }
-
-                  noConvert.push(newSegPoly)
-               //    // only first four items
-
-                  if (Math.abs(newSegPoly[0][0]-newSegPoly[1][0])< Math.abs(newSegPoly[1][0]-newSegPoly[2][0])) {
-                    if (newSegPoly[0][0] != d[2][0] ) {
-                      newSegPoly = [newSegPoly[2],newSegPoly[3],newSegPoly[0],newSegPoly[1]]
-                    }
-                    newSegPolyList.push(newSegPoly)
-                  }
-                  else if (Math.abs(newSegPoly[0][0]-newSegPoly[1][0]) >= Math.abs(newSegPoly[1][0]-newSegPoly[2][0])) {
-
-                    let newSeg = [newSegPoly[3],newSegPoly[0],newSegPoly[1],newSegPoly[2]]
-                    if (newSeg[0][0] != d[2][0] ) {
-
-                    }
-
-                    newSegPolyList.push(newSeg)
-                  }
+                  newSegPolyList.push(newSegPoly)
 
                 })
 
                 console.log(newSegPolyList)
-                console.log(noConvert);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
             subsegments
@@ -347,24 +318,24 @@ class BaseMap extends Component {
 */
                 // console.log(this.innerBoundaryCoordinates)
                 // Compute belt from newSegPolyList
-                let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
-                    return this.autoProjection(d)
-                })
-                let beltSegList = []
-                newSegPolyList.forEach((d) => {
-                    let beltSeg = getBeltSegment(d, clip_boundary)
-                    beltSegList.push(beltSeg)
-                })
+                // let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
+                //     return this.autoProjection(d)
+                // })
+                // let beltSegList = []
+                // newSegPolyList.forEach((d) => {
+                //     let beltSeg = getBeltSegment(d, clip_boundary)
+                //     beltSegList.push(beltSeg)
+                // })
                 // console.log(beltSegList)
 /*
             belt cells
 
 */
-                let beltCellList = []
-                beltSegList.forEach((d) => {
-                    let subCell = interpolateSegment(d, subSegNum)
-                    beltCellList.push(subCell)
-                })
+                // let beltCellList = []
+                // beltSegList.forEach((d) => {
+                //     let subCell = interpolateSegment(d, subSegNum)
+                //     beltCellList.push(subCell)
+                // })
 
                 // console.log(beltCellList)
 
@@ -418,8 +389,8 @@ class BaseMap extends Component {
                     inscribledCircles :circleAry,
                     linePts : simplifiedAreaProjected,
                     subSegList:subSegList,
-                    beltCellList: beltCellList,
-                    beltSegList:beltSegList,
+                    // beltCellList: beltCellList,
+                    // beltSegList:beltSegList,
                     // segPolyList: segPolyList
                     newSegPolyList:newSegPolyList
 
@@ -588,27 +559,50 @@ class BaseMap extends Component {
 
             }
 
-            let cells
+            let cells0,cells1,cells2
             if(this.state.subSegList){
-                cells = this.state.subSegList.map((d, i) => {
-                    let pathStr = getLinePathStr(d[2])
-                    if (i<2500 && i>3000) {
+                cells0 = this.state.subSegList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d[0])
                       return (
                           <path
                           key = {`split_boundary_segments-${i}`}
                           className = {`split_boundary_segments-${i}`}
-                          d = {pathStr}
-                          stroke = "#000"
-                          strokeWidth = "0"
+                          d = {pathStr0}
                           fill = '#f00'
                           // fill = {this.color_scale(d.dens)}
                           />
                       )
-                    }
+
+                })
+                cells1 = this.state.subSegList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d[1])
+                      return (
+                          <path
+                          key = {`split_boundary_segments-${i}`}
+                          className = {`split_boundary_segments-${i}`}
+                          d = {pathStr0}
+                          fill = 'green'
+                          // fill = {this.color_scale(d.dens)}
+                          />
+                      )
+
+                })
+                cells2 = this.state.subSegList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d[2])
+                      return (
+                          <path
+                          key = {`split_boundary_segments-${i}`}
+                          className = {`split_boundary_segments-${i}`}
+                          d = {pathStr0}
+                          fill = 'blue'
+                          // fill = {this.color_scale(d.dens)}
+                          />
+                      )
 
                 })
 
             }
+
 
             /*
             Mapping simplified outer boundary with this.state.simplifiedArea
@@ -658,7 +652,9 @@ class BaseMap extends Component {
                     simplified_Outboundary,
                     // inscribledCircles,
                     linePts,
-                    cells,
+                    cells0,
+                    cells1,
+                    cells2,
                     // segPoly
                     //boundaryDots
                ]
