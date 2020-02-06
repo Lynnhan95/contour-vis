@@ -20,7 +20,7 @@ import "antd/dist/antd.css";
 import "./style.css"
 
 const setSegNumb = 5000
-const slidingBins = 100
+const slidingBins = 150
 
 const intersect = require('path-intersection')
 
@@ -253,7 +253,7 @@ class BaseMap extends Component {
             if (d.properties.name === '湖南'){
                 // store computed dots and paths
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 0.3
+                const simplifiedFactor = 0.4
 
                 // Compute simplified area
                 let res = []
