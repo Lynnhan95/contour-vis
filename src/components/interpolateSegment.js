@@ -5,9 +5,7 @@ export function interpolateSegment(segPoly, num ,i) {
          * B: intersect point
          */
         let [A1, A2, B2, B1] = segPoly
-        // if (A2 == undefined) {
-        //   A2 =A1
-        // }
+
         let interpolatePair = [ [A1, A2] ]
         for (let i=1; i< num; i++) {
             // [M, N]

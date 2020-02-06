@@ -14,6 +14,7 @@ import {interpolateSegment} from './interpolateSegment'
 import {getBeltSegment} from './getBeltSegment'
 import {insideCounter} from './insideCounter'
 import {getNewSeg} from './getNewSeg.js'
+import {getBeltSeg} from './getBeltSeg.js'
 
 
 
@@ -143,7 +144,7 @@ class BaseMap extends Component {
     // getPerpendicularYfromX(A, B, x){ // A, B are line end points
     //     let k = (B.x-A.x)/(B.y-A.y)
 
-    //     return -1*k*x + k*(A.x+B.x)/2 + (A.y+B.y)/2
+    //     return -1*k*x + k*(A.x+B.x)/2getBeltSeg + (A.y+B.y)/2
     // }
 
     // getPerpendicularXfromAB(A, B, len) {
@@ -316,17 +317,17 @@ class BaseMap extends Component {
 /*
             belt
 */
-                // console.log(this.innerBoundaryCoordinates)
-                // Compute belt from newSegPolyList
-                // let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
-                //     return this.autoProjection(d)
-                // })
-                // let beltSegList = []
-                // newSegPolyList.forEach((d) => {
-                //     let beltSeg = getBeltSegment(d, clip_boundary)
-                //     beltSegList.push(beltSeg)
-                // })
-                // console.log(beltSegList)
+                //console.log(this.innerBoundaryCoordinates)
+                //Compute belt from newSegPolyList
+                let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
+                    return this.autoProjection(d)
+                })
+                let beltSegList = []
+                segPolyList.forEach((d, i) => {
+                    let beltSeg = getBeltSeg(d, clip_outBoundary, clip_boundary, i)
+                    beltSegList.push(beltSeg)
+                })
+                console.log(beltSegList)
 /*
             belt cells
 
@@ -390,7 +391,7 @@ class BaseMap extends Component {
                     linePts : simplifiedAreaProjected,
                     subSegList:subSegList,
                     // beltCellList: beltCellList,
-                    // beltSegList:beltSegList,
+                    beltSegList:beltSegList,
                     // segPolyList: segPolyList
                     newSegPolyList:newSegPolyList
 
@@ -560,9 +561,9 @@ class BaseMap extends Component {
             }
 
             let cells0,cells1,cells2
-            if(this.state.subSegList){
-                cells0 = this.state.subSegList.map((d, i) => {
-                    let pathStr0 = getLinePathStr(d[0])
+            if(this.state.beltSegList){
+                cells0 = this.state.beltSegList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d)
                       return (
                           <path
                           key = {`split_boundary_segments-${i}`}
@@ -653,8 +654,8 @@ class BaseMap extends Component {
                     // inscribledCircles,
                     linePts,
                     cells0,
-                    cells1,
-                    cells2,
+                    // cells1,
+                    // cells2,
                     // segPoly
                     //boundaryDots
                ]
