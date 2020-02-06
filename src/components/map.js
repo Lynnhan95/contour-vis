@@ -443,6 +443,7 @@ class BaseMap extends Component {
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
             this.setState({cellObjArr: cellObjArr })
+            console.log(cellObjArr)
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -580,16 +581,16 @@ class BaseMap extends Component {
             }
 
             let cells0,cells1,cells2
-            if(this.state.beltCellList){
-                cells0 = this.state.beltCellList.map((d, i) => {
-                    let pathStr0 = getLinePathStr(d[2])
+            if(this.state.cellObjArr){
+                cells0 = this.state.cellObjArr.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d.coor)
                       return (
                           <path
                           key = {`split_boundary_segments-${i}`}
                           className = {`split_boundary_segments-${i}`}
                           d = {pathStr0}
-                          fill = '#f00'
-                          // fill = {this.color_scale(d.dens)}
+                          //fill = '#f00'
+                          fill = {this.color_scale(d.dens)}
                           />
                       )
 

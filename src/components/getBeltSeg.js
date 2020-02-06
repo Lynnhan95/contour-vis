@@ -40,9 +40,9 @@ export function getBeltSeg(segPoly, clip_outBoundary, clip_boundary ,index) {
 
   //console.log(interSect1, interSect2, interSect3, interSect4)
   return ([
-    [interSect1[0].point.x, interSect1[0].point.y],
-    [interSect2[0].point.x, interSect2[0].point.y],
     [interSect4[0].point.x, interSect4[0].point.y],
     [interSect3[0].point.x, interSect3[0].point.y],
+    [interSect1[0].point.x, interSect1[0].point.y],
+    [interSect2[0].point.x, interSect2[0].point.y],
       ])
 }
