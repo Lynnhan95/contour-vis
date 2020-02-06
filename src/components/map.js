@@ -392,7 +392,7 @@ class BaseMap extends Component {
                     subSegList:subSegList,
                     // beltCellList: beltCellList,
                     beltSegList:beltSegList,
-                    // segPolyList: segPolyList
+                    segPolyList: segPolyList,
                     newSegPolyList:newSegPolyList
 
                     // paper_inter: nk_intersect_points[1],
@@ -561,8 +561,8 @@ class BaseMap extends Component {
             }
 
             let cells0,cells1,cells2
-            if(this.state.beltSegList){
-                cells0 = this.state.beltSegList.map((d, i) => {
+            if(this.state.newSegPolyList){
+                cells0 = this.state.newSegPolyList.map((d, i) => {
                     let pathStr0 = getLinePathStr(d)
                       return (
                           <path

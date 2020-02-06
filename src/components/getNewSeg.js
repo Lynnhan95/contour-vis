@@ -42,6 +42,6 @@ export function getNewSeg(segPoly, clip_boundary ,index) {
     newAry.push([newPt2.point.x,newPt2.point.y])
 
 
-    return ([segPoly[3],segPoly[2],[interSect1[0].point.x,interSect1[0].point.y],[interSect2[0].point.x,interSect2[0].point.y]]);
+    return ([segPoly[3],segPoly[2],[interSect2[0].point.x,interSect2[0].point.y], [interSect1[0].point.x,interSect1[0].point.y]]);
     // return polygonClipping.intersection([segPoly], [clip_boundary])[0][0]
 }
