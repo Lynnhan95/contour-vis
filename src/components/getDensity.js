@@ -31,11 +31,15 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
   //let widget_line = path_line.length/segment_num, new_pts_line = []
 
   let widget = path.getTotalLength()/segment_num, new_pts = []
+  let prevValue = path.getPointAtLength((segment_num-1)*widget)
 
   for (var i = 0; i < segment_num; i++) {
-    var point  = path.getPointAtLength(i*widget);
-     new_pts.push(point)
+      var point  = path.getPointAtLength(i*widget);
+      var newPoint = {x:(point.x+prevValue.x)/2,y:(point.y+prevValue.y)/2}
+      prevValue = point
+      new_pts.push(newPoint)
     }
+
 
 
   // quarterly split the list to advoid max exceeding
@@ -100,8 +104,10 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
     var d1 = Math.pow(((center1[0]-pt1[0])*(center1[0]-pt1[0])+(center1[1]-pt1[1])*(center1[1]-pt1[1])),0.5)
     var d2 = Math.pow(((center2[0]-pt2[0])*(center2[0]-pt2[0])+(center2[1]-pt2[1])*(center2[1]-pt2[1])),0.5)
 
-    var scale1 = (d1+7)/d1
-    var scale2 = (d2+7)/d2
+
+    var extendMetric = 10
+    var scale1 = (d1+extendMetric)/d1
+    var scale2 = (d2+extendMetric)/d2
 
 
     var new_pt1 = [(scale1*(pt1[0]-center1[0])+center1[0]),(scale1*(pt1[1]-center1[1])+center1[1])]

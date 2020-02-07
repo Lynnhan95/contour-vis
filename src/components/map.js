@@ -20,7 +20,7 @@ import "antd/dist/antd.css";
 import "./style.css"
 
 const setSegNumb = 5000
-const slidingBins = 150
+const slidingBins = 120
 
 const intersect = require('path-intersection')
 
@@ -150,28 +150,6 @@ class BaseMap extends Component {
         return result
     }
 
-
-    // getPerpendicularYfromX(A, B, x){ // A, B are line end points
-    //     let k = (B.x-A.x)/(B.y-A.y)
-
-    //     return -1*k*x + k*(A.x+B.x)/2getBeltSeg + (A.y+B.y)/2
-    // }
-
-    // getPerpendicularXfromAB(A, B, len) {
-    //     let M = {
-    //             x: (B.x + A.x) / 2
-    //         },
-    //         k = (B.x-A.x)/(B.y-A.y),
-    //         x = {
-    //             pos: null,
-    //             neg: null
-    //         }
-
-    //     x.pos = M.x + len/Math.sqrt(k*k + 1)
-    //     x.neg = M.x - len/Math.sqrt(k*k + 1)
-
-    //     return x
-    // }
 
     getMedianPointsFromEvenPoint(arr) {
         let _me = this
@@ -312,7 +290,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 3 // set how many subsegments we divide each seg
+                const subSegNum = 8 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
