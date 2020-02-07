@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv, extent, scaleSequential, interpolateOrRd, select} from 'd3'
+import { csv, extent, scaleSequential, interpolateOrRd, select, nest} from 'd3'
 import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -15,9 +15,13 @@ import {getBeltSegment} from './getBeltSegment'
 import {insideCounter} from './insideCounter'
 import {getNewSeg} from './getNewSeg.js'
 import {getBeltSeg} from './getBeltSeg.js'
-import {Slider} from 'antd'
+import {Slider, Select} from 'antd'
 import "antd/dist/antd.css";
 import "./style.css"
+import ProviencesNames from './chinaProvincesName'
+import chinaProvincesName from './chinaProvincesName'
+import keyBy from 'lodash.keyby'
+const { Option } = Select
 
 const setSegNumb = 5000
 const slidingBins = 150
@@ -31,6 +35,9 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
+            province_en: 'Hunan',
+            province_cn: '湖南',
+            currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
             resDots: null,
@@ -51,6 +58,11 @@ class BaseMap extends Component {
 
         // segment
         this.segmentBoxObjArray = []
+
+        // nest data
+        this.pointsDataNest = null
+        this.chinaGeoDataNest = null
+        this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
     }
 
     onAfterChange = value => {
@@ -58,7 +70,17 @@ class BaseMap extends Component {
           inputValue: value,
         });
         console.log(value)
-      };
+    }
+
+    onChange(value) {
+        let name_en = value,
+            name_cn = this.chinaProvincesNameNest[value].provinceName
+
+        this.setState({
+            currGeoData: this.chinaGeoDataNest[name_cn]
+        })
+        console.log(`selected ${name_cn} ${name_en}`);
+    }
 
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
@@ -66,36 +88,99 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
-        /* Fetching Geo-boundary data from geojson file */
-        fetch("/chinaGeo.geojson")
-            .then(response => {
-                if (response.status !== 200){
-                    //console.log('can not load geojson file')
-                    return
-                }
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+            .then(result=>{
+                let response = result[0],
+                    religious_data = result[1]
+
+                /**
+                 * religious_data
+                 */
+                religious_data.forEach(d => {
+                    d["id"] = +d["id"];
+                    d["Latitude"] = +d["Latitude"]
+                    d["Longitude"] = +d["Longitude"]
+                    d["year"] = +d["year"]
+                })
+                let entries = nest()
+                    .key(d=>d.province)
+                    .entries(religious_data)
+
+                let entriesObj = keyBy(entries, d=>d.key)
+
+                _me.pointsDataNest = entriesObj
+
+                /**
+                 * chinaGeo
+                 */
                 response.json().then(chinaGeoData => {
                     this.autoProjection = geoMercator().fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], chinaGeoData)
-                    this.setState ({
-                        chinaGeoData:  chinaGeoData.features                    })
+
+                    let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
+
+                    _me.chinaGeoDataNest = featuresObj
+
+                    console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_cn]);
+                    
+                    _me.setState ({
+                        chinaGeoData: chinaGeoData.features,
+                        currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
+                        pointsData: _me.pointsDataNest[_me.state.province_en].values
+                    })
                 })
+                
+            })
+            .catch(error=>{
+                console.error(error)
             })
 
-        csv('/religious_data.csv').then( data => {
-            // Converting certain csv data from string to number
-            data.forEach( (d) => {
-              d["id"] = +d["id"];
-              d["Latitude"] = +d["Latitude"]
-              d["Longitude"] = +d["Longitude"]
-              d["year"] = +d["year"]
-            })
-            return data
+        /* Fetching Geo-boundary data from geojson file */
+        // fetch("/chinaGeo.geojson")
+        //     .then(response => {
+        //         if (response.status !== 200){
+        //             //console.log('can not load geojson file')
+        //             return
+        //         }
+        //         response.json().then(chinaGeoData => {
+        //             this.autoProjection = geoMercator().fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], chinaGeoData)
 
-            }).then( data => {
-                const pointsData = data.filter( (d) => {
-                    return d.province === "Hunan"
-                })
-                this.setState({pointsData: pointsData})
-            })
+        //             let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
+        //             console.warn('featuresObj', featuresObj);
+        //             _me.chinaGeoDataNest = featuresObj
+                    
+        //             this.setState ({
+        //                 chinaGeoData: chinaGeoData.features,
+        //                 currGeoData: _me.chinaGeoDataNest[_me.state.province]
+        //             })
+        //         })
+        //     })
+
+        // csv('/religious_data.csv').then( data => {
+        //     // Converting certain csv data from string to number
+        //     data.forEach( (d) => {
+        //       d["id"] = +d["id"];
+        //       d["Latitude"] = +d["Latitude"]
+        //       d["Longitude"] = +d["Longitude"]
+        //       d["year"] = +d["year"]
+        //     })
+        //     return data
+
+        //     }).then( data => {
+        //         // const pointsData = data.filter( (d) => {
+        //         //     return d.province === "Hunan"
+        //         // })
+        //         let entries = nest()
+        //             .key(d=>d.province)
+        //             .entries(data)
+
+        //         let entriesObj = keyBy(entries, d=>d.key)
+
+        //         _me.pointsDataNest = entriesObj
+        //         // this.setState({pointsData: pointsData})
+        //         this.setState({
+        //             pointsData: _me.pointsDataNest[_me.state.province].values
+        //         })
+        //     })
     }
 
     /* Helper function for getting even_point */
@@ -247,11 +332,15 @@ class BaseMap extends Component {
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
-        if(prevState.chinaGeoData !== this.state.chinaGeoData) {
-
-            this.state.chinaGeoData.map((d,i)=> {
-            if (d.properties.name === '湖南'){
+        // if(prevState.chinaGeoData !== this.state.chinaGeoData) {
+        if(prevState.currGeoData !== this.state.currGeoData){
+            console.log('currGeoData update')
+            // this.state.chinaGeoData.map((d,i)=> {
+            // if (d.properties.name === '湖南'){
                 // store computed dots and paths
+                const d = this.state.currGeoData
+                console.warn('dddddd', d);
+                
                 const mainArea = d.geometry.coordinates
                 const simplifiedFactor = 0.4
 
@@ -409,12 +498,12 @@ class BaseMap extends Component {
                     //segments: segments,
                     //boundary_segments: boundary_segments
                 })
-            }
-            })
+            // }
+            // })
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if (prevState.pointsData !== this.state.pointsData) {
-
+        if (prevState.subSegList !== this.state.subSegList) {
+            console.log('pointsData update', this.state.subSegList)
             var pointsDataProjected = this.state.pointsData.map((e)=>{
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
@@ -442,7 +531,9 @@ class BaseMap extends Component {
                 return d.dens
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
-            this.setState({cellObjArr: cellObjArr })
+            this.setState({
+                cellObjArr: cellObjArr 
+            })
             console.log(cellObjArr)
 
         }
@@ -744,12 +835,33 @@ class BaseMap extends Component {
 
         }
 
+        let options = []
+        chinaProvincesName.forEach((e, i)=>{
+            options.push(
+                <Option value={e.provincePhonetic} key={`province-${i}`}>{e.provinceName}</Option>
+            )
+        })
+
         return (
 
         <div>
             <div className="Control">
                 <p>Basemap</p>
                 <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
+
+                <Select
+                    showSearch
+                    style={{ width: 200 }}
+                    placeholder="Select a province"
+                    optionFilterProp="children"
+                    onChange={this.onChange.bind(this)}
+                    defaultValue={'Hunan'}
+                    filterOption={(input, option) =>
+                        option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                >
+                    { options }
+                </Select>
 
             </div>
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
