@@ -24,7 +24,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 120
+const slidingBins = 200
 
 const intersect = require('path-intersection')
 
@@ -121,14 +121,14 @@ class BaseMap extends Component {
                     _me.chinaGeoDataNest = featuresObj
 
                     console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_cn]);
-                    
+
                     _me.setState ({
                         chinaGeoData: chinaGeoData.features,
                         currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
                         pointsData: _me.pointsDataNest[_me.state.province_en].values
                     })
                 })
-                
+
             })
             .catch(error=>{
                 console.error(error)
@@ -147,7 +147,7 @@ class BaseMap extends Component {
         //             let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
         //             console.warn('featuresObj', featuresObj);
         //             _me.chinaGeoDataNest = featuresObj
-                    
+
         //             this.setState ({
         //                 chinaGeoData: chinaGeoData.features,
         //                 currGeoData: _me.chinaGeoDataNest[_me.state.province]
@@ -318,7 +318,7 @@ class BaseMap extends Component {
                 // store computed dots and paths
                 const d = this.state.currGeoData
                 console.warn('dddddd', d);
-                
+
                 const mainArea = d.geometry.coordinates
                 const simplifiedFactor = 0.4
 
@@ -379,7 +379,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 8 // set how many subsegments we divide each seg
+                const subSegNum = 20 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -510,7 +510,7 @@ class BaseMap extends Component {
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
             this.setState({
-                cellObjArr: cellObjArr 
+                cellObjArr: cellObjArr
             })
             console.log(cellObjArr)
 

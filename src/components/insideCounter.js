@@ -81,28 +81,26 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
           }
         }
 
-        // let perpenDensity=[];
-        // for (var i = 0; i < densityGroup.length; i++) {
-        //   let len = densityGroup[i].length
-        //   let init = [densityGroup[i][len-1],densityGroup[i][0]]
-        //   let result = []
-        //   var j=1
-        //   while (j < len+1) {
-        //     if (j == len) {
-        //         init.push(densityGroup[i][0])
-        //     }
-        //     else {
-        //         init.push(densityGroup[i][j])
-        //     }
-        //     result.push(getSum(init)/3)
-        //     init.shift()
-        //     j++
-        //
-        //   }
-        //   perpenDensity.push(result)
-        // }
-        //
-        // densityGroup =perpenDensity
+        let perpenDensity=[];
+        for (var i = 0; i < densityGroup.length; i++) {
+          let result = slidingCalSum(segNumb,8,densityGroup[i])
+          // var j=1
+          // while (j < len+1) {
+          //   if (j == len) {
+          //       init.push(densityGroup[i][0])
+          //   }
+          //   else {
+          //       init.push(densityGroup[i][j])
+          //   }
+          //   result.push(getSum(init)/3)
+          //   init.shift()
+          //   j++
+          //
+          // }
+          perpenDensity.push(result)
+        }
+
+        densityGroup =perpenDensity
 
 
         console.log(densityGroup);
