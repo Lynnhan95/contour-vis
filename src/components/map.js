@@ -35,8 +35,11 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            province_one_en: 'Hunan',
+            province_one_cn: '湖南',
+            province_two_cn: '江西',
+            state_one: 'Indiana',
+            state_two: 'California',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -88,10 +91,11 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv'), fetch("/us-states.json")])
             .then(result=>{
                 let response = result[0],
-                    religious_data = result[1]
+                    religious_data = result[1],
+                    states = result[2]
 
                 /**
                  * religious_data
@@ -120,12 +124,12 @@ class BaseMap extends Component {
 
                     _me.chinaGeoDataNest = featuresObj
 
-                    console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_cn]);
+                    console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_one_cn]);
                     
                     _me.setState ({
                         chinaGeoData: chinaGeoData.features,
-                        currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
-                        pointsData: _me.pointsDataNest[_me.state.province_en].values
+                        currGeoData: _me.chinaGeoDataNest[_me.state.province_one_cn],
+                        pointsData: _me.pointsDataNest[_me.state.province_one_en].values
                     })
                 })
                 
@@ -401,7 +405,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 3 // set how many subsegments we divide each seg
+                const subSegNum = 3// set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
