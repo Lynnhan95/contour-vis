@@ -24,7 +24,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 150
+const slidingBins = 200
 
 const intersect = require('path-intersection')
 
@@ -35,11 +35,8 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_one_en: 'Hunan',
-            province_one_cn: '湖南',
-            province_two_cn: '江西',
-            state_one: 'Indiana',
-            state_two: 'California',
+            province_en: 'Hunan',
+            province_cn: '湖南',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -91,11 +88,10 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv'), fetch("/us-states.json")])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
             .then(result=>{
                 let response = result[0],
-                    religious_data = result[1],
-                    states = result[2]
+                    religious_data = result[1]
 
                 /**
                  * religious_data
@@ -124,15 +120,15 @@ class BaseMap extends Component {
 
                     _me.chinaGeoDataNest = featuresObj
 
-                    console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_one_cn]);
-                    
+                    console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_cn]);
+
                     _me.setState ({
                         chinaGeoData: chinaGeoData.features,
-                        currGeoData: _me.chinaGeoDataNest[_me.state.province_one_cn],
-                        pointsData: _me.pointsDataNest[_me.state.province_one_en].values
+                        currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
+                        pointsData: _me.pointsDataNest[_me.state.province_en].values
                     })
                 })
-                
+
             })
             .catch(error=>{
                 console.error(error)
@@ -151,7 +147,7 @@ class BaseMap extends Component {
         //             let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
         //             console.warn('featuresObj', featuresObj);
         //             _me.chinaGeoDataNest = featuresObj
-                    
+
         //             this.setState ({
         //                 chinaGeoData: chinaGeoData.features,
         //                 currGeoData: _me.chinaGeoDataNest[_me.state.province]
@@ -240,28 +236,6 @@ class BaseMap extends Component {
     }
 
 
-    // getPerpendicularYfromX(A, B, x){ // A, B are line end points
-    //     let k = (B.x-A.x)/(B.y-A.y)
-
-    //     return -1*k*x + k*(A.x+B.x)/2getBeltSeg + (A.y+B.y)/2
-    // }
-
-    // getPerpendicularXfromAB(A, B, len) {
-    //     let M = {
-    //             x: (B.x + A.x) / 2
-    //         },
-    //         k = (B.x-A.x)/(B.y-A.y),
-    //         x = {
-    //             pos: null,
-    //             neg: null
-    //         }
-
-    //     x.pos = M.x + len/Math.sqrt(k*k + 1)
-    //     x.neg = M.x - len/Math.sqrt(k*k + 1)
-
-    //     return x
-    // }
-
     getMedianPointsFromEvenPoint(arr) {
         let _me = this
         let MedianPoints = [],
@@ -344,7 +318,7 @@ class BaseMap extends Component {
                 // store computed dots and paths
                 const d = this.state.currGeoData
                 console.warn('dddddd', d);
-                
+
                 const mainArea = d.geometry.coordinates
                 const simplifiedFactor = 0.4
 
@@ -405,7 +379,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 3// set how many subsegments we divide each seg
+                const subSegNum = 20 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -536,7 +510,7 @@ class BaseMap extends Component {
             })
             this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
             this.setState({
-                cellObjArr: cellObjArr 
+                cellObjArr: cellObjArr
             })
             console.log(cellObjArr)
 

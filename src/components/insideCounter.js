@@ -5,7 +5,7 @@
 */
 
 
-export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,scaleFactor = 100){
+export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,scaleFactor = 200){
         // for each subseg
 
         var densityGroup = []
@@ -15,6 +15,7 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
         var density_max = 0
         var densityBystripe = []
         var areaBystripe = []
+
 
 
 
@@ -55,16 +56,20 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
 
           // set length of densityGroup
           densityGroup.push ([])
-          // densityGroup.push (subDensityGroup)
-          // areaGroup.push(subAreaGroup)
+          // densityGroupNorm.push (subDensityGroup)
+          areaGroup.push(subAreaGroup)
         }
-
+        console.log(areaGroup);
         console.log(density_min+"<<<<"+density_max);
         for (var i = 0; i < densityBystripe.length; i++) {
-          let newDensitySub = slidingCalSum(segNumb,slidingNumb,densityBystripe[i])
+          let newDensitySub
+
           newDensitySub = weightedMean(densityBystripe[i],areaBystripe[i],slidingNumb)
-          // scale up
+          newDensitySub = slidingCalSum(segNumb,slidingNumb,densityBystripe[i])
           newDensitySub = newDensitySub.map(function(item){ item = item*scaleFactor;  if (item ==0) {item=0.1} ;return item;})
+
+
+          // scale up
           newDensityGroup.push(newDensitySub)
         }
         // refactor back to old structure
@@ -75,6 +80,28 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
             densityGroup[i].push(newDensityGroup[j][i])
           }
         }
+
+        let perpenDensity=[];
+        for (var i = 0; i < densityGroup.length; i++) {
+          let result = slidingCalSum(segNumb,8,densityGroup[i])
+          // var j=1
+          // while (j < len+1) {
+          //   if (j == len) {
+          //       init.push(densityGroup[i][0])
+          //   }
+          //   else {
+          //       init.push(densityGroup[i][j])
+          //   }
+          //   result.push(getSum(init)/3)
+          //   init.shift()
+          //   j++
+          //
+          // }
+          perpenDensity.push(result)
+        }
+
+        densityGroup =perpenDensity
+
 
         console.log(densityGroup);
         // we do sliding and average process over here. For index i, it is the stripe of the subsegment
