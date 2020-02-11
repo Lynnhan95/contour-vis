@@ -55,5 +55,8 @@ https://github.com/mfogel/polygon-clipping
 
 5. SAT to get thinner lines contour
 
-6. Simplify boundary: https://mourner.github.io/simplify-js/
+6. Simplify boundary: https://mourner.github.io/simplify-js/ <br/>
 ![simplify](./src/assets/0108.jpg)
+
+7. Color mapping
+![color](./src/assets/triangular_2.jpg)
