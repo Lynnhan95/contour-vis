@@ -11,14 +11,54 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
     init an empty svg for calculating purpose
   */
 
+//   for (var i = 0; i < pts_ary.length; i++) {
+//
+//     // let a,b,c;
+//     // console.log(pts_ary[i]);
+//     // if (i == 1 ) {
+//     //     a = pts_ary[i]
+//     //     b = pts_ary[i+2]
+//     //     c = pts_ary[i+1]
+//     //     let result = (b[0] - a[0])*(c[1] - a[1]) - (b[1] - a[1])*(c[0] - a[0])
+//     //     if (true) {
+//     //
+//     //     }
+//     //     console.log(result);
+//     // }
+//     //
+//     // if (i<pts_ary.length-2) {
+//     //   a = pts_ary[i]
+//     //   b = pts_ary[i+2]
+//     //   c = pts_ary[i+1]
+//     // }
+//     // if (i= pts_ary.length-2) {
+//     //   a = pts_ary[i]
+//     //   b = pts_ary[i+2-pts_ary.length]
+//     //   c = pts_ary[i+1]
+//     // }
+//     // else {
+//     //   a = pts_ary[i]
+//     //   b = pts_ary[i+2-pts_ary.length]
+//     //   c = pts_ary[i+1-pts_ary.length]
+//     // }
+//     //
+//     // console.log([a,b,c]);
+//     //
+//     // let result = (b[0] - a[0])*(c[1] - a[1]) - (b[1] - a[1])*(c[0] - a[0])
+//     // if (result>0) {
+//     //   console.log("left");
+//     // }
+// }
+
+
   var line0 = d3.line()
                 .x(function(d) { return d[0]})
                 .y(function(d) { return d[1]})
-                .curve(d3.curveCatmullRomClosed);
+                .curve(d3.curveLinear);
 
   var p = svg.append("path")
                   .style("fill","none")
-                  .style("stroke","none")
+                  .style("stroke","orange")
                   .style("stroke-width","1px")
                   .attr("d",line0(pts_ary));
 
@@ -122,7 +162,7 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
   */
 
 
-    return [dictAllmin,segPolyList];
+    return [dictAllmin,segPolyList,path];
 
 }
 

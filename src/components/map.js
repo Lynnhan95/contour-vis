@@ -23,8 +23,8 @@ import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
 const { Option } = Select
 
-const setSegNumb = 5000
-const slidingBins = 200
+const setSegNumb = 3000
+const slidingBins = 3
 
 const intersect = require('path-intersection')
 
@@ -354,7 +354,9 @@ class BaseMap extends Component {
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
 
-                let [circleAry,segPolyList] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
+                let [circleAry,segPolyList,newCurvePath] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
+
+                console.log(newCurvePath);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // create new segList by clipping from mainArea polygon
@@ -544,7 +546,8 @@ class BaseMap extends Component {
 
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-                    return (
+                  if (i===624)
+              {      return (
                         <circle
                         cx = {d.centerX }
                         cy = {d.centerY}
@@ -554,7 +557,7 @@ class BaseMap extends Component {
                         fill = "none"
                         strokeWidth = "0.1"
                         />
-                    )
+                    )}
                 })
             }
 
@@ -740,7 +743,7 @@ class BaseMap extends Component {
             return [
                     //outsideBoundary,
                     simplified_Outboundary,
-                    // inscribledCircles,
+                    inscribledCircles,
                     linePts,
                     cells0,
                     // cells1,
