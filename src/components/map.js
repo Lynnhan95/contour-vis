@@ -481,14 +481,40 @@ class BaseMap extends Component {
             // }
             // })
         }
+        
+        // function calDistanceBetweenPoints(coord1, coord2) {
+        //     let distance = 0
+        //     let [x1, y1] = coord1 
+        //     let [x2, y2] = coord2
+        //     distance = Math.pow( (x2 -x1)* (x2 -x1) + (y2-y1)*(y2-y1), 0.5 )
+        //     console.log(distance)
+        //     return distance
+        // }
+
+        function deleteDuplicate(arr) {
+            var uniques = [];
+            var itemsFound = {};
+            for(var i = 0, l = arr.length; i < l; i++) {
+                var stringified = JSON.stringify(arr[i]);
+                if(itemsFound[stringified]) { continue; }
+                uniques.push(arr[i]);
+                itemsFound[stringified] = true;
+            }
+            return uniques;
+        }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.subSegList !== this.state.subSegList) {
             console.log('pointsData update', this.state.subSegList)
-            var pointsDataProjected = this.state.pointsData.map((e)=>{
+            var pointsDataProjected = this.state.pointsData.map((e) => {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            var [densityGroup,areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
+            let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
+            console.log(pointsDataProjected)
+            console.log(deleteDuplicatePoints)
+
+            // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
+            var [densityGroup, areGroup] = insideCounter(this.state.subSegList,deleteDuplicatePoints,setSegNumb,slidingBins)
             console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
