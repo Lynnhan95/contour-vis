@@ -88,7 +88,7 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+        Promise.all([fetch("/chinaGeo.json"), csv('/religious_data.csv')])
             .then(result=>{
                 let response = result[0],
                     religious_data = result[1]
