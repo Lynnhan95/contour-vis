@@ -73,11 +73,12 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
         for (var i = 0; i < densityBystripe.length; i++) {
           let newDensitySub
 
+
           newDensitySub = weightedMean(densityBystripe[i],areaBystripe[i],slidingNumb)
-          // newDensitySub = slidingCalSum(segNumb,slidingNumb,densityBystripe[i])
+            newDensitySub = slidingCalSum(segNumb,slidingNumb,newDensitySub)
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
-            // if (item ==0) {item=0.1} ;
+            if (item ==0) {item=0.1} ;
             return item;})
 
 
@@ -93,26 +94,26 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
           }
         }
 
-        // let perpenDensity=[];
-        // for (var i = 0; i < densityGroup.length; i++) {
-        //   let result = slidingCalSum(segNumb,1,densityGroup[i])
-        //   // var j=1
-        //   // while (j < len+1) {
-        //   //   if (j == len) {
-        //   //       init.push(densityGroup[i][0])
-        //   //   }
-        //   //   else {
-        //   //       init.push(densityGroup[i][j])
-        //   //   }
-        //   //   result.push(getSum(init)/3)
-        //   //   init.shift()
-        //   //   j++
-        //   //
-        //   // }
-        //   perpenDensity.push(result)
-        // }
+        let perpenDensity=[];
+        for (var i = 0; i < densityGroup.length; i++) {
+          let result = slidingCalSum(segNumb,10,densityGroup[i])
+          // var j=1
+          // while (j < len+1) {
+          //   if (j == len) {
+          //       init.push(densityGroup[i][0])
+          //   }
+          //   else {
+          //       init.push(densityGroup[i][j])
+          //   }
+          //   result.push(getSum(init)/3)
+          //   init.shift()
+          //   j++
+          //
+          // }
+          perpenDensity.push(result)
+        }
 
-        // densityGroup =perpenDensity
+        densityGroup =perpenDensity
 
 
         console.log(densityGroup);

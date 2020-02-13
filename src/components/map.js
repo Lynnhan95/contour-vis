@@ -23,8 +23,8 @@ import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
 const { Option } = Select
 
-const setSegNumb = 3000
-const slidingBins = 3
+const setSegNumb = 5000
+const slidingBins = 50
 
 const intersect = require('path-intersection')
 
@@ -742,8 +742,8 @@ class BaseMap extends Component {
             })
             return [
                     //outsideBoundary,
-                    simplified_Outboundary,
-                    inscribledCircles,
+                    //simplified_Outboundary,
+                    // inscribledCircles,
                     linePts,
                     cells0,
                     // cells1,
