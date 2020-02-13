@@ -25,15 +25,15 @@ export function getNewSeg(segPoly, clip_boundary ,index) {
     segPath2.add(ptC2,ptP2)
 
 
-
     let interSect1 = polyPath.getIntersections(segPath1) // polygon intersects to line thru center 1
     let interSect2 = polyPath.getIntersections(segPath2)
 
 
-
     let newPt1 = interSect1[0]
     let newPt2 = interSect2[0]
-
+    if(!newPt2) {
+      console.log(index, segPoly)
+    }
 
     let newAry = []
     newAry.push(segPoly[3])
