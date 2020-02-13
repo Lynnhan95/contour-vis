@@ -34,7 +34,14 @@ computes all segments —> color ranges
 4. Compare medial axis computation result with Junhan's maximum intersect circle.
 5. Guojun will look at "region with multiple center" implementation.
 
+### Schedule for Februrary:
+1. Fine tune sliding window algorithm for color mapping; 
+2. Cope with sharp corners within the polygon for better segmentation;
+3. Prepare samples for human subject study, including: 3 samples for training; 4 complex boundary for matching task; one adjacent boundaries sample for demonstration.
+
 ## Algorithm about
+0. Data processign with Shapely and geoPandas in Python, also maptool online for adjacent boundary simplification.
+
 1. Interpolate point on path evenly:
 
 ![even_points](./src/assets/even_points.jpg)
@@ -53,10 +60,8 @@ computes all segments —> color ranges
 Implementation: 
 https://github.com/mfogel/polygon-clipping
 
-5. SAT to get thinner lines contour
-
 6. Simplify boundary: https://mourner.github.io/simplify-js/ <br/>
 ![simplify](./src/assets/0108.jpg)
 
-7. Color mapping
-![color](./src/assets/triangular_2.jpg)
+7. Encode density information to contour area of a arbitrary polygon
+![color](./src/assets/simple.jpg)
