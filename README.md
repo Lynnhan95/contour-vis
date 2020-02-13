@@ -63,5 +63,6 @@ https://github.com/mfogel/polygon-clipping
 6. Simplify boundary: https://mourner.github.io/simplify-js/ <br/>
 ![simplify](./src/assets/0108.jpg)
 
-7. Encode density information to contour area of a arbitrary polygon
-![color](./src/assets/simple.jpg)
+7. Encode density information to contour area of a arbitrary polygon <br/>
+Simple shape example: ![color](./src/assets/simple.jpg)
+Complex shape example: ![color](./src/assets/complex.jpg)
