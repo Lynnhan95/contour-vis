@@ -432,7 +432,7 @@ class BaseMap extends Component {
                 })
                 let beltSegList = []
                 segPolyList.forEach((d, i) => {
-                    let beltSeg = getBeltSeg(d, clip_boundary, clip_innerboundary, i)
+                    let beltSeg = getBeltSeg(d, strPath, clip_innerboundary, i)
                     beltSegList.push(beltSeg)
                 })
                 //console.log(beltSegList)

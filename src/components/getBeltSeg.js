@@ -1,16 +1,16 @@
 //import polygonClipping from 'polygon-clipping'
 import {Point,Path} from 'paper'
 
-export function getBeltSeg(segPoly, clip_outBoundary, clip_boundary ,index) {
-  var outPolyPath = new Path()
+export function getBeltSeg(segPoly, strPath, clip_boundary ,index) {
+  var outPolyPath = new Path(strPath)
   var polyPath = new Path()
   var segPath1 = new Path();
   var segPath2 = new Path();
-
-  for (var i = 0; i < clip_outBoundary.length; i++) {
-    var temp_point = new Point (clip_outBoundary[i][0],clip_outBoundary[i][1])
-    outPolyPath.add (temp_point)
-  }
+  // 
+  // for (var i = 0; i < clip_outBoundary.length; i++) {
+  //   var temp_point = new Point (clip_outBoundary[i][0],clip_outBoundary[i][1])
+  //   outPolyPath.add (temp_point)
+  // }
 
   for (var i = 0; i < clip_boundary.length; i++) {
     var temp_point = new Point (clip_boundary[i][0],clip_boundary[i][1])
