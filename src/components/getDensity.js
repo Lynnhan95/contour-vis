@@ -12,46 +12,6 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
     init an empty svg for calculating purpose
   */
 
-//   for (var i = 0; i < pts_ary.length; i++) {
-//
-//     // let a,b,c;
-//     // console.log(pts_ary[i]);
-//     // if (i == 1 ) {
-//     //     a = pts_ary[i]
-//     //     b = pts_ary[i+2]
-//     //     c = pts_ary[i+1]
-//     //     let result = (b[0] - a[0])*(c[1] - a[1]) - (b[1] - a[1])*(c[0] - a[0])
-//     //     if (true) {
-//     //
-//     //     }
-//     //     console.log(result);
-//     // }
-//     //
-//     // if (i<pts_ary.length-2) {
-//     //   a = pts_ary[i]
-//     //   b = pts_ary[i+2]
-//     //   c = pts_ary[i+1]
-//     // }
-//     // if (i= pts_ary.length-2) {
-//     //   a = pts_ary[i]
-//     //   b = pts_ary[i+2-pts_ary.length]
-//     //   c = pts_ary[i+1]
-//     // }
-//     // else {
-//     //   a = pts_ary[i]
-//     //   b = pts_ary[i+2-pts_ary.length]
-//     //   c = pts_ary[i+1-pts_ary.length]
-//     // }
-//     //
-//     // console.log([a,b,c]);
-//     //
-//     // let result = (b[0] - a[0])*(c[1] - a[1]) - (b[1] - a[1])*(c[0] - a[0])
-//     // if (result>0) {
-//     //   console.log("left");
-//     // }
-// }
-
-
   var line0 = d3.line()
                 .x(function(d) { return d[0]})
                 .y(function(d) { return d[1]})
@@ -61,20 +21,13 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
 
 
   var strPath = getLinePathStr(pts_ary)
-  strPath = roundPathCorners(strPath,0.07,true)
+  strPath = roundPathCorners(strPath,0.1,true)
 
   var p = svg.append("path")
                   .style("fill","none")
                   .style("stroke","orange")
                   .style("stroke-width","1px")
                   .attr("d",draw(d3.path(),strPath));
-  // d3.create("svg")
-  // .call(svg => svg.append("path")
-  //   .style("stroke", "black")
-  //   .style("fill", "none")
-  //   .attr("d", draw(d3.path(),strPath))
-  // .node()
-
 
   function draw(context,strPath) {
     var split = strPath.split(/(?=[LMC])/)
@@ -97,12 +50,6 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
 
 
   var path = p.node();
-  // var path_line = new Path ();
-  //
-  // for (var i = 0; i < pts_ary.length; i++) {
-  //   var temp_point = new Point (pts_ary[i][0],pts_ary[i][1])
-  //   path_line.add (temp_point)}
-  //let widget_line = path_line.length/segment_num, new_pts_line = []
 
   let widget = path.getTotalLength()/segment_num, new_pts = []
 

@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv, extent, scaleSequential, interpolateOrRd, select, nest} from 'd3'
-import { legendColor } from 'd3-svg-legend'
+import { csv, extent, scaleSequential, interpolateOrRd, select, nest,scaleLinear} from 'd3'
 import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -22,9 +21,7 @@ import "./style.css"
 import ProviencesNames from './chinaProvincesName'
 import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
-
 const { Option } = Select
-
 
 const setSegNumb = 5000
 const slidingBins = 50
@@ -66,10 +63,6 @@ class BaseMap extends Component {
         this.pointsDataNest = null
         this.chinaGeoDataNest = null
         this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
-
-        // legend ref 
-        this.legendRef = React.createRef()
-        this.gradientLegendRef = React.createRef()
     }
 
     onAfterChange = value => {
@@ -546,11 +539,11 @@ class BaseMap extends Component {
             })
 
             let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
-            console.log("pointsDataProjected", pointsDataProjected)
-            console.log("deleteDuplicatePoints", deleteDuplicatePoints)
+            //console.log(pointsDataProjected)
+            //console.log(deleteDuplicatePoints)
 
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
-            var [densityGroup, areGroup] = insideCounter(this.state.subSegList,deleteDuplicatePoints,setSegNumb,slidingBins)
+            var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
@@ -568,63 +561,20 @@ class BaseMap extends Component {
                     cellObjArr.push(cellObj)
                 }
             }
-            ////console.log(cellObjArr)
-            ////////////Create legend scale/////////////////////
             let cell_extent = extent(cellObjArr, (d)=>{
                 return d.dens
             })
-            this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
-            
-            this.legend = legendColor().scale(this.color_scale).cells(10)
-           // console.log('colorscale', )
-            /////////////Create cell legend/////////////////////
-            const node = this.legendRef.current
-            console.log("node", node)
-            select(node)
-                .call(this.legend)
-                
-            ////////////Create gradient legend /////////////////
-            var colors = [ 
-                'rgb(255, 247, 236)', 
-                'rgb(254, 233, 203)', 
-                'rgb(253, 216, 169)', 
-                'rgb(253, 194, 140)',
-                'rgb(252, 161, 109)',
-                'rgb(246, 123, 82)',
-                'rgb(230, 83, 57)',
-                'rgb(206, 38, 25)', 
-                'rgb(171, 6, 4)',
-                'rgb(127, 0, 0)' ];
-            const gradientNode = this.gradientLegendRef.current 
-            const element = 
-            select(gradientNode)
-                // .attr('width', 50)
-                // .attr('height', 300)
+            let deltaColor = (cell_extent[1]-cell_extent[0])/9
+            let colors = []
+            for (var i = 0; i < 9; i++) {
+              var temp = cell_extent[0]+i*deltaColor
+              colors.push(temp)
+            }
 
-            element.append('rect')
-            .attr('x', 100)
-            .attr('y', 0)
-            .attr('width', 20)
-            .attr('height', 180)
-            .style('fill', 'url(#grad)');
-
-            let grad = element.append('defs')
-            .append('linearGradient')
-            .attr('id', 'grad')
-            .attr('x1', '0%')
-            .attr('x2', '0%')
-            .attr('y1', '0%')
-            .attr('y2', '100%');
-
-            grad.selectAll('stop')
-            .data(colors)
-            .enter()
-            .append('stop')
-            .style('stop-color', function(d){ return d; })
-            .attr('offset', function(d,i){
-              return 100 * (i / (colors.length - 1)) + '%';
-            })
-
+            this.color_scale = scaleLinear()
+                                .domain(colors)
+                                .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
+                                        "#f9d057","#f29e2e","#e76818","#d7191c"]);
             this.setState({
                 cellObjArr: cellObjArr
             })
@@ -781,19 +731,19 @@ class BaseMap extends Component {
                       )
 
                 })
-                cells1 = this.state.subSegList.map((d, i) => {
-                    let pathStr0 = getLinePathStr(d[1])
-                      return (
-                          <path
-                          key = {`split_boundary_segments-${i}`}
-                          className = {`split_boundary_segments-${i}`}
-                          d = {pathStr0}
-                          fill = 'green'
-                          // fill = {this.color_scale(d.dens)}
-                          />
-                      )
-
-                })
+                // cells1 = this.state.subSegList.map((d, i) => {
+                //     let pathStr0 = getLinePathStr(d[1])
+                //       return (
+                //           <path
+                //           key = {`split_boundary_segments-${i}`}
+                //           className = {`split_boundary_segments-${i}`}
+                //           d = {pathStr0}
+                //           fill = 'green'
+                //           // fill = {this.color_scale(d.dens)}
+                //           />
+                //       )
+                //
+                // })
                 cells2 = this.state.subSegList.map((d, i) => {
                     let pathStr0 = getLinePathStr(d[2])
                       return (
@@ -858,7 +808,7 @@ class BaseMap extends Component {
                     //outsideBoundary,
                     //simplified_Outboundary,
                     // inscribledCircles,
-                    linePts,
+                    //linePts,
                     cells0,
                     // cells1,
                     // cells2,
@@ -993,15 +943,9 @@ class BaseMap extends Component {
             <g className="innerBoundary">
                 {innerBoundary}
             </g>
-            <g className="innerBoundary">
+            <g className="outerBoundary">
                 {outerBoundary}
             </g>
-            <g className = "legend" ref = {this.legendRef}>
-
-            </g>
-            <g className = "gradientLegend" ref = {this.gradientLegendRef}>
-
-            </g>    
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>

@@ -5,7 +5,7 @@
 */
 
 
-export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,scaleFactor = 200){
+export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 50){
         // for each subseg
 
         var densityGroup = []
@@ -23,11 +23,13 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
           // there are three subseg for each item
 
           var subSegGroup  = subSegGroup_ary[i] // it has four points
+          var subBeltGroup = beltSegGroup_ary[i]
           var subDensityGroup = []
           var subAreaGroup = []
           for (var j = 0; j < subSegGroup.length; j++) {
 
             var subSeg = subSegGroup[j]
+            var subBeltCell = subBeltGroup[j]
             var counter = 0 // init the counter
             if (i == 0) {
               densityBystripe.push([])
@@ -40,7 +42,7 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
               }
             });
 
-            var area = getArea (subSeg)
+            var area = getArea (subBeltCell)
             var density = counter/area
 
             if (density>density_max) {
@@ -66,10 +68,10 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
 
 
           newDensitySub = weightedMean(densityBystripe[i],areaBystripe[i],slidingNumb)
-          newDensitySub = slidingCalSum(segNumb,slidingNumb,newDensitySub)
+          newDensitySub = slidingCalSum(segNumb,2*slidingNumb,newDensitySub)
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
-            if (item ==0) {item=0.1} ;
+            if (item ==0) {item=0.01} ;
             return item;})
 
 
