@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
 import { csv, extent, scaleSequential, interpolateOrRd, select, nest,scaleLinear} from 'd3'
+import { legendColor } from 'd3-svg-legend'
 import { findMats, traverseEdges, getPathsFromStr, Mat, toScaleAxis } from 'flo-mat'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -63,6 +64,10 @@ class BaseMap extends Component {
         this.pointsDataNest = null
         this.chinaGeoDataNest = null
         this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
+
+        // legend ref 
+        this.legendRef = React.createRef()
+        this.gradientLegendRef = React.createRef()
     }
 
     onAfterChange = value => {
@@ -575,6 +580,56 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
+                                        this.legend = legendColor().scale(this.color_scale).cells(10)
+                                        // console.log('colorscale', )
+                                         /////////////Create cell legend/////////////////////
+                                         const node = this.legendRef.current
+                                         console.log("node", node)
+                                         select(node)
+                                             .call(this.legend)
+                             
+                                         ////////////Create gradient legend /////////////////
+                                         var color_scheme = [ 
+                                             '#2c7bb6', 
+                                             '#00a6ca', 
+                                             '#00ccbc', 
+                                             '#90eb9d',
+                                             '#ffff8c',
+                                             '#f9d057',
+                                             '#f29e2e',
+                                             '#e76818', 
+                                             '#d7191c' ];
+                                         const gradientNode = this.gradientLegendRef.current 
+                                         const element = 
+                                         select(gradientNode)
+                                             // .attr('width', 50)
+                                             // .attr('height', 300)
+                             
+                                         element.append('rect')
+                                         .attr('x', 100)
+                                         .attr('y', 0)
+                                         .attr('width', 20)
+                                         .attr('height', 180)
+                                         .style('fill', 'url(#grad)');
+                             
+                                         let grad = element.append('defs')
+                                         .append('linearGradient')
+                                         .attr('id', 'grad')
+                                         .attr('x1', '0%')
+                                         .attr('x2', '0%')
+                                         .attr('y1', '0%')
+                                         .attr('y2', '100%');
+                             
+                                         grad.selectAll('stop')
+                                         .data(color_scheme)
+                                         .enter()
+                                         .append('stop')
+                                         .style('stop-color', function(d){ return d; })
+                                         .attr('offset', function(d,i){
+                                           return 100 * (i / (colors.length - 1)) + '%';
+                                         })
+
+                                         
             this.setState({
                 cellObjArr: cellObjArr
             })
@@ -946,6 +1001,12 @@ class BaseMap extends Component {
             <g className="outerBoundary">
                 {outerBoundary}
             </g>
+            <g className = "legend" ref = {this.legendRef}>
+
+            </g>
+            <g className = "gradientLegend" ref = {this.gradientLegendRef}>
+
+            </g>    
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>
