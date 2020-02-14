@@ -69,7 +69,7 @@ class BaseMap extends Component {
         this.setState({
           inputValue: value,
         });
-        console.log(value)
+
     }
 
     onChange(value) {
@@ -79,7 +79,7 @@ class BaseMap extends Component {
         this.setState({
             currGeoData: this.chinaGeoDataNest[name_cn]
         })
-        console.log(`selected ${name_cn} ${name_en}`);
+        // //console.log(`selected ${name_cn} ${name_en}`);
     }
 
     /* when component will mount, fetch geojson and csv data locally */
@@ -120,7 +120,7 @@ class BaseMap extends Component {
 
                     _me.chinaGeoDataNest = featuresObj
 
-                    console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_cn]);
+                    //console.log('Promise currGeoData', _me.chinaGeoDataNest[_me.state.province_cn]);
 
                     _me.setState ({
                         chinaGeoData: chinaGeoData.features,
@@ -131,21 +131,21 @@ class BaseMap extends Component {
 
             })
             .catch(error=>{
-                console.error(error)
+                //console.error(error)
             })
 
         /* Fetching Geo-boundary data from geojson file */
         // fetch("/chinaGeo.geojson")
         //     .then(response => {
         //         if (response.status !== 200){
-        //             //console.log('can not load geojson file')
+        //             ////console.log('can not load geojson file')
         //             return
         //         }
         //         response.json().then(chinaGeoData => {
         //             this.autoProjection = geoMercator().fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], chinaGeoData)
 
         //             let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
-        //             console.warn('featuresObj', featuresObj);
+        //             //console.warn('featuresObj', featuresObj);
         //             _me.chinaGeoDataNest = featuresObj
 
         //             this.setState ({
@@ -268,7 +268,7 @@ class BaseMap extends Component {
             }
 
             let median = _me.autoProjection([M.x, M.y])
-            ////console.log(median)
+            //////console.log(median)
                 MedianPoints.push(median)
         }
         return MedianPoints
@@ -283,7 +283,7 @@ class BaseMap extends Component {
         for(let i=1; i< num+1 ; i++) {
 
             const padding = (-1.6/num)
-            //console.log(padding)
+            ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -312,12 +312,12 @@ class BaseMap extends Component {
 
         // if(prevState.chinaGeoData !== this.state.chinaGeoData) {
         if(prevState.currGeoData !== this.state.currGeoData){
-            console.log('currGeoData update')
+            //console.log('currGeoData update')
             // this.state.chinaGeoData.map((d,i)=> {
             // if (d.properties.name === '湖南'){
                 // store computed dots and paths
                 const d = this.state.currGeoData
-                console.warn('dddddd', d);
+                //console.warn('dddddd', d);
 
                 const mainArea = d.geometry.coordinates
                 const simplifiedFactor = 0.4
@@ -343,7 +343,7 @@ class BaseMap extends Component {
                 _me.state.simplifiedArea = simplifiedArea
 
                 _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
-                //console.log('mainArea', _me.state.simplifiedContours)
+                ////console.log('mainArea', _me.state.simplifiedContours)
 
                 let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
 
@@ -354,9 +354,7 @@ class BaseMap extends Component {
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
 
-                let [circleAry,segPolyList,newCurvePath] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
-
-                console.log(newCurvePath);
+                let [circleAry,segPolyList,strPath] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // create new segList by clipping from mainArea polygon
@@ -367,13 +365,13 @@ class BaseMap extends Component {
                 let newSegPolyList = []
 
                 segPolyList.forEach((d,i) => {
-                  let newSegPoly = getNewSeg(d, clip_outBoundary,i)
+                  let newSegPoly = getNewSeg(d,strPath,i)
 
                   newSegPolyList.push(newSegPoly)
 
                 })
 
-                console.log(newSegPolyList)
+                //console.log(newSegPolyList)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -389,14 +387,14 @@ class BaseMap extends Component {
 
                 })
 
-                //console.log(subSegList)
-                // console.log(insideCounter(subSegList,this.state.pointsData));
+                ////console.log(subSegList)
+                // //console.log(insideCounter(subSegList,this.state.pointsData));
 
 
 /*
             belt
 */
-                //console.log(this.innerBoundaryCoordinates)
+                ////console.log(this.innerBoundaryCoordinates)
                 //Compute belt from newSegPolyList
                 let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
                     return this.autoProjection(d)
@@ -406,7 +404,7 @@ class BaseMap extends Component {
                     let beltSeg = getBeltSeg(d, clip_outBoundary, clip_boundary, i)
                     beltSegList.push(beltSeg)
                 })
-                console.log(beltSegList)
+                //console.log(beltSegList)
 /*
             belt cells
 
@@ -417,7 +415,7 @@ class BaseMap extends Component {
                     beltCellList.push(subCell)
                 })
 
-                //console.log(beltCellList)
+                ////console.log(beltCellList)
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
@@ -425,10 +423,10 @@ class BaseMap extends Component {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                // //console.log(MedianPoints)
+                // ////console.log(MedianPoints)
 
                 // let MedianVerticalPoints = _me.getVerticalPathFromEvenPoint(even_points)
-                ////console.log(MedianVerticalPoints)
+                //////console.log(MedianVerticalPoints)
 
                 // let MedialVerticalPaths = _me.getPathsfromPoints(MedianVerticalPoints)
 
@@ -481,13 +479,13 @@ class BaseMap extends Component {
             // }
             // })
         }
-        
+
         // function calDistanceBetweenPoints(coord1, coord2) {
         //     let distance = 0
-        //     let [x1, y1] = coord1 
+        //     let [x1, y1] = coord1
         //     let [x2, y2] = coord2
         //     distance = Math.pow( (x2 -x1)* (x2 -x1) + (y2-y1)*(y2-y1), 0.5 )
-        //     console.log(distance)
+        //     //console.log(distance)
         //     return distance
         // }
 
@@ -504,25 +502,25 @@ class BaseMap extends Component {
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.subSegList !== this.state.subSegList) {
-            console.log('pointsData update', this.state.subSegList)
+            //console.log('pointsData update', this.state.subSegList)
             var pointsDataProjected = this.state.pointsData.map((e) => {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
             let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
-            console.log(pointsDataProjected)
-            console.log(deleteDuplicatePoints)
+            //console.log(pointsDataProjected)
+            //console.log(deleteDuplicatePoints)
 
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList,deleteDuplicatePoints,setSegNumb,slidingBins)
-            console.log(densityGroup);
+            //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
 ///////////////slidng window and scaler are applied
 
 
             var cellGroup = this.state.beltCellList
-            //console.log(cellGroup[0], densityGroup[0])
+            ////console.log(cellGroup[0], densityGroup[0])
             let cellObjArr = []
             for(let i=0; i< densityGroup.length; i++) {
                 for(let j=0; j< densityGroup[i].length; j++) {
@@ -532,7 +530,7 @@ class BaseMap extends Component {
                     cellObjArr.push(cellObj)
                 }
             }
-            //console.log(cellObjArr)
+            ////console.log(cellObjArr)
             let cell_extent = extent(cellObjArr, (d)=>{
                 return d.dens
             })
@@ -540,12 +538,12 @@ class BaseMap extends Component {
             this.setState({
                 cellObjArr: cellObjArr
             })
-            console.log(cellObjArr)
+            //console.log(cellObjArr)
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.inputValue !== this.state.inputValue) {
-            console.log(this.state.inputValue)
+            //console.log(this.state.inputValue)
         }
     }
 
@@ -610,7 +608,7 @@ class BaseMap extends Component {
             let evenPoints
             // if(this.state.even_points) {
             //     evenPoints = this.state.even_points.map((d, i)=>{
-            //         console.log(d)
+            //         //console.log(d)
             //         return(
             //             <circle
             //             key = {`evenPoints-${i}`}
@@ -754,7 +752,7 @@ class BaseMap extends Component {
 
             this.state.chinaGeoData.map((d, i) => {
                 if(d.properties.name === '湖南'){
-                    ////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
+                    //////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
                     this.autoProjection.fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], d)
                     outsideBoundary = <path
                         key = {`path-${ i }`}
@@ -823,7 +821,7 @@ class BaseMap extends Component {
 
         let innerBoundary
         if(this.state.simplifiedContours){
-            //console.log('render simplifiedContours', this.state.simplifiedContours)
+            ////console.log('render simplifiedContours', this.state.simplifiedContours)
             innerBoundary =
             this.state.simplifiedContours.map((d, i) => {
             return (
@@ -841,6 +839,7 @@ class BaseMap extends Component {
             })
 
         }
+
 
         let options = []
         chinaProvincesName.forEach((e, i)=>{

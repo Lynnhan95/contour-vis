@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import {Point,Path} from 'paper'
 import {insideCounter} from './insideCounter'
+import {roundPathCorners} from './rounding'
 
 /*
 params: points array of boundary
@@ -56,11 +57,44 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
                 .y(function(d) { return d[1]})
                 .curve(d3.curveLinear);
 
+
+
+
+  var strPath = getLinePathStr(pts_ary)
+  strPath = roundPathCorners(strPath,0.07,true)
+
   var p = svg.append("path")
                   .style("fill","none")
                   .style("stroke","orange")
                   .style("stroke-width","1px")
-                  .attr("d",line0(pts_ary));
+                  .attr("d",draw(d3.path(),strPath));
+  // d3.create("svg")
+  // .call(svg => svg.append("path")
+  //   .style("stroke", "black")
+  //   .style("fill", "none")
+  //   .attr("d", draw(d3.path(),strPath))
+  // .node()
+
+
+  function draw(context,strPath) {
+    var split = strPath.split(/(?=[LMC])/)
+    for (var i = 0; i < split.length; i++) {
+      let current = split[i]
+      current = current.split(" ")
+      if (current[0] == "M") {
+        context.moveTo(Number(current[1]),Number(current[2]));
+      }
+      if (current[0] == "L") {
+        context.lineTo(Number(current[1]),Number(current[2]))
+      }
+      if (current[0] == "C") {
+        context.bezierCurveTo(Number(current[1]),Number(current[2]),Number(current[3]),Number(current[4]),Number(current[5]),Number(current[6]))
+      }
+      }
+      return context; // not mandatory, but will make it easier to chain operations
+  }
+
+
 
   var path = p.node();
   // var path_line = new Path ();
@@ -71,16 +105,16 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
   //let widget_line = path_line.length/segment_num, new_pts_line = []
 
   let widget = path.getTotalLength()/segment_num, new_pts = []
+
   let prevValue = path.getPointAtLength((segment_num-1)*widget)
 
   for (var i = 0; i < segment_num; i++) {
       var point  = path.getPointAtLength(i*widget);
       var newPoint = {x:(point.x+prevValue.x)/2,y:(point.y+prevValue.y)/2}
       prevValue = point
+
       new_pts.push(newPoint)
     }
-
-
 
   // quarterly split the list to advoid max exceeding
   let dictAllmin1Q= [];
@@ -162,7 +196,7 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
   */
 
 
-    return [dictAllmin,segPolyList,path];
+    return [dictAllmin,segPolyList,strPath];
 
 }
 
@@ -306,6 +340,19 @@ function threePointsCircle (pt1,pt2,pt3){
 
     return [circleRadius,centerX,centerY];
 }
+
+function getLinePathStr(arr) {
+    let path_str = []
+    arr.forEach((e, i)=>{
+        if (i === 0) {
+            path_str.push(`M${e[0]} ${e[1]}`)
+        }else{
+            path_str.push(`L${e[0]} ${e[1]}`)
+        }
+    })
+    return path_str.join(' ')
+}
+
 
 
 

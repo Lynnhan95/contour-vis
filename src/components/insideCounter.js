@@ -43,14 +43,6 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
             var area = getArea (subSeg)
             var density = counter/area
 
-            if (i>500 && i<800) {
-              console.log(density);
-              if (density >2) {
-                console.log(i);
-                console.log(counter);
-              }
-            }
-
             if (density>density_max) {
               density_min = density
             }
@@ -68,14 +60,13 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
           // densityGroupNorm.push (subDensityGroup)
           areaGroup.push(subAreaGroup)
         }
-        console.log(areaGroup);
-        console.log(density_min+"<<<<"+density_max);
+
         for (var i = 0; i < densityBystripe.length; i++) {
           let newDensitySub
 
 
           newDensitySub = weightedMean(densityBystripe[i],areaBystripe[i],slidingNumb)
-            newDensitySub = slidingCalSum(segNumb,slidingNumb,newDensitySub)
+          newDensitySub = slidingCalSum(segNumb,slidingNumb,newDensitySub)
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
             if (item ==0) {item=0.1} ;
@@ -86,7 +77,7 @@ export function insideCounter (subSegGroup_ary, dataPts, segNumb,slidingNumb,sca
           newDensityGroup.push(newDensitySub)
         }
         // refactor back to old structure
-        console.log(newDensityGroup);
+
 
         for (var i = 0; i < densityGroup.length; i++) {
           for (var j = 0; j < newDensityGroup.length; j++) {
