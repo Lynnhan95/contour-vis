@@ -66,4 +66,4 @@ https://github.com/mfogel/polygon-clipping
 7. Encode density information to contour area of a arbitrary polygon <br/>
 Simple shape example: ![color](./src/assets/simple.jpg)
 Complex shape example: ![color](./src/assets/complex.jpg)
-Enlarge color scope for : ![color](./src/assets/color.jpg)
+Enlarge color scope for : ![enlarge](./src/assets/color.jpg)
