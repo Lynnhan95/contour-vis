@@ -29,7 +29,9 @@ export function getNewSeg(segPoly, strPath ,index) {
 
     let newPt1 = interSect1[0]
     let newPt2 = interSect2[0]
-
+    if(!newPt2) {
+      console.log(index, segPoly)
+    }
 
     let newAry = []
     newAry.push(segPoly[3])

@@ -47,7 +47,7 @@ class BaseMap extends Component {
             segmentBoxObjArray: null
         }
 
-        this.svgMargin = 20;
+        this.svgMargin = 50;
         this.autoProjection = null
         this.svg_w = 960
         this.svg_h = 600
@@ -88,7 +88,10 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
+
+        //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+
             .then(result=>{
                 let response = result[0],
                     religious_data = result[1]
@@ -114,7 +117,7 @@ class BaseMap extends Component {
                  * chinaGeo
                  */
                 response.json().then(chinaGeoData => {
-                    this.autoProjection = geoMercator().fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], chinaGeoData)
+                    this.autoProjection = geoMercator().fitExtent([[this.svgMargin*3, this.svgMargin*3],[this.svg_w- this.svgMargin*3 , this.svg_h-this.svgMargin*3]], chinaGeoData)
 
                     let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
 
@@ -275,6 +278,31 @@ class BaseMap extends Component {
 
     }
 
+    getOuterBoundaryContours(coordinates, num) {
+        let contours = []
+        const margin = 0.2
+        for(let i=1; i< num+1; i++) {
+            let offsetContour = new Offset(coordinates).offset(margin* i)
+            if (i == 1) {
+                this.outerBoundaryCoordinates = offsetContour.filter(e => !!e)
+            }
+
+            let outerBoundaryCoordinates = offsetContour.filter(e => !!e)
+            let paddinged = {
+                type: 'Feature',
+                properties: {
+                },
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: outerBoundaryCoordinates
+                }
+            }
+            contours.push(paddinged)
+        }
+
+        return contours
+    }
+
     getInnerBoundaryContours(coordinates, num) {
 
         let contours = []
@@ -358,7 +386,7 @@ class BaseMap extends Component {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // create new segList by clipping from mainArea polygon
-                let clip_outBoundary = simplifiedArea.map((d) => {
+                let clip_boundary = simplifiedArea.map((d) => {
                     return this.autoProjection(d)
                 })
 
@@ -390,18 +418,21 @@ class BaseMap extends Component {
                 ////console.log(subSegList)
                 // //console.log(insideCounter(subSegList,this.state.pointsData));
 
-
+                //     let outsubSeg = interpolateSegment(d, subSegNum, i)
+                //     outsubSegList.push(outsubSeg)
+                // })
+                // console.log("outsubSeg", outsubSegList)
 /*
             belt
 */
                 ////console.log(this.innerBoundaryCoordinates)
                 //Compute belt from newSegPolyList
-                let clip_boundary = this.innerBoundaryCoordinates[0].map((d) => {
+                let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
                     return this.autoProjection(d)
                 })
                 let beltSegList = []
                 segPolyList.forEach((d, i) => {
-                    let beltSeg = getBeltSeg(d, clip_outBoundary, clip_boundary, i)
+                    let beltSeg = getBeltSeg(d, clip_boundary, clip_innerboundary, i)
                     beltSegList.push(beltSeg)
                 })
                 //console.log(beltSegList)
@@ -772,7 +803,7 @@ class BaseMap extends Component {
                     cells0,
                     // cells1,
                     // cells2,
-                    // segPoly
+                    //segPoly
                     //boundaryDots
                ]
                // .concat(innerBoundaryArr)
@@ -840,6 +871,26 @@ class BaseMap extends Component {
 
         }
 
+        let outerBoundary
+        if(this.state.simplifiedOutContours){
+            //console.log('render simplifiedContours', this.state.simplifiedContours)
+            outerBoundary =
+            this.state.simplifiedOutContours.map((d, i) => {
+            return (
+            <path
+                key = {`contours-${i}`}
+                d = { geoPath().projection(this.autoProjection)(d) }
+                stroke = "#000"
+                strokeWidth = "0.2"
+                //fill = "#edc949"
+                fill = "transparent"
+                //fillOpacity = "0.8"
+                className = "inner-boundary"
+                />
+                )
+            })
+
+        }
 
         let options = []
         chinaProvincesName.forEach((e, i)=>{
@@ -882,6 +933,9 @@ class BaseMap extends Component {
             </g>
             <g className="innerBoundary">
                 {innerBoundary}
+            </g>
+            <g className="innerBoundary">
+                {outerBoundary}
             </g>
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
