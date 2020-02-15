@@ -22,6 +22,9 @@ import "./style.css"
 import ProviencesNames from './chinaProvincesName'
 import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
+import * as PerspT from 'perspective-transform'
+import {hoMo} from './homography'
+import {constructPtInSeg} from './constructPtInSeg'
 const { Option } = Select
 
 const setSegNumb = 5000
@@ -65,7 +68,7 @@ class BaseMap extends Component {
         this.chinaGeoDataNest = null
         this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
 
-        // legend ref 
+        // legend ref
         this.legendRef = React.createRef()
         this.gradientLegendRef = React.createRef()
     }
@@ -190,6 +193,9 @@ class BaseMap extends Component {
         //         })
         //     })
     }
+
+
+
 
     /* Helper function for getting even_point */
     calcDistanceFromTwoPoints(point1, point2) {
@@ -516,15 +522,6 @@ class BaseMap extends Component {
             // })
         }
 
-        // function calDistanceBetweenPoints(coord1, coord2) {
-        //     let distance = 0
-        //     let [x1, y1] = coord1
-        //     let [x2, y2] = coord2
-        //     distance = Math.pow( (x2 -x1)* (x2 -x1) + (y2-y1)*(y2-y1), 0.5 )
-        //     //console.log(distance)
-        //     return distance
-        // }
-
         function deleteDuplicate(arr) {
             var uniques = [];
             var itemsFound = {};
@@ -548,6 +545,10 @@ class BaseMap extends Component {
             //console.log(deleteDuplicatePoints)
 
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
+            var slicePts_in_Seg = constructPtInSeg(this.state.segPolyList,deleteDuplicatePoints)
+            console.log(deleteDuplicatePoints.length);
+            var transformPts = hoMo(this.state.segPolyList,this.state.beltSegList,slicePts_in_Seg)
+            console.log(transformPts);
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -587,31 +588,31 @@ class BaseMap extends Component {
                                          console.log("node", node)
                                          select(node)
                                              .call(this.legend)
-                             
+
                                          ////////////Create gradient legend /////////////////
-                                         var color_scheme = [ 
-                                             '#2c7bb6', 
-                                             '#00a6ca', 
-                                             '#00ccbc', 
+                                         var color_scheme = [
+                                             '#2c7bb6',
+                                             '#00a6ca',
+                                             '#00ccbc',
                                              '#90eb9d',
                                              '#ffff8c',
                                              '#f9d057',
                                              '#f29e2e',
-                                             '#e76818', 
+                                             '#e76818',
                                              '#d7191c' ];
-                                         const gradientNode = this.gradientLegendRef.current 
-                                         const element = 
+                                         const gradientNode = this.gradientLegendRef.current
+                                         const element =
                                          select(gradientNode)
                                              // .attr('width', 50)
                                              // .attr('height', 300)
-                             
+
                                          element.append('rect')
                                          .attr('x', 100)
                                          .attr('y', 0)
                                          .attr('width', 20)
                                          .attr('height', 180)
                                          .style('fill', 'url(#grad)');
-                             
+
                                          let grad = element.append('defs')
                                          .append('linearGradient')
                                          .attr('id', 'grad')
@@ -619,7 +620,7 @@ class BaseMap extends Component {
                                          .attr('x2', '0%')
                                          .attr('y1', '0%')
                                          .attr('y2', '100%');
-                             
+
                                          grad.selectAll('stop')
                                          .data(color_scheme)
                                          .enter()
@@ -629,9 +630,10 @@ class BaseMap extends Component {
                                            return 100 * (i / (colors.length - 1)) + '%';
                                          })
 
-                                         
+
             this.setState({
-                cellObjArr: cellObjArr
+                cellObjArr: cellObjArr,
+                transDots:transformPts
             })
             //console.log(cellObjArr)
 
@@ -864,7 +866,7 @@ class BaseMap extends Component {
                     //simplified_Outboundary,
                     // inscribledCircles,
                     //linePts,
-                    cells0,
+                    //cells0,
                     // cells1,
                     // cells2,
                     //segPoly
@@ -899,11 +901,29 @@ class BaseMap extends Component {
             )
         })
 
+        // draw dots to the map
+        let transDots
+        if (this.state.transDots) {
+          console.log(this.state.transDots);
+          transDots = this.state.transDots.map((d,i) => {
+              return (
+              <circle
+              key = {`transdot-${ i }`}
+              cx = { d[0]}
+              cy = { d[1]}
+              fill="red"
+              r = "0.75"
+              />
+              )
+          })
+        }
+
+
         let test_near
         if(this.state.test_near_points){
             test_near = this.state.test_near_points.map((d, i)=>{
                 return(
-                    <circle
+                    <circletransformPts
                     key = {`test_near-${i}`}
                     r = ".5"
                     fill = "#dec009"
@@ -992,6 +1012,11 @@ class BaseMap extends Component {
              <g className="Dots">
                 {Dots}
             </g>
+
+            <g className="transDots">
+               {transDots}
+           </g>
+
             <g className="test_near">
                 {test_near}
             </g>
@@ -1006,7 +1031,7 @@ class BaseMap extends Component {
             </g>
             <g className = "gradientLegend" ref = {this.gradientLegendRef}>
 
-            </g>    
+            </g>
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>

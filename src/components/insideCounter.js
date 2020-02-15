@@ -17,8 +17,6 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         var areaBystripe = []
 
 
-
-
         for (var i = 0; i < subSegGroup_ary.length; i++) {
           // there are three subseg for each item
 
