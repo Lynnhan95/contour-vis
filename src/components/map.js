@@ -22,6 +22,10 @@ import "./style.css"
 import ProviencesNames from './chinaProvincesName'
 import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
+import h337 from 'heatmap.js'
+import ReactHeatmap from 'react-heatmap'
+import HeatMap from './heatmap'
+
 const { Option } = Select
 
 const setSegNumb = 5000
@@ -45,7 +49,8 @@ class BaseMap extends Component {
             segment_path_len: 0.1,
             simplifiedContours: null,
 
-            segmentBoxObjArray: null
+            segmentBoxObjArray: null,
+            cfg: null 
         }
 
         this.svgMargin = 50;
@@ -68,6 +73,11 @@ class BaseMap extends Component {
         // legend ref 
         this.legendRef = React.createRef()
         this.gradientLegendRef = React.createRef()
+        this.myCanvasRef = React.createRef()
+
+        // Config heatmap initialization object 
+
+
     }
 
     onAfterChange = value => {
@@ -93,6 +103,7 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
+        // this.setState({ heatmapInstance:  h337.create({container: document.querySelector('#heatMap')}) })
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
@@ -551,6 +562,22 @@ class BaseMap extends Component {
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Create point initialization with heatmap.js 
+        
+
+        let heatmapPointData = deleteDuplicatePoints.map((d) => {
+            return {
+                x: parseInt(d[0]),
+                y: parseInt(d[1]),
+                value: 1
+            }
+        })
+
+        console.log(heatmapPointData)
+
+
+
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
 ///////////////slidng window and scaler are applied
 
@@ -631,7 +658,8 @@ class BaseMap extends Component {
 
                                          
             this.setState({
-                cellObjArr: cellObjArr
+                cellObjArr: cellObjArr,
+                heatmapPointData: heatmapPointData
             })
             //console.log(cellObjArr)
 
@@ -640,6 +668,20 @@ class BaseMap extends Component {
         if (prevState.inputValue !== this.state.inputValue) {
             //console.log(this.state.inputValue)
         }
+
+        // if(prevState.heatmapPointData!== this.state.heatmapPointData ) {
+        //     if (this.state.heatmapInstance) {
+        //         console.log(this.state.heatmapInstance)
+        //         this.state.heatmapInstance.setData(
+        //             { 
+        //                 max: 50, 
+        //                 data: this.state.heatmapPointData
+        //               }
+        //          );
+        //     }
+
+     
+        // }
     }
 
     render() {
@@ -963,6 +1005,13 @@ class BaseMap extends Component {
             )
         })
 
+        let Heatmap 
+        if(this.state.heatmapPointData) {
+
+            Heatmap = <HeatMap data = {this.state.heatmapPointData}/>
+                
+        }
+
         return (
 
         <div>
@@ -985,6 +1034,10 @@ class BaseMap extends Component {
                 </Select>
 
             </div>
+            {/* <ReactHeatmap style={ {width:960, height: 800}} className = "ReactHeatmap" max={5} data={this.state.heatmapPointData}/> */}
+            <div width = {this.svg_w} height = {this.svg_h} id="heatMap">
+            </div>
+
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
             <g className="Regions">
                 {Regions}
@@ -1009,6 +1062,12 @@ class BaseMap extends Component {
             </g>    
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
+            {/* { this.state.heatmapPointData } ? <HeatMap data = {this.state.heatmapPointData}/> : '' */}
+            {/* <div>
+                { this.state.heatmapPointData !== undefined } ? {console.log(this.state.heatmapPointData)} : ''
+            </div> */}
+            { Heatmap }
+
         </div>
 
         )
