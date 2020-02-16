@@ -27,7 +27,8 @@
     "simplify-js": "^1.2.3",
     "smooth-polyline": "^1.0.8",
     "snapsvg-cjs": "0.0.6",
-    "topojson-client": "^3.1.0"
+    "topojson-client": "^3.1.0",
+    "visual-heatmap": "^1.0.4"
   },
   "scripts": {
     "start": "react-scripts start",

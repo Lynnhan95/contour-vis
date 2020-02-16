@@ -25,10 +25,11 @@ import keyBy from 'lodash.keyby'
 import * as PerspT from 'perspective-transform'
 import {hoMo} from './homography'
 import {constructPtInSeg} from './constructPtInSeg'
+import Heatmap from 'visual-heatmap'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 50
+const slidingBins = 30
 
 const intersect = require('path-intersection')
 
@@ -547,8 +548,10 @@ class BaseMap extends Component {
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var slicePts_in_Seg = constructPtInSeg(this.state.segPolyList,deleteDuplicatePoints)
             console.log(deleteDuplicatePoints.length);
-            var transformPts = hoMo(this.state.segPolyList,this.state.beltSegList,slicePts_in_Seg)
-            console.log(transformPts);
+            var [transformPts,transObj] = hoMo(this.state.newSegPolyList,this.state.beltSegList,slicePts_in_Seg,15)
+            console.log(transObj);
+
+
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -639,6 +642,8 @@ class BaseMap extends Component {
 
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.inputValue !== this.state.inputValue) {
             //console.log(this.state.inputValue)
         }
@@ -667,7 +672,7 @@ class BaseMap extends Component {
 
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-                  if (i===624)
+                  if (i>2130 && i<2170)
               {      return (
                         <circle
                         cx = {d.centerX }
@@ -864,9 +869,9 @@ class BaseMap extends Component {
             return [
                     //outsideBoundary,
                     //simplified_Outboundary,
-                    // inscribledCircles,
+                    //inscribledCircles,
                     //linePts,
-                    //cells0,
+                    cells0,
                     // cells1,
                     // cells2,
                     //segPoly
@@ -1009,13 +1014,13 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots">
+             {/* <g className="Dots">
                 {Dots}
             </g>
 
             <g className="transDots">
                {transDots}
-           </g>
+           </g> */}
 
             <g className="test_near">
                 {test_near}

@@ -1,7 +1,8 @@
 import * as PerspT from 'perspective-transform'
 
-export function hoMo (segment_ary,belt_ary,pts_inside_ary){
+export function hoMo (segment_ary,belt_ary,pts_inside_ary,value){
   var outputAllpts = []
+  var outputObj = []
   console.log(segment_ary.length);
   console.log(belt_ary.length);
   console.log(pts_inside_ary.length);
@@ -14,11 +15,19 @@ export function hoMo (segment_ary,belt_ary,pts_inside_ary){
     segment_ary[index][3][0],segment_ary[index][3][1]];
     var dstCorners =  [belt_ary[index][0][0],belt_ary[index][0][1], belt_ary[index][1][0], belt_ary[index][1][1], belt_ary[index][2][0]
     , belt_ary[index][2][1],belt_ary[index][3][0],belt_ary[index][3][1]];
+
+    if (i ==200) {
+      console.log(srcCorners);
+      console.log(dstCorners);
+    }
     var perspT = PerspT(srcCorners, dstCorners);
     var mat = perspT.coeffs;
     for (var j = 0; j < data.length; j++) {
         var srcPt = [data[j][0], data[j][1]];
         var dstPt = perspT.transform(srcPt[0], srcPt[1]);
+        outputObj.push({x:dstPt[0],y:dstPt[1],value:value})
+
+        dstPt = [dstPt[0],dstPt[1],value]
         outputAllpts.push(dstPt)
     }
   }
@@ -37,5 +46,5 @@ export function hoMo (segment_ary,belt_ary,pts_inside_ary){
   //   }
   // }
 
-  return outputAllpts
+  return [outputAllpts,outputObj]
 }
