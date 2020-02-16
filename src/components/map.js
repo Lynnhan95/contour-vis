@@ -607,54 +607,54 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells(10)
-                                        // console.log('colorscale', )
-                                         /////////////Create cell legend/////////////////////
-                                         const node = this.legendRef.current
-                                         console.log("node", node)
-                                         select(node)
-                                             .call(this.legend)
-                             
-                                         ////////////Create gradient legend /////////////////
-                                         var color_scheme = [ 
-                                             '#2c7bb6', 
-                                             '#00a6ca', 
-                                             '#00ccbc', 
-                                             '#90eb9d',
-                                             '#ffff8c',
-                                             '#f9d057',
-                                             '#f29e2e',
-                                             '#e76818', 
-                                             '#d7191c' ];
-                                         const gradientNode = this.gradientLegendRef.current 
-                                         const element = 
-                                         select(gradientNode)
-                                             // .attr('width', 50)
-                                             // .attr('height', 300)
-                             
-                                         element.append('rect')
-                                         .attr('x', 100)
-                                         .attr('y', 0)
-                                         .attr('width', 20)
-                                         .attr('height', 180)
-                                         .style('fill', 'url(#grad)');
-                             
-                                         let grad = element.append('defs')
-                                         .append('linearGradient')
-                                         .attr('id', 'grad')
-                                         .attr('x1', '0%')
-                                         .attr('x2', '0%')
-                                         .attr('y1', '0%')
-                                         .attr('y2', '100%');
-                             
-                                         grad.selectAll('stop')
-                                         .data(color_scheme)
-                                         .enter()
-                                         .append('stop')
-                                         .style('stop-color', function(d){ return d; })
-                                         .attr('offset', function(d,i){
-                                           return 100 * (i / (colors.length - 1)) + '%';
-                                         })
+            // this.legend = legendColor().scale(this.color_scale).cells(10)
+            // // console.log('colorscale', )
+            //     /////////////Create cell legend/////////////////////
+            //     const node = this.legendRef.current
+            //     console.log("node", node)
+            //     select(node)
+            //         .call(this.legend)
+    
+            //     ////////////Create gradient legend /////////////////
+            //     var color_scheme = [ 
+            //         '#2c7bb6', 
+            //         '#00a6ca', 
+            //         '#00ccbc', 
+            //         '#90eb9d',
+            //         '#ffff8c',
+            //         '#f9d057',
+            //         '#f29e2e',
+            //         '#e76818', 
+            //         '#d7191c' ];
+            //     const gradientNode = this.gradientLegendRef.current 
+            //     const element = 
+            //     select(gradientNode)
+            //         // .attr('width', 50)
+            //         // .attr('height', 300)
+    
+            //     element.append('rect')
+            //     .attr('x', 100)
+            //     .attr('y', 0)
+            //     .attr('width', 20)
+            //     .attr('height', 180)
+            //     .style('fill', 'url(#grad)');
+    
+            //     let grad = element.append('defs')
+            //     .append('linearGradient')
+            //     .attr('id', 'grad')
+            //     .attr('x1', '0%')
+            //     .attr('x2', '0%')
+            //     .attr('y1', '0%')
+            //     .attr('y2', '100%');
+    
+            //     grad.selectAll('stop')
+            //     .data(color_scheme)
+            //     .enter()
+            //     .append('stop')
+            //     .style('stop-color', function(d){ return d; })
+            //     .attr('offset', function(d,i){
+            //     return 100 * (i / (colors.length - 1)) + '%';
+            //     })
 
                                          
             this.setState({
@@ -1017,7 +1017,7 @@ class BaseMap extends Component {
         <div>
             <div className="Control">
                 <p>Basemap</p>
-                <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
+                {/* <Slider defaultValue={30} onAfterChange={this.onAfterChange}/> */}
 
                 <Select
                     showSearch
@@ -1035,38 +1035,40 @@ class BaseMap extends Component {
 
             </div>
             {/* <ReactHeatmap style={ {width:960, height: 800}} className = "ReactHeatmap" max={5} data={this.state.heatmapPointData}/> */}
-            <div width = {this.svg_w} height = {this.svg_h} id="heatMap">
+            {/* <div width = {this.svg_w} height = {this.svg_h} id="heatMap">
+            </div> */}
+            <div className="myCanvas">
+                <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
+                {/* <g className="Regions">
+                    {Regions}
+                </g>
+                <g className="Dots">
+                    {Dots}
+                </g>
+                <g className="test_near">
+                    {test_near}
+                </g>
+                <g className="innerBoundary">
+                    {innerBoundary}
+                </g>
+                <g className="outerBoundary">
+                    {outerBoundary}
+                </g> */}
+                <g className = "legend" ref = {this.legendRef}>
+
+                </g>
+                <g className = "gradientLegend" ref = {this.gradientLegendRef}>
+
+                </g>    
+                </svg>
+                { Heatmap }
             </div>
-
-            <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
-            <g className="Regions">
-                {Regions}
-            </g>
-             <g className="Dots">
-                {Dots}
-            </g>
-            <g className="test_near">
-                {test_near}
-            </g>
-            <g className="innerBoundary">
-                {innerBoundary}
-            </g>
-            <g className="outerBoundary">
-                {outerBoundary}
-            </g>
-            <g className = "legend" ref = {this.legendRef}>
-
-            </g>
-            <g className = "gradientLegend" ref = {this.gradientLegendRef}>
-
-            </g>    
-            </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
             {/* { this.state.heatmapPointData } ? <HeatMap data = {this.state.heatmapPointData}/> : '' */}
             {/* <div>
                 { this.state.heatmapPointData !== undefined } ? {console.log(this.state.heatmapPointData)} : ''
             </div> */}
-            { Heatmap }
+
 
         </div>
 

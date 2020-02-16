@@ -1,13 +1,30 @@
 import React, {useEffect} from "react";
 import h337 from "heatmap.js";
-
+import {sampleData} from './sampleData.js'
 
 function HeatMap(props) {
         console.log(props.data)
         useEffect(() => {
+
         var heatmapInstance = h337.create({
             // only container is required, the rest will be defaults
-            container: document.querySelector('.App')
+            container: document.querySelector('.App'),
+            gradient: {
+                // enter n keys between 0 and 1 here
+                // for gradient color customization
+                // '.5': 'blue',
+                // '.8': 'red',
+                // '.95': 'white'
+                '0.11':'#2c7bb6', 
+                '0.22':'#00a6ca', 
+                '0.33':'#00ccbc', 
+                '0.44':'#90eb9d',
+                '0.55':'#ffff8c',
+                '0.66':'#f9d057',
+                '0.77':'#f29e2e',
+                '0.88':'#e76818', 
+                '0.99':'#d7191c' 
+              },
         });
     // now generate some random data
     var points = [];
@@ -29,8 +46,15 @@ function HeatMap(props) {
 
    console.log(max)
    // heatmap data format
+   let processData = sampleData.map((d,i) => {
+       return {
+           x: parseInt(d.x),
+           y: parseInt(d.y),
+           value: d.value/ 15
+       }
+   })
   var data = {
-    max: 10,
+    max: 15,
     data: 
     [
         {
@@ -3139,16 +3163,29 @@ function HeatMap(props) {
           "value": 1
         }
       ]
+    // processData
+
   };
   // if you have a set of datapoints always use setData instead of addData
   // for data initialization
   heatmapInstance.setData(data);
+  let canvas = document.querySelector('.heatmap-canvas')
+  console.log(canvas)
+
+  let ctx = canvas.getContext('2d')
+  data.data.forEach((d,i) => {
+    ctx.beginPath();
+    ctx.arc(d.x, d.y, 1, 0, 2 * Math.PI);
+    ctx.fill();
+  })
+
+
  })
 
 
 
   return (
-    <div className="App">
+    <div className="myCanvas">
     </div>
   );
 }
