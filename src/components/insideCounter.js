@@ -5,9 +5,9 @@
 */
 
 
-export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 50){
+export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 2){
         // for each subseg
-
+        console.log(slidingNumb);
         var densityGroup = []
         var areaGroup = []
         var newDensityGroup = []
@@ -41,13 +41,13 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
             });
 
             var area = getArea (subBeltCell)
-            var density = counter/area
-
+            // var density = counter/area
+            var density = counter
             if (density>density_max) {
-              density_min = density
+              density_max = density
             }
             if (density<density_min) {
-              density_max = density
+              density_min = density
             }
             subDensityGroup.push(density)
             subAreaGroup.push(area)
@@ -61,15 +61,16 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           areaGroup.push(subAreaGroup)
         }
 
+        console.log([density_min,density_max]);
+
         for (var i = 0; i < densityBystripe.length; i++) {
           let newDensitySub
 
-
           newDensitySub = weightedMean(densityBystripe[i],areaBystripe[i],slidingNumb)
-          newDensitySub = slidingCalSum(segNumb,2*slidingNumb,newDensitySub)
+          newDensitySub = slidingCalSum(segNumb,slidingNumb,newDensitySub)
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
-            if (item ==0) {item=0.01} ;
+            // if (item ==0) {item=0.01} ;
             return item;})
 
 
@@ -87,20 +88,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
 
         let perpenDensity=[];
         for (var i = 0; i < densityGroup.length; i++) {
-          let result = slidingCalSum(segNumb,10,densityGroup[i])
-          // var j=1
-          // while (j < len+1) {
-          //   if (j == len) {
-          //       init.push(densityGroup[i][0])
-          //   }
-          //   else {
-          //       init.push(densityGroup[i][j])
-          //   }
-          //   result.push(getSum(init)/3)
-          //   init.shift()
-          //   j++
-          //
-          // }
+          let result = slidingCalSumPerp(7,densityGroup[i])
           perpenDensity.push(result)
         }
 
@@ -160,26 +148,37 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         var countList = [];
         var quotient = Math.floor(segment_num/sliding);
         var half_arS = (Math.floor(sliding/2));
-
+        var weightAry = []
+        for (var a = 1; a < sliding+1; a++) {
+          if (a<=half_arS) {
+            weightAry.push(a)
+          }
+          else {
+            weightAry.push(sliding+1-a)
+          }
+        }
       // initialize starting from index 0
-          var init_array_up = ary.slice(0,half_arS+1)
-          var init_array_down = ary.slice((ary.length-half_arS),(ary.length+1))
+        var init_array_up = ary.slice(0,half_arS+1)
+        var init_array_down = ary.slice((ary.length-half_arS),(ary.length+1))
 
 
-          var init_array = init_array_down.concat(init_array_up);
+        var init_array = init_array_down.concat(init_array_up);
+        var init_weighted = init_array.map((d,i)=>{
+          return d*weightAry[i]
+        })
+        var init_sum = init_weighted.reduce(function(s,x) {return (s + x)}, 0)
 
-          var init_sum = init_array.reduce(function(s,x) {return (s + x)}, 0)
-
-          countList.push(init_sum)
+        countList.push(init_sum)
 
           for (var i = 1; i < ary.length-half_arS; i++) {
 
             init_array.shift();
             var value = ary[i+half_arS];
             init_array.push(value);
-            var sum = init_array.reduce(function(s,x) {return (s + x)}, 0)
+            init_weighted = init_array.map((d,i)=>{
+              return d*weightAry[i]})
+            var sum = init_weighted.reduce(function(s,x) {return (s + x)}, 0)
             sum = 100* sum/sliding
-
             countList.push(sum)
 
           }
@@ -189,12 +188,109 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
             init_array.shift();
             var value = ary[i];
             init_array.push(value)
-            sum = init_array.reduce(function(s,x) {return (s + x)}, 0)
+            init_weighted = init_array.map((d,i)=>{
+              return (d*weightAry[i])})
+            sum = init_weighted.reduce(function(s,x) {return (s + x)}, 0)
             sum = 100* sum/sliding
             countList.push(sum)
           }
+
+          console.log(countList);
           return countList;
     }
+
+    function slidingCalSumPerp(sliding,ary) {
+        // sliding needs to be an odd number
+        var countList = [];
+        var half_arS = (Math.ceil(sliding/2));
+        ////console.log("half IS:"+half_arS);
+        ////console.log("length IS:"+ary.length);
+        // assuming half is always even number.
+
+        for (var i = 0; i < ary.length; i++) {
+
+
+        // CASE2. in this case left doesn't have enough values but right has values.
+        if ((i-half_arS) < 0 && (ary.length-1 - i -half_arS) >=0)
+        {
+          //console.log("left");
+          let weightAry = []
+
+          for (var a = i ; a > 0 ; a--) {
+            weightAry.push(half_arS-a)
+          }
+
+          for (var b= half_arS; b >0 ; b--) {
+            weightAry.push(b)
+          }
+
+
+          let total = getSum(weightAry)
+          // console.log(weightAry);
+          let sum = 0
+          for (var j = 0; j < (sliding-weightAry[0]+1); j++) {
+              let ratio = weightAry[j]/total
+              //console.log([weightAry[j],total]);
+              let curDensity = ary[i]*ratio
+              sum = sum+curDensity
+          }
+          countList.push(sum)
+        }
+        // CASE1. in this case both left and right have values.
+          if ((i-half_arS) >= 0 && (ary.length-1 - i -half_arS) >=0)
+          {
+            //console.log("both");
+            let weightAry = []
+            for (var a = 1; a < sliding+1; a++) {
+              if (a<=half_arS) {
+                weightAry.push(a)
+              }
+              else {
+                weightAry.push(sliding+1-a)
+              }
+            }
+            let total = getSum(weightAry)
+            // console.log(weightAry);
+            let sum = 0
+            for (var j = 0; j < sliding; j++) {
+                let ratio = weightAry[j]/total
+                //console.log([weightAry[j],total]);
+                let curDensity = ary[i]*ratio
+                sum = sum+curDensity
+            }
+            countList.push(sum)
+          }
+
+
+
+        // CASE3. in this case left has enough values but right doesn't have values.
+        if ((i-half_arS) >= 0 && (ary.length-1 - i -half_arS) < 0)
+        {
+          //console.log("right");
+          let weightAry = []
+          for (var a = 1; a < (half_arS+1); a++) {
+              weightAry.push(a)
+            }
+          for (var a = 1; a < (ary.length-i) ; a++) {
+              weightAry.push(half_arS-a)
+            }
+
+          let total = getSum(weightAry)
+          //console.log(weightAry);
+          let sum = 0
+          for (var j = 0; j < (weightAry.length); j++) {
+              let ratio = weightAry[j]/total
+              // console.log([weightAry[j],total]);
+              let curDensity = ary[i]*ratio
+              sum = sum+curDensity
+          }
+          countList.push(sum)
+          }
+        }
+
+          return countList;
+    }
+
 
     function weightedMean (list,areaList,stride) {
 

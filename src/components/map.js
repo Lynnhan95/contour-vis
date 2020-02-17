@@ -29,7 +29,7 @@ import Heatmap from 'visual-heatmap'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 30
+const slidingBins = 11 // make sure it is an odd number
 
 const intersect = require('path-intersection')
 
@@ -916,7 +916,7 @@ class BaseMap extends Component {
               key = {`transdot-${ i }`}
               cx = { d[0]}
               cy = { d[1]}
-              fill="red"
+              fill="black"
               r = "0.75"
               />
               )
@@ -1014,20 +1014,20 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             {/* <g className="Dots">
+            {/*   <g className="Dots">
                 {Dots}
             </g>
+            */}
 
-            <g className="transDots">
+           <g className="transDots">
                {transDots}
-           </g> */}
-
-            <g className="test_near">
+           </g>
+          {/*   <g className="test_near">
                 {test_near}
             </g>
             <g className="innerBoundary">
                 {innerBoundary}
-            </g>
+            </g> */}
             <g className="outerBoundary">
                 {outerBoundary}
             </g>
