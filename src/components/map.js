@@ -40,8 +40,8 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            province_en: 'Shanxi',
+            province_cn: '山西',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -322,7 +322,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = (-1.6/num)
+            const padding = -0.2
             ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
@@ -853,7 +853,7 @@ class BaseMap extends Component {
             let outsideBoundary
 
             this.state.chinaGeoData.map((d, i) => {
-                if(d.properties.name === '湖南'){
+                if(d.properties.name === '山西'){
                     //////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
                     this.autoProjection.fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], d)
                     outsideBoundary = <path
@@ -1014,15 +1014,28 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
+<<<<<<< HEAD
             {/*   <g className="Dots">
+=======
+            
+            {/*<g className="Dots">
+>>>>>>> 3f7d5da90b55c0ecd3818c494a195ced64ff2d56
                 {Dots}
             </g>
             */}
 
+<<<<<<< HEAD
            <g className="transDots">
                {transDots}
            </g>
           {/*   <g className="test_near">
+=======
+             <g className="transDots">
+               {transDots}
+            </g>  */}
+
+            <g className="test_near">
+>>>>>>> 3f7d5da90b55c0ecd3818c494a195ced64ff2d56
                 {test_near}
             </g>
             <g className="innerBoundary">
