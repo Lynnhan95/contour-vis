@@ -5,7 +5,7 @@
 */
 
 
-export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 2){
+export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 20){
         // for each subseg
         console.log(slidingNumb);
         var densityGroup = []
@@ -40,9 +40,9 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
               }
             });
 
-            var area = getArea (subBeltCell)
+            var area = getArea (subSeg)
             // var density = counter/area
-            var density = counter
+            var density = counter/area
             if (density>density_max) {
               density_max = density
             }
@@ -71,7 +71,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
             // if (item ==0) {item=0.01} ;
-             // item = Math.pow(item,0.5)
+            item = Math.pow(item,0.5)
             return item;})
 
 
@@ -90,7 +90,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         let perpenDensity=[];
         for (var i = 0; i < densityGroup.length; i++) {
           console.log(i);
-          let result = slidingCalSumPerp(7,densityGroup[i])
+          let result = slidingCalSumPerp(11,densityGroup[i])
           perpenDensity.push(result)
         }
 

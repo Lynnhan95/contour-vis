@@ -1014,19 +1014,16 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-           <g className="Dots">
+            <g className="Dots">
                 {Dots}
             </g>
-
-
-          {/* <g className="transDots">
+            
+            {/*
+            <g className="transDots">
                {transDots}
            </g>
-             <g className="test_near">
-             <g className="transDots">
-               {transDots}
-            </g>  */}
-
+           */}
+               {/*
             <g className="test_near">
                 {test_near}
             </g>
