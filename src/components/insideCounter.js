@@ -71,7 +71,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
             // if (item ==0) {item=0.01} ;
-            // item = Math.pow(item,0.5)
+             item = Math.pow(item,0.5)
             return item;})
 
 
@@ -237,6 +237,8 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
               let curDensity = ary[i]*ratio
               sum = sum+curDensity
           }
+          // sum = ary[i]/weightAry.length
+
           countList.push(sum)
         }
         // CASE1. in this case both left and right have values.
@@ -262,6 +264,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
                 let curDensity = ary[i]*ratio
                 sum = sum+curDensity
             }
+            // sum = ary[i]/weightAry.length
             countList.push(sum)
           }
 
@@ -289,6 +292,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
               let curDensity = ary[i]*ratio
               sum = sum+curDensity
           }
+          // sum = ary[i]/weightAry.length
           countList.push(sum)
           }
         }

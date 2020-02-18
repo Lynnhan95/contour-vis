@@ -28,8 +28,8 @@ import {constructPtInSeg} from './constructPtInSeg'
 import Heatmap from 'visual-heatmap'
 const { Option } = Select
 
-const setSegNumb = 3000
-const slidingBins = 17 // make sure it is an odd number
+const setSegNumb = 5000
+const slidingBins = 21 // make sure it is an odd number
 
 const intersect = require('path-intersection')
 
@@ -419,7 +419,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 10 // set how many subsegments we divide each seg
+                const subSegNum = 15 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
