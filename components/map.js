@@ -29,7 +29,7 @@ import Heatmap from 'visual-heatmap'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 21 // make sure it is an odd number
+const slidingBins = 37 // make sure it is an odd number
 
 const intersect = require('path-intersection')
 
@@ -419,7 +419,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 20 // set how many subsegments we divide each seg
+                const subSegNum = 30 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -552,7 +552,7 @@ class BaseMap extends Component {
             console.log(transObj);
 
 
-            var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
+            var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,transformPts,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
@@ -917,7 +917,7 @@ class BaseMap extends Component {
               cx = { d[0]}
               cy = { d[1]}
               fill="black"
-              r = "0.75"
+              r = "0.7"
               />
               )
           })
@@ -1014,31 +1014,34 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-            <g className="Dots">
-                {Dots}
-            </g>
-            
-            {/*
-            <g className="transDots">
-               {transDots}
-           </g>
-           */}
-               {/*
-            <g className="test_near">
-                {test_near}
-            </g>
-            <g className="innerBoundary">
-                {innerBoundary}
-            </g> */}
-            <g className="outerBoundary">
-                {outerBoundary}
-            </g>
-            <g className = "legend" ref = {this.legendRef}>
 
-            </g>
-            <g className = "gradientLegend" ref = {this.gradientLegendRef}>
+             <g className="Dots">
+                  {Dots}
+              </g>
 
-            </g>
+              {/*<g className="Dots">
+                   {Dots}
+               </g>*/}
+
+               {/* <g className="transDots">
+                  {transDots}
+              </g> */}
+
+             {/*<g className="transDots">
+                 {transDots}
+             </g>
+             */}
+              <g className="test_near">
+                  {test_near}
+              </g>
+              <g className="innerBoundary">
+                  {innerBoundary}
+              </g>
+              <g className="outerBoundary">
+                  {outerBoundary}
+              </g>
+              <g className = "legend" ref = {this.legendRef}></g>
+              <g className = "gradientLegend" ref = {this.gradientLegendRef}></g>
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>
