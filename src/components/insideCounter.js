@@ -71,7 +71,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
             // if (item ==0) {item=0.01} ;
-             item = Math.pow(item,0.5)
+             // item = Math.pow(item,0.5)
             return item;})
 
 
@@ -90,7 +90,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         let perpenDensity=[];
         for (var i = 0; i < densityGroup.length; i++) {
           console.log(i);
-          let result = slidingCalSumPerp(5,densityGroup[i])
+          let result = slidingCalSumPerp(7,densityGroup[i])
           perpenDensity.push(result)
         }
 
@@ -212,7 +212,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         for (var i = 0; i < ary.length; i++) {
 
 
-        // CASE2. in this case left doesn't have enough values but right has values.
+        // CASE1. in this case left doesn't have enough values but right has values.
         if ((i-half_arS) < 0 && (ary.length-1 - i -half_arS) >=0)
         {
           //console.log("left");
@@ -230,18 +230,14 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           let total = getSum(weightAry)
           console.log(weightAry);
           let sum = 0
-          for (var j = 0; j < (sliding-weightAry[0]+1); j++) {
-              let ratio = weightAry[j]/total
-              console.log(ratio);
-              //console.log([weightAry[j],total]);
-              let curDensity = ary[i]*ratio
-              sum = sum+curDensity
+          for (var w = 0; w < (i+half_arS); w++) {
+            let curDensity = ary[w]*weightAry[w]/total
+            sum = sum+curDensity
           }
-          // sum = ary[i]/weightAry.length
 
           countList.push(sum)
         }
-        // CASE1. in this case both left and right have values.
+        // CASE2. in this case both left and right have values.
           if ((i-half_arS) >= 0 && (ary.length-1 - i -half_arS) >=0)
           {
             //console.log("both");
@@ -257,11 +253,10 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
             let total = getSum(weightAry)
             console.log(weightAry);
             let sum = 0
-            for (var j = 0; j < sliding; j++) {
-                let ratio = weightAry[j]/total
-                console.log(ratio);
+            for (var j = (i-half_arS+1); j <(i+half_arS-1) ; j++) {
+                let ratio = weightAry[j-i+half_arS-1]/total
                 //console.log([weightAry[j],total]);
-                let curDensity = ary[i]*ratio
+                let curDensity = ary[j]*ratio
                 sum = sum+curDensity
             }
             // sum = ary[i]/weightAry.length
@@ -285,11 +280,10 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           let total = getSum(weightAry)
           console.log(weightAry);
           let sum = 0
-          for (var j = 0; j < (weightAry.length); j++) {
-              let ratio = weightAry[j]/total
-              console.log(ratio);
+          for (var j = (i-half_arS+1); j < ary.length; j++) {
+              let ratio = weightAry[j-i+half_arS-1]/total
               // console.log([weightAry[j],total]);
-              let curDensity = ary[i]*ratio
+              let curDensity = ary[j]*ratio
               sum = sum+curDensity
           }
           // sum = ary[i]/weightAry.length

@@ -419,7 +419,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 15 // set how many subsegments we divide each seg
+                const subSegNum = 20 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
