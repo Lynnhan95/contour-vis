@@ -25,7 +25,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 50
+const slidingBins = 40
 
 const intersect = require('path-intersection')
 
@@ -65,7 +65,7 @@ class BaseMap extends Component {
         this.chinaGeoDataNest = null
         this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
 
-        // legend ref 
+        // legend ref
         this.legendRef = React.createRef()
         this.gradientLegendRef = React.createRef()
     }
@@ -587,31 +587,31 @@ class BaseMap extends Component {
                                          console.log("node", node)
                                          select(node)
                                              .call(this.legend)
-                             
+
                                          ////////////Create gradient legend /////////////////
-                                         var color_scheme = [ 
-                                             '#2c7bb6', 
-                                             '#00a6ca', 
-                                             '#00ccbc', 
+                                         var color_scheme = [
+                                             '#2c7bb6',
+                                             '#00a6ca',
+                                             '#00ccbc',
                                              '#90eb9d',
                                              '#ffff8c',
                                              '#f9d057',
                                              '#f29e2e',
-                                             '#e76818', 
+                                             '#e76818',
                                              '#d7191c' ];
-                                         const gradientNode = this.gradientLegendRef.current 
-                                         const element = 
+                                         const gradientNode = this.gradientLegendRef.current
+                                         const element =
                                          select(gradientNode)
                                              // .attr('width', 50)
                                              // .attr('height', 300)
-                             
+
                                          element.append('rect')
                                          .attr('x', 100)
                                          .attr('y', 0)
                                          .attr('width', 20)
                                          .attr('height', 180)
                                          .style('fill', 'url(#grad)');
-                             
+
                                          let grad = element.append('defs')
                                          .append('linearGradient')
                                          .attr('id', 'grad')
@@ -619,7 +619,7 @@ class BaseMap extends Component {
                                          .attr('x2', '0%')
                                          .attr('y1', '0%')
                                          .attr('y2', '100%');
-                             
+
                                          grad.selectAll('stop')
                                          .data(color_scheme)
                                          .enter()
@@ -629,7 +629,7 @@ class BaseMap extends Component {
                                            return 100 * (i / (colors.length - 1)) + '%';
                                          })
 
-                                         
+
             this.setState({
                 cellObjArr: cellObjArr
             })
@@ -1006,7 +1006,7 @@ class BaseMap extends Component {
             </g>
             <g className = "gradientLegend" ref = {this.gradientLegendRef}>
 
-            </g>    
+            </g>
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
         </div>
