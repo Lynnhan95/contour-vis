@@ -25,7 +25,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 40
+const slidingBins = 50
 
 const intersect = require('path-intersection')
 
@@ -995,12 +995,12 @@ class BaseMap extends Component {
             <g className="test_near">
                 {test_near}
             </g>
-            <g className="innerBoundary">
+            {/* <g className="innerBoundary">
                 {innerBoundary}
             </g>
             <g className="outerBoundary">
                 {outerBoundary}
-            </g>
+            </g> */}
             <g className = "legend" ref = {this.legendRef}>
 
             </g>

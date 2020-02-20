@@ -18,16 +18,16 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
                 .curve(d3.curveLinear);
 
 
-
-
   var strPath = getLinePathStr(pts_ary)
   strPath = roundPathCorners(strPath,0.1,true)
+  console.log(strPath);
 
   var p = svg.append("path")
                   .style("fill","none")
                   .style("stroke","orange")
                   .style("stroke-width","1px")
                   .attr("d",draw(d3.path(),strPath));
+
 
   function draw(context,strPath) {
     var split = strPath.split(/(?=[LMC])/)
@@ -46,8 +46,6 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
       }
       return context; // not mandatory, but will make it easier to chain operations
   }
-
-
 
   var path = p.node();
 
