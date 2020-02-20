@@ -669,7 +669,8 @@ class BaseMap extends Component {
 
                 //get medial axis transforms
                 let mats = findMats(resloop, 3)
-
+                console.log('MATS: ', mats);
+                
                 //traverse
                 mats.forEach(f)
                 function f(mat){
@@ -766,6 +767,7 @@ class BaseMap extends Component {
                     //rea: mainArea,
                     //simplifiedArea: simplifiedArea,
                     resPaths: medialPath,
+                    resDots: resDots,
                     segmentBorderPaths: segmentBorderPaths,
                     even_points: even_points,
                     MedianPoints: MedianPoints,
@@ -1142,6 +1144,24 @@ class BaseMap extends Component {
             stroke = "#e56048"
             />
         }
+
+        let resDots = []
+        if(this.state.resDots){
+            this.state.resDots.map((e, i)=>{
+                e.forEach((d, j)=>{
+                    resDots.push(
+                        <circle
+                        key = {`resDots-${i}${j}`}
+                        className = {`resDots-${i}`}
+                        r = "1"
+                        fill = "#000"
+                        cx = {d[0]}
+                        cy = {d[1]}
+                        />
+                    )
+                })
+            })
+        }
         
 
         // draw dots to the map 
@@ -1235,6 +1255,9 @@ class BaseMap extends Component {
             </g>
             <g className="innerBoundary">
                 {innerBoundary}
+            </g>
+            <g className="resDots">
+                {resDots}
             </g>
             </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
