@@ -95,7 +95,7 @@ class BaseMap extends Component {
 
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -580,7 +580,7 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells(10)
+                                        this.legend = legendColor().scale(this.color_scale).cells([0, 100, 200,300, 400, 500, 600])
                                         // console.log('colorscale', )
                                          /////////////Create cell legend/////////////////////
                                          const node = this.legendRef.current
@@ -609,7 +609,7 @@ class BaseMap extends Component {
                                          .attr('x', 100)
                                          .attr('y', 0)
                                          .attr('width', 20)
-                                         .attr('height', 180)
+                                         .attr('height', 120)
                                          .style('fill', 'url(#grad)');
 
                                          let grad = element.append('defs')
