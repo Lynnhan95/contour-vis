@@ -262,7 +262,7 @@ class BaseMap extends Component {
             ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
-            if (i == 1) {
+            if (i === 1) {
                 this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
             }
 
@@ -316,7 +316,7 @@ class BaseMap extends Component {
             _me.state.simplifiedArea = simplifiedArea
 
             _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
-            console.log('simplifiedContours', _me.state.simplifiedContours)
+            // console.log('simplifiedContours', _me.state.simplifiedContours)
 
             let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
 
@@ -362,7 +362,7 @@ class BaseMap extends Component {
 /*
         belt
 */
-            ////console.log(this.innerBoundaryCoordinates)
+            console.log('innerBoundaryCoordinates', this.innerBoundaryCoordinates)
             //Compute belt from newSegPolyList
             let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
                 return this.autoProjection(d)
@@ -697,7 +697,6 @@ class BaseMap extends Component {
 
             }
 
-
             /*
             Mapping simplified outer boundary with this.state.simplifiedArea
             Used this.state.even_point before, since we interpolate evenly on out boundary to get segments before
@@ -726,6 +725,20 @@ class BaseMap extends Component {
 
                 }
             })
+
+            let simplified_contours
+            if(this.state.simplifiedContours){
+                simplified_contours = this.state.simplifiedContours.map((d, i)=>{
+                    return <path
+                        key = {`simplifiedContours-${i}`}
+                        d = { geoPath().projection(this.autoProjection)(d) }
+                        stroke = "black"
+                        strokeWidth = "1"
+                        fill="none"
+                        />
+                })
+            }
+
             return [
                 // outsideBoundary,
                 // simplified_Outboundary,
@@ -734,7 +747,8 @@ class BaseMap extends Component {
                 // cells1,
                 // cells2,
                 // segPoly,
-                inscribledCircles
+                // inscribledCircles,
+                simplified_contours
             ]
         }
         const Regions = getRegionElements()
