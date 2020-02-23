@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv, extent, select, nest, scaleLinear } from 'd3'
+import { csv, extent, select, nest, scaleLinear, polygonCentroid } from 'd3'
 import { legendColor } from 'd3-svg-legend'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -28,8 +28,10 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            province_en: 'Xinjiang',
+            province_cn: '新疆',
+            // province_en: 'Hebei',
+            // province_cn: '河北',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -41,7 +43,7 @@ class BaseMap extends Component {
         }
 
         this.svgMargin = 50;
-        this.autoProjection = null
+        this.autoProjection = geoMercator()
         this.svg_w = 960
         this.svg_h = 600
 
@@ -60,6 +62,11 @@ class BaseMap extends Component {
         // legend ref
         this.legendRef = React.createRef()
         this.gradientLegendRef = React.createRef()
+
+        // contour
+        this.contour_num = 5
+        this.contour_padding_len = -4.2
+        this.contour_padding_len_unit = -0.007
     }
 
     onAfterChange = value => {
@@ -74,9 +81,12 @@ class BaseMap extends Component {
             name_cn = this.chinaProvincesNameNest[value].provinceName
 
         this.setState({
-            currGeoData: this.chinaGeoDataNest[name_cn]
+            province_en: name_en,
+            province_cn: name_cn,
+            currGeoData: this.chinaGeoDataNest[name_cn],
+            pointsData: this.pointsDataNest[name_en].values
         })
-        // //console.log(`selected ${name_cn} ${name_en}`);
+        // console.log(`selected ${name_cn} ${name_en}`);
     }
 
     /* when component will mount, fetch geojson and csv data locally */
@@ -87,7 +97,7 @@ class BaseMap extends Component {
 
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data_all.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -114,7 +124,7 @@ class BaseMap extends Component {
                  * chinaGeo
                  */
                 response.json().then(chinaGeoData => {
-                    this.autoProjection = geoMercator().fitExtent([[this.svgMargin*3, this.svgMargin*3],[this.svg_w- this.svgMargin*3 , this.svg_h-this.svgMargin*3]], chinaGeoData)
+                    // this.autoProjection = geoMercator().fitExtent([[this.svgMargin*3, this.svgMargin*3],[this.svg_w- this.svgMargin*3 , this.svg_h-this.svgMargin*3]], chinaGeoData)
 
                     let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
 
@@ -251,16 +261,21 @@ class BaseMap extends Component {
         return contours
     }
 
-    getInnerBoundaryContours(coordinates, num) {
-
-        let contours = []
+    getInnerBoundaryContours(coordinates, num, r) {
+        console.log('getInnerBoundaryContours coordinates', coordinates);
+        
+        let contours = [],
+            padding = (this.contour_padding_len / num)
+        // TODO: calculate the correct contour_padding_len
+        this.offset.data(coordinates)
+        // const padding = (-1.6/num)
         // HARDCODE 1.89: Api confusion
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = (-1.6/num)
-            ////console.log(padding)
-            let offsetContour = new Offset(coordinates).offset(padding* i)
+            console.log('padding', padding* i)
+            let offsetContour = this.offset.offset(padding* i)
+            console.log('offsetContour', offsetContour)
             // Set the first contour as clipping_boundary
             if (i === 1) {
                 this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
@@ -287,53 +302,54 @@ class BaseMap extends Component {
         let _me = this
 
         if(prevState.currGeoData !== this.state.currGeoData){
+            console.log('autoProjection.scale', _me.autoProjection.scale())
+            _me.autoProjection.fitExtent([
+                [this.svgMargin / 2, this.svgMargin / 2],
+                [this.svg_w - this.svgMargin / 2 , this.svg_h - this.svgMargin / 2]
+            ], this.state.currGeoData)
             
             // store computed dots and paths
             const d = this.state.currGeoData
-            //console.warn('dddddd', d);
+            console.log('currGeoData', d)
 
-            const mainArea = d.geometry.coordinates
+            const d_coordinates = d.geometry.coordinates
             const simplifiedFactor = 0.4
 
-            // Compute simplified area
+            /**
+             * Compute simplified area coordinates
+             */
             let res = []
-            for(let i=0; i< mainArea[0].length; i++) {
+            for(let i=0; i< d_coordinates[0].length; i++) {
                 let temp = { }
-                temp['x'] = mainArea[0][i][0]
-                temp['y'] = mainArea[0][i][1]
+                temp['x'] = d_coordinates[0][i][0]
+                temp['y'] = d_coordinates[0][i][1]
                 res.push(temp)
             }
 
             let simplified = simplify(res, simplifiedFactor, true)
-            let simplifiedArea = []
+            let simplified_coordinates = []
             for(let i=0; i< simplified.length; i++) {
                 let temp = []
                 temp.push(simplified[i].x)
                 temp.push(simplified[i].y)
-                simplifiedArea.push(temp)
+                simplified_coordinates.push(temp)
             }
 
-            _me.state.simplifiedArea = simplifiedArea
+            _me.state.simplifiedArea = simplified_coordinates
 
-            _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
-            // console.log('simplifiedContours', _me.state.simplifiedContours)
-
-            let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
+            let even_points = _me.getEvenPointsFromCoordinates(simplified_coordinates, 0.05)
 
             let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // convert boundary to path for computing.
             // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
-            let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
+            let simplifiedAreaProjected = simplified_coordinates.map((d)=> {return this.autoProjection(d)})
 
-            let [circleAry,segPolyList,strPath] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
-
+            let [circleAry,segPolyList,strPath, bigest_circle] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
+            console.log('bigest_circle', bigest_circle, _me.autoProjection.scale());
+            
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // create new segList by clipping from mainArea polygon
-            let clip_boundary = simplifiedArea.map((d) => {
-                return this.autoProjection(d)
-            })
 
             let newSegPolyList = []
 
@@ -348,17 +364,21 @@ class BaseMap extends Component {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
-        subsegments
+        subsegments for map color
 */
 
             let subSegList = []
-            const subSegNum = 20 // set how many subsegments we divide each seg
+            const subSegNum = 10 // set how many subsegments we divide each seg
             newSegPolyList.forEach((d,i) => {
-
-                let subSeg = interpolateSegment(d, subSegNum,i)
+                let subSeg = interpolateSegment(d, subSegNum)
                 subSegList.push(subSeg)
-
             })
+
+            /**
+             * Compute inner contours
+             */
+            _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplified_coordinates, _me.contour_num, bigest_circle.radius)
+            // console.log('simplifiedContours', _me.state.simplifiedContours)
 /*
         belt
 */
@@ -387,40 +407,9 @@ class BaseMap extends Component {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            // console.log(MedianPoints)
-
-            function getLinesfromPoints(arr) {
-                let lines = []
-
-                for (let i=0; i <= arr.length-1; i++) {
-                    let x0 = arr[i][0][0],
-                        y0 = arr[i][0][1],
-                        x1 = arr[i][1][0],
-                        y1 = arr[i][1][1]
-
-                    lines.push(`M${x0} ${y0} L${x1} ${y1}`)
-                }
-                return lines
-            }
-
-            function getSecondElements(arr) {
-                let temp = []
-                for(let i=0; i< arr.length; i++) {
-                    temp.push(arr[i][1])
-                }
-                return temp
-            }
-
-            // let segmentBorderPaths = getLinesfromPoints(segmentBorderPoints)
-            // let segmentBorderPaths = getLinesfromPoints(nk_intersect_points[0])
             this.setState({
-                // interpolatePoints: interpolatePoints,
-                // SegmentPoints: SegmentPoints,
-                // MedialVerticalPaths: MedialVerticalPaths,
-                //rea: mainArea,
-                //simplifiedArea: simplifiedArea,
-                // resPaths: medialPath,
-                // segmentBorderPaths: segmentBorderPaths,
+                // rea: mainArea,
+                // simplifiedArea: simplifiedArea,
                 even_points: even_points,
                 MedianPoints: MedianPoints,
                 inscribledCircles :circleAry,
@@ -430,10 +419,6 @@ class BaseMap extends Component {
                 beltSegList:beltSegList,
                 segPolyList: segPolyList,
                 newSegPolyList:newSegPolyList
-
-                // paper_inter: nk_intersect_points[1],
-                //segments: segments,
-                //boundary_segments: boundary_segments
             })
         }
 
@@ -497,7 +482,7 @@ class BaseMap extends Component {
 
             /////////////Create cell legend/////////////////////
             const node = this.legendRef.current
-            console.log("node", node)
+            // console.log("node", node)
             select(node)
                 .call(this.legend)
 
@@ -576,7 +561,7 @@ class BaseMap extends Component {
 
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-                    if (i % 50 === 0){
+                    if (i % 100 === 0){
                         return (
                             <circle
                             key = {`inscribledCircles-${i}`}
@@ -633,25 +618,7 @@ class BaseMap extends Component {
                     - boundarySegmentCoordinate
                     - dotCount (dots amount per segment)
             */
-            let segments
-            if(this.state.segments) {
-                segments = this.state.segments.map((d, i)=>{
-                        let pathStr = this.getLinePathStr(d)
-                        return (
-                            <path
-                            key = {`path-${i}`}
-                            className = {`Segment-${i}`}
-                            d = {pathStr}
-                            stroke = "#fff"
-                            strokeWidth = "0.2"
-                            fill = 'blue'
-                            fill-opacity = '0.2'
-                            />
-                        )
-
-                })
-
-            }
+            
 
             let cells0,cells1,cells2
             if(this.state.cellObjArr){
@@ -709,23 +676,6 @@ class BaseMap extends Component {
 
             }
 
-            // No longer draw boundary from original chinaGeoData
-            let outsideBoundary
-            this.state.chinaGeoData.map((d, i) => {
-                if(d.properties.name === '湖南'){
-                    //////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
-                    this.autoProjection.fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], d)
-                    outsideBoundary = <path
-                        key = {`path-${ i }`}
-                        d = { geoPath().projection(this.autoProjection)(d) }
-                        stroke = "black"
-                        strokeWidth = "2"
-                        fill="none"
-                        />
-
-                }
-            })
-
             let simplified_contours
             if(this.state.simplifiedContours){
                 simplified_contours = this.state.simplifiedContours.map((d, i)=>{
@@ -742,12 +692,12 @@ class BaseMap extends Component {
             return [
                 // outsideBoundary,
                 // simplified_Outboundary,
-                // linePts,
                 cells0,
                 // cells1,
                 // cells2,
                 // segPoly,
-                // inscribledCircles,
+                inscribledCircles,
+                // linePts,
                 simplified_contours
             ]
         }
@@ -776,8 +726,7 @@ class BaseMap extends Component {
         return (
             <div>
                 <div className="Control">
-                    <p>Basemap</p>
-                    <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
+                    <h3>Basemap</h3>
 
                     <Select
                         showSearch
@@ -785,7 +734,7 @@ class BaseMap extends Component {
                         placeholder="Select a province"
                         optionFilterProp="children"
                         onChange={this.onChange.bind(this)}
-                        defaultValue={'Hunan'}
+                        defaultValue={this.state.province_en}
                         filterOption={(input, option) =>
                             option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                         }
@@ -807,6 +756,7 @@ class BaseMap extends Component {
                     <g className = "gradientLegend" ref = {this.gradientLegendRef}>
 
                     </g>
+                    <path id="calc_path"></path>
                 </svg>
 
             </div>

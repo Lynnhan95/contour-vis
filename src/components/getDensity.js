@@ -6,93 +6,121 @@ import {roundPathCorners} from './rounding'
 /*
 params: points array of boundary
 */
+var bigest_circle = {
+  radius: 0
+}
 
-export function getDensity (svg,pts_ary,segment_num = 5000){
+export function getDensity(svg, pts_ary, segment_num) {
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
 
-  var line0 = d3.line()
-                .x(function(d) { return d[0]})
-                .y(function(d) { return d[1]})
-                .curve(d3.curveLinear);
-
-
   var strPath = getLinePathStr(pts_ary)
-  strPath = roundPathCorners(strPath,0.1,true)
+  strPath = roundPathCorners(strPath, 0.1, true)
   console.log(strPath);
 
-  var p = svg.append("path")
-                  .style("fill","none")
-                  .style("stroke","orange")
-                  .style("stroke-width","1px")
-                  .attr("d",draw(d3.path(),strPath));
+  var p = svg.select("#calc_path")
+    .style("fill", "none")
+    .style("stroke", "orange")
+    .style("stroke-width", "1px")
+    .attr("d", draw(d3.path(), strPath));
 
 
-  function draw(context,strPath) {
+  function draw(context, strPath) {
     var split = strPath.split(/(?=[LMC])/)
     for (var i = 0; i < split.length; i++) {
       let current = split[i]
       current = current.split(" ")
       if (current[0] == "M") {
-        context.moveTo(Number(current[1]),Number(current[2]));
+        context.moveTo(Number(current[1]), Number(current[2]));
       }
       if (current[0] == "L") {
-        context.lineTo(Number(current[1]),Number(current[2]))
+        context.lineTo(Number(current[1]), Number(current[2]))
       }
       if (current[0] == "C") {
-        context.bezierCurveTo(Number(current[1]),Number(current[2]),Number(current[3]),Number(current[4]),Number(current[5]),Number(current[6]))
+        context.bezierCurveTo(Number(current[1]), Number(current[2]), Number(current[3]), Number(current[4]), Number(current[5]), Number(current[6]))
       }
-      }
-      return context; // not mandatory, but will make it easier to chain operations
+    }
+    return context; // not mandatory, but will make it easier to chain operations
   }
 
   var path = p.node();
 
-  let widget = path.getTotalLength()/segment_num, new_pts = []
+  let widget = path.getTotalLength() / segment_num,
+    new_pts = []
 
-  let prevValue = path.getPointAtLength((segment_num-1)*widget)
+  let prevValue = path.getPointAtLength((segment_num - 1) * widget)
 
   for (var i = 0; i < segment_num; i++) {
-      var point  = path.getPointAtLength(i*widget);
-      var newPoint = {x:(point.x+prevValue.x)/2,y:(point.y+prevValue.y)/2}
-      prevValue = point
-
-      new_pts.push(newPoint)
+    var point = path.getPointAtLength(i * widget);
+    var newPoint = {
+      x: (point.x + prevValue.x) / 2,
+      y: (point.y + prevValue.y) / 2
     }
+    prevValue = point
+
+    new_pts.push(newPoint)
+  }
 
   // quarterly split the list to advoid max exceeding
-  let dictAllmin1Q= [];
-  let dictAllmin2Q= [];
-  let dictAllmin3Q= [];
-  let dictAllmin4Q= [];
+  let dictAllmin1Q = [];
+  let dictAllmin2Q = [];
+  let dictAllmin3Q = [];
+  let dictAllmin4Q = [];
 
-
-  for (var index = 0; index < segment_num/4; index++) {
+  for (var index = 0; index < segment_num / 4; index++) {
     var result;
     result = minCircle(index, new_pts)
-    dictAllmin1Q.push({index:index,radius:result[0],centerX:result[1],centerY:result[2]})
+    let circle = {
+      index: index,
+      radius: result[0],
+      centerX: result[1],
+      centerY: result[2]
     }
+    getBigestCircle(circle)
+    dictAllmin1Q.push(circle)
+  }
 
-  for (var index = segment_num/4; index < segment_num/2; index++) {
-      var result;
-      result = minCircle(index, new_pts)
-      dictAllmin2Q.push({index:index,radius:result[0],centerX:result[1],centerY:result[2]})
+  for (var index = segment_num / 4; index < segment_num / 2; index++) {
+    var result;
+    result = minCircle(index, new_pts)
+    let circle = {
+      index: index,
+      radius: result[0],
+      centerX: result[1],
+      centerY: result[2]
     }
+    getBigestCircle(circle)
+    dictAllmin2Q.push(circle)
+  }
 
-  for (var index = segment_num/2; index < 3*segment_num/4; index++) {
-      var result;
-      result = minCircle(index, new_pts)
-      dictAllmin3Q.push({index:index,radius:result[0],centerX:result[1],centerY:result[2]})
+  for (var index = segment_num / 2; index < 3 * segment_num / 4; index++) {
+    var result;
+    result = minCircle(index, new_pts)
+    let circle = {
+      index: index,
+      radius: result[0],
+      centerX: result[1],
+      centerY: result[2]
     }
+    getBigestCircle(circle)
+    dictAllmin3Q.push(circle)
+  }
 
-  for (var index = 3*segment_num/4; index < segment_num; index++) {
-      var result;
-      result = minCircle(index, new_pts)
-      dictAllmin4Q.push({index:index,radius:result[0],centerX:result[1],centerY:result[2]})
+  for (var index = 3 * segment_num / 4; index < segment_num; index++) {
+    var result;
+    result = minCircle(index, new_pts)
+    let circle = {
+      index: index,
+      radius: result[0],
+      centerX: result[1],
+      centerY: result[2]
     }
+    getBigestCircle(circle)
+    dictAllmin4Q.push(circle)
+  }
 
-  let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q,dictAllmin3Q,dictAllmin4Q)
+  let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q, dictAllmin3Q, dictAllmin4Q)
 
   //console.log(dictAllmin);
 
@@ -100,40 +128,41 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
   let segPolyList = []
   for (var i = 0; i < new_pts.length; i++) {
     var center1 = [dictAllmin[i].centerX, dictAllmin[i].centerY]
-    var pt1 = [new_pts[i].x,new_pts[i].y]
+    var pt1 = [new_pts[i].x, new_pts[i].y]
 
-    var center2,pt2;
-    if (i !== new_pts.length-1) {
-      center2 = [dictAllmin[i+1].centerX, dictAllmin[i+1].centerY]
-      pt2     = [new_pts[i+1].x,new_pts[i+1].y]
+    var center2, pt2;
+    if (i !== new_pts.length - 1) {
+      center2 = [dictAllmin[i + 1].centerX, dictAllmin[i + 1].centerY]
+      pt2 = [new_pts[i + 1].x, new_pts[i + 1].y]
     }
-    if (i === new_pts.length-1 ) {
-    center2 = [dictAllmin[0].centerX, dictAllmin[0].centerY]
-      pt2   = [new_pts[0].x,new_pts[0].y]
+    if (i === new_pts.length - 1) {
+      center2 = [dictAllmin[0].centerX, dictAllmin[0].centerY]
+      pt2 = [new_pts[0].x, new_pts[0].y]
     }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-  refactor the polygon. extend the edges for intersecting with the outline
-*/
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    /*
+      refactor the polygon. extend the edges for intersecting with the outline
+    */
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    var d1 = Math.pow(((center1[0]-pt1[0])*(center1[0]-pt1[0])+(center1[1]-pt1[1])*(center1[1]-pt1[1])),0.5)
-    var d2 = Math.pow(((center2[0]-pt2[0])*(center2[0]-pt2[0])+(center2[1]-pt2[1])*(center2[1]-pt2[1])),0.5)
+    var d1 = Math.pow(((center1[0] - pt1[0]) * (center1[0] - pt1[0]) + (center1[1] - pt1[1]) * (center1[1] - pt1[1])), 0.5)
+    var d2 = Math.pow(((center2[0] - pt2[0]) * (center2[0] - pt2[0]) + (center2[1] - pt2[1]) * (center2[1] - pt2[1])), 0.5)
 
 
     var extendMetric = 10
-    var scale1 = (d1+extendMetric)/d1
-    var scale2 = (d2+extendMetric)/d2
+    var scale1 = (d1 + extendMetric) / d1
+    var scale2 = (d2 + extendMetric) / d2
 
 
-    var new_pt1 = [(scale1*(pt1[0]-center1[0])+center1[0]),(scale1*(pt1[1]-center1[1])+center1[1])]
-    var new_pt2 = [(scale2*(pt2[0]-center2[0])+center2[0]),(scale2*(pt2[1]-center2[1])+center2[1])]
+    var new_pt1 = [(scale1 * (pt1[0] - center1[0]) + center1[0]), (scale1 * (pt1[1] - center1[1]) + center1[1])]
+    var new_pt2 = [(scale2 * (pt2[0] - center2[0]) + center2[0]), (scale2 * (pt2[1] - center2[1]) + center2[1])]
 
-    var polygon = [new_pt1,new_pt2,center2,center1]
-    segPolyList.push(polygon)}
+    var polygon = [new_pt1, new_pt2, center2, center1]
+    segPolyList.push(polygon)
+  }
 
   /*
     return dictAllmin as all maxinscribled circles
@@ -141,11 +170,16 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
   */
 
 
-    return [dictAllmin,segPolyList,strPath];
+  return [dictAllmin, segPolyList, strPath, bigest_circle];
 
 }
 
-
+// calculate the Bigest circle
+function getBigestCircle(next_circle) {
+  if(bigest_circle.radius < next_circle.radius){
+    bigest_circle = next_circle
+  }
+}
 
 function minCircle (pt_index,newpts_list){
     var pt1;

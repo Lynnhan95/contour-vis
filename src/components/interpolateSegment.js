@@ -1,6 +1,6 @@
 
-export function interpolateSegment(segPoly, num ,i) {
-            /**
+export function interpolateSegment(segPoly, num) {
+        /**
          * A: median point
          * B: intersect point
          */
