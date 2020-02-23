@@ -11,12 +11,10 @@ import {interpolateSegment} from './interpolateSegment'
 import {insideCounter} from './insideCounter'
 import {getNewSeg} from './getNewSeg.js'
 import {getBeltSeg} from './getBeltSeg.js'
-import {Slider, Select} from 'antd'
-import "antd/dist/antd.css"
 import "./style.css"
-import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
-const { Option } = Select
+
+import {rect_matrix, dots} from './training_data/rect/rect_sample6.js'
 
 const setSegNumb = 5000
 const slidingBins = 50
@@ -28,10 +26,6 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Xinjiang',
-            province_cn: '新疆',
-            // province_en: 'Hebei',
-            // province_cn: '河北',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -54,11 +48,6 @@ class BaseMap extends Component {
         // segment
         this.segmentBoxObjArray = []
 
-        // nest data
-        this.pointsDataNest = null
-        this.chinaGeoDataNest = null
-        this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
-
         // legend ref
         this.legendRef = React.createRef()
         this.gradientLegendRef = React.createRef()
@@ -69,36 +58,14 @@ class BaseMap extends Component {
         this.contour_padding_len_unit = -0.007
     }
 
-    onAfterChange = value => {
-        this.setState({
-          inputValue: value,
-        });
-
-    }
-
-    onChange(value) {
-        let name_en = value,
-            name_cn = this.chinaProvincesNameNest[value].provinceName
-
-        this.setState({
-            province_en: name_en,
-            province_cn: name_cn,
-            currGeoData: this.chinaGeoDataNest[name_cn],
-            pointsData: this.pointsDataNest[name_en].values
-        })
-        // console.log(`selected ${name_cn} ${name_en}`);
-    }
-
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
         let _me = this
 
         paper.setup('myCanvas')
 
-
-        //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data_all.csv')])
-
+        Promise
+            .all([fetch("/chinaGeo.geojson"), csv('/religious_data_all.csv')])
             .then(result=>{
                 let response = result[0],
                     religious_data = result[1]
@@ -261,48 +228,83 @@ class BaseMap extends Component {
         return contours
     }
 
-    getInnerBoundaryContours(coordinates, num, r) {
+    getInnerBoundaryContours(coordinates, num, contour_padding_len) {
         console.log('getInnerBoundaryContours coordinates', coordinates);
         
         let contours = [],
-            padding = (this.contour_padding_len / num)
+            padding = (contour_padding_len / num)
         // TODO: calculate the correct contour_padding_len
         this.offset.data(coordinates)
         // const padding = (-1.6/num)
         // HARDCODE 1.89: Api confusion
         // let dist = 0.1/ (num)
-        for(let i=1; i< num+1 ; i++) {
+        let offsetContour = this.offset.offset(padding)
+        this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
 
-            console.log('padding', padding* i)
-            let offsetContour = this.offset.offset(padding* i)
-            console.log('offsetContour', offsetContour)
-            // Set the first contour as clipping_boundary
-            if (i === 1) {
-                this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
+        let paddinged = {
+            type: 'Feature',
+            properties: {
+            },
+            geometry: {
+                type: 'Polygon',
+                coordinates: this.innerBoundaryCoordinates
             }
-
-            let innerBoundaryCoordinates = offsetContour.filter(e => !!e)
-
-            let paddinged = {
-                type: 'Feature',
-                properties: {
-                },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: innerBoundaryCoordinates
-                }
-            }
-            contours.push(paddinged)
         }
+        contours.push(paddinged)
+
+        // for(let i=1; i< num+1 ; i++) {
+
+        //     // console.log('padding', padding* i)
+        //     let offsetContour = this.offset.offset(padding* i)
+        //     // console.log('offsetContour', offsetContour)
+        //     // Set the first contour as clipping_boundary
+        //     if (i === 1) {
+        //         this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
+        //     }
+
+        //     let innerBoundaryCoordinates = offsetContour.filter(e => !!e)
+
+        //     let paddinged = {
+        //         type: 'Feature',
+        //         properties: {
+        //         },
+        //         geometry: {
+        //             type: 'Polygon',
+        //             coordinates: innerBoundaryCoordinates
+        //         }
+        //     }
+        //     contours.push(paddinged)
+        // }
 
         return contours
+    }
+
+    getCoordinatesFromRect(rect){
+        let temp = [],
+            p0 = [rect.x, rect.y],
+            p1 = [rect.x + rect.width, rect.y],
+            p2 = [rect.x + rect.width, rect.y + rect.height],
+            p3 = [rect.x, rect.y + rect.height]
+
+        return [].concat(p0, p1, p2, p3, p0)
+    }
+
+    drawOneMap(map_data){
+        let coordinates = this.getCoordinatesFromRect(map_data.rect_matrix)
+
+        let [circleAry, segPolyList, strPath] = getDensity(
+            select("#myCanvas"),
+            coordinates,
+            setSegNumb)
+
+        // TODO: 
     }
 
     componentDidUpdate(prevPros, prevState){
         let _me = this
 
         if(prevState.currGeoData !== this.state.currGeoData){
-            console.log('autoProjection.scale', _me.autoProjection.scale())
+
             _me.autoProjection.fitExtent([
                 [this.svgMargin / 2, this.svgMargin / 2],
                 [this.svg_w - this.svgMargin / 2 , this.svg_h - this.svgMargin / 2]
@@ -556,61 +558,61 @@ class BaseMap extends Component {
         // define province shapes with chinaGeoData
         let getRegionElements =() =>{
 
-            let inscribledCircles
-            if(this.state.inscribledCircles) {
+            // let inscribledCircles
+            // if(this.state.inscribledCircles) {
 
-                inscribledCircles = this.state.inscribledCircles.map((d,i) => {
+            //     inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-                    if (i % 100 === 0){
-                        return (
-                            <circle
-                            key = {`inscribledCircles-${i}`}
-                            cx = {d.centerX }
-                            cy = {d.centerY}
-                        //  r =  {0.1}// only plot the centers
-                            r = {d.radius}
-                            stroke = "#000"
-                            fill = "none"
-                            strokeWidth = ".1"
-                            />
-                        )
-                    }
-                })
-            }
+            //         if (i % 100 === 0){
+            //             return (
+            //                 <circle
+            //                 key = {`inscribledCircles-${i}`}
+            //                 cx = {d.centerX }
+            //                 cy = {d.centerY}
+            //             //  r =  {0.1}// only plot the centers
+            //                 r = {d.radius}
+            //                 stroke = "#000"
+            //                 fill = "none"
+            //                 strokeWidth = ".1"
+            //                 />
+            //             )
+            //         }
+            //     })
+            // }
 
-            let segPoly
-            if(this.state.segPolyList) {
-                segPoly = this.state.segPolyList.map((d, i) => {
+            // let segPoly
+            // if(this.state.segPolyList) {
+            //     segPoly = this.state.segPolyList.map((d, i) => {
 
-                    let pathStr = this.getLinePathStr(d)
+            //         let pathStr = this.getLinePathStr(d)
 
-                    return (
-                        <path
-                        key = {`path-${i}`}
-                        className = {`Segment-${i}`}
-                        d = {pathStr}
-                        stroke = "#12f6a2"
-                        strokeWidth = "0.1"
-                        fill = 'none'
-                        />
-                    )
-                })
-            }
+            //         return (
+            //             <path
+            //             key = {`path-${i}`}
+            //             className = {`Segment-${i}`}
+            //             d = {pathStr}
+            //             stroke = "#12f6a2"
+            //             strokeWidth = "0.1"
+            //             fill = 'none'
+            //             />
+            //         )
+            //     })
+            // }
 
-            let linePts
-            if (this.state.linePts) {
-              linePts = this.state.linePts.map((d,i) => {
-                  return (
-                  <circle
-                  key = {`dot-${ i }`}
-                  cx = { d[0]}
-                  cy = { d[1]}
-                  fill = "#33ff22"
-                  r = "2"
-                  />
-                  )
-              })
-            }
+            // let linePts
+            // if (this.state.linePts) {
+            //   linePts = this.state.linePts.map((d,i) => {
+            //       return (
+            //       <circle
+            //       key = {`dot-${ i }`}
+            //       cx = { d[0]}
+            //       cy = { d[1]}
+            //       fill = "#33ff22"
+            //       r = "2"
+            //       />
+            //       )
+            //   })
+            // }
 
             /* Map segments and belt segments (denoted as boundary_segments)
             With this.state.segments and this.state.segmentBoxObjArray data
@@ -618,7 +620,6 @@ class BaseMap extends Component {
                     - boundarySegmentCoordinate
                     - dotCount (dots amount per segment)
             */
-            
 
             let cells0,cells1,cells2
             if(this.state.cellObjArr){
@@ -670,11 +671,11 @@ class BaseMap extends Component {
             No longer necessary for Phoenix map based algorithm
             Therefore, changed to simplifiedArea in this branch
              */
-            let simplified_Outboundary
-            if( this.state.simplifiedArea ) {
-                simplified_Outboundary = MapColor(this.state.simplifiedArea, 1, geoPath().projection(this.autoProjection), 'transparent', 'outBoundary' )
+            // let simplified_Outboundary
+            // if( this.state.simplifiedArea ) {
+            //     simplified_Outboundary = MapColor(this.state.simplifiedArea, 1, geoPath().projection(this.autoProjection), 'transparent', 'outBoundary' )
 
-            }
+            // }
 
             let simplified_contours
             if(this.state.simplifiedContours){
@@ -696,7 +697,7 @@ class BaseMap extends Component {
                 // cells1,
                 // cells2,
                 // segPoly,
-                inscribledCircles,
+                // inscribledCircles,
                 // linePts,
                 simplified_contours
             ]
@@ -716,32 +717,10 @@ class BaseMap extends Component {
             )
         })
 
-        let options = []
-        chinaProvincesName.forEach((e, i)=>{
-            options.push(
-                <Option value={e.provincePhonetic} key={`province-${i}`}>{e.provinceName}</Option>
-            )
-        })
-
         return (
             <div>
                 <div className="Control">
-                    <h3>Basemap</h3>
-
-                    <Select
-                        showSearch
-                        style={{ width: 200 }}
-                        placeholder="Select a province"
-                        optionFilterProp="children"
-                        onChange={this.onChange.bind(this)}
-                        defaultValue={this.state.province_en}
-                        filterOption={(input, option) =>
-                            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                        }
-                    >
-                        { options }
-                    </Select>
-
+                    <h1>12 Training Maps</h1>
                 </div>
                 <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
                     <g className="Regions">

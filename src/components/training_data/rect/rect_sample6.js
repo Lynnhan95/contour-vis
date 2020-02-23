@@ -8510,3 +8510,5 @@ const dots = [
     "y": 174.42003381256234
   }
 ]
+
+export default {rect_matrix, dots}

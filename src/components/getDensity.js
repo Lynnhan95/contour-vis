@@ -77,7 +77,7 @@ export function getDensity(svg, pts_ary, segment_num) {
       centerX: result[1],
       centerY: result[2]
     }
-    getBigestCircle(circle)
+    
     dictAllmin1Q.push(circle)
   }
 
@@ -90,7 +90,7 @@ export function getDensity(svg, pts_ary, segment_num) {
       centerX: result[1],
       centerY: result[2]
     }
-    getBigestCircle(circle)
+    
     dictAllmin2Q.push(circle)
   }
 
@@ -103,7 +103,7 @@ export function getDensity(svg, pts_ary, segment_num) {
       centerX: result[1],
       centerY: result[2]
     }
-    getBigestCircle(circle)
+    
     dictAllmin3Q.push(circle)
   }
 
@@ -116,7 +116,7 @@ export function getDensity(svg, pts_ary, segment_num) {
       centerX: result[1],
       centerY: result[2]
     }
-    getBigestCircle(circle)
+    
     dictAllmin4Q.push(circle)
   }
 
@@ -170,7 +170,7 @@ export function getDensity(svg, pts_ary, segment_num) {
   */
 
 
-  return [dictAllmin, segPolyList, strPath, bigest_circle];
+  return [dictAllmin, segPolyList, strPath];
 
 }
 
