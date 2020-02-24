@@ -802,9 +802,7 @@ class BaseMap extends Component {
                 <div id="svg_list">
 
                 </div>
-                <div>
-                    { Heatmap}
-                </div>
+                { Heatmap }
             </div>
         )
     }

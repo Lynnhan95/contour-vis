@@ -11,6 +11,7 @@
     "d3-polygon": "^1.0.6",
     "d3-svg-legend": "^2.25.6",
     "flo-mat": "^1.0.4",
+    "heatmap.js": "^2.0.5",
     "heatmapjs": "^2.0.2",
     "hull.js": "^1.0.0",
     "lodash.keyby": "^4.6.0",
