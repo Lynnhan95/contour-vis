@@ -1,17 +1,7 @@
 
-### other provience:
-1. Hebei:
+### Training Map:
 
-![even_points](./src/assets/aurora1.jpg)
+> 方的需要：1，2，4，7，9，19;
 
-2. Jiangxi:
+> 圆的需要：1，3，5，7，8，9;
 
-![even_points](./src/assets/aurora2.jpg)
-
-3. Xizang:
-
-![even_points](./src/assets/aurora3.jpg)
-
-4. Xinjiang:
-
-![even_points](./src/assets/aurora4.jpg)
