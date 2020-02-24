@@ -19,7 +19,7 @@ let intersection2 = orInsidept_large_second.filter(d => !orInsidept_small_second
 let intersection = intersection1.concat(intersection2)
 /* data
 */
-const rect_matrix = { x:400, y:120, width: 400, height: 300 }
+const matrix = { x:400, y:120, width: 400, height: 300 }
 const dots = 
 [
   {
@@ -7875,3 +7875,4 @@ const dots =
     "y": 162
   }
 ]
+export default {matrix, dots}

@@ -14,7 +14,7 @@ import {getBeltSeg} from './getBeltSeg.js'
 import "./style.css"
 import keyBy from 'lodash.keyby'
 
-import rect_sample1 from './training_data/rect/rect_sample1.js'
+import rect_sample2 from './training_data/rect/rect_sample2.js'
 import circle_sample1 from './training_data/circle/circle_sample1.js'
 
 const setSegNumb = 1000
@@ -80,7 +80,8 @@ class BaseMap extends Component {
         /**
          * Start draw
          */
-        _me.drawOneMap(rect_sample1, 'rect')
+        _me.drawOneMap(rect_sample2, 'rect')
+      
         // _me.drawOneMap(circle_sample1, 'circle')
 
         // Promise
@@ -205,6 +206,7 @@ class BaseMap extends Component {
     }
 
     drawOneMap(map_data, type){
+        console.log(map_data)
         let matrix = map_data.matrix
 
         // create a new svg
@@ -611,27 +613,25 @@ class BaseMap extends Component {
         // define province shapes with chinaGeoData
         let getRegionElements =() =>{
 
-            // let inscribledCircles
-            // if(this.state.inscribledCircles) {
+            let inscribledCircles
+            if(this.state.inscribledCircles) {
+                console.log('inscribledCircles')
+                inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-            //     inscribledCircles = this.state.inscribledCircles.map((d,i) => {
-
-            //         if (i % 100 === 0){
-            //             return (
-            //                 <circle
-            //                 key = {`inscribledCircles-${i}`}
-            //                 cx = {d.centerX }
-            //                 cy = {d.centerY}
-            //             //  r =  {0.1}// only plot the centers
-            //                 r = {d.radius}
-            //                 stroke = "#000"
-            //                 fill = "none"
-            //                 strokeWidth = ".1"
-            //                 />
-            //             )
-            //         }
-            //     })
-            // }
+                        return (
+                            <circle
+                            key = {`inscribledCircles-${i}`}
+                            cx = {d.centerX }
+                            cy = {d.centerY}
+                        //  r =  {0.1}// only plot the centers
+                            r = {d.radius}
+                            stroke = "#000"
+                            fill = "none"
+                            strokeWidth = ".1"
+                            />
+                        )
+                })
+            }
 
             // let segPoly
             // if(this.state.segPolyList) {
@@ -676,6 +676,7 @@ class BaseMap extends Component {
 
             let cells0,cells1,cells2
             if(this.state.cellObjArr){
+                console.log('inscribledCircles')
                 cells0 = this.state.cellObjArr.map((d, i) => {
                     let pathStr0 = this.getLinePathStr(d.coor)
                       return (
@@ -685,6 +686,7 @@ class BaseMap extends Component {
                           d = {pathStr0}
                           //fill = '#f00'
                           fill = {this.color_scale(d.dens)}
+
                           />
                       )
 
@@ -750,7 +752,7 @@ class BaseMap extends Component {
                 // cells1,
                 // cells2,
                 // segPoly,
-                // inscribledCircles,
+                inscribledCircles,
                 // linePts,
                 simplified_contours
             ]

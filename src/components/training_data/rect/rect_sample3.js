@@ -1,4 +1,4 @@
-    const rect_matrix = { x:350, y:300, width: 400, height: 300 }
+    const matrix = { x:350, y:300, width: 400, height: 300 }
     const dots = 
     [
   {

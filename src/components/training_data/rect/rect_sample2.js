@@ -1,6 +1,6 @@
-    const rect_matrix = { x:550, y:500, width: 400, height: 300 }
-    const dots = 
-    [
+const matrix = { x:550, y:500, width: 400, height: 300 }
+const dots = 
+[
   {
     "x": 809.1742434627288,
     "y": 554.080695396425
@@ -7150,3 +7150,5 @@
     "y": 763.9722861272758
   }
 ]
+
+export default {matrix, dots}

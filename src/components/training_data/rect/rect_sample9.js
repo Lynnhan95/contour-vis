@@ -5,7 +5,7 @@
     var orInsidept  = orInsidept1.concat(orInsidept2)
 /* data
 */
-    const rect_matrix = { x:360, y:120, width: 400, height: 300 }
+    const matrix = { x:360, y:120, width: 400, height: 300 }
     const dots = 
     [
   {
@@ -26621,3 +26621,5 @@
     "y": 232.3759490831836
   }
 ]
+
+export default {matrix, dots}

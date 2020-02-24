@@ -1,4 +1,4 @@
-    const rect_matrix = { x:360, y:110, width: 400, height: 300 }
+    const matrix = { x:360, y:110, width: 400, height: 300 }
     const dots = 
     [
   {
@@ -8610,3 +8610,5 @@
     "y": 145.57290925786222
   }
 ]
+
+export default {matrix, dots}
