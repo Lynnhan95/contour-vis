@@ -13,6 +13,7 @@ import {getNewSeg} from './getNewSeg.js'
 import {getBeltSeg} from './getBeltSeg.js'
 import "./style.css"
 import keyBy from 'lodash.keyby'
+import HeatMap from './heatmap.js'
 
 import rect_sample2 from './training_data/rect/rect_sample2.js'
 import circle_sample1 from './training_data/circle/circle_sample1.js'
@@ -771,6 +772,9 @@ class BaseMap extends Component {
             />
             )
         })
+        let Heatmap = <HeatMap data = {this.state.heatmapPointData}/>
+                
+
 
         return (
             <div>
@@ -797,6 +801,9 @@ class BaseMap extends Component {
                 </svg>
                 <div id="svg_list">
 
+                </div>
+                <div>
+                    { Heatmap}
                 </div>
             </div>
         )
