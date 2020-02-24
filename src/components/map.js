@@ -15,11 +15,11 @@ import "./style.css"
 import keyBy from 'lodash.keyby'
 import HeatMap from './heatmap.js'
 
-import rect_sample2 from './training_data/rect/rect_sample2.js'
+import rect_sample9 from './training_data/rect/rect_sample9.js'
 import circle_sample1 from './training_data/circle/circle_sample1.js'
 
 const setSegNumb = 1000
-const slidingBins = 50
+const slidingBins = 8
 
 
 // global varibales:
@@ -81,7 +81,7 @@ class BaseMap extends Component {
         /**
          * Start draw
          */
-        _me.drawOneMap(rect_sample2, 'rect')
+        _me.drawOneMap(rect_sample9, 'rect')
       
         // _me.drawOneMap(circle_sample1, 'circle')
 
@@ -209,15 +209,23 @@ class BaseMap extends Component {
     drawOneMap(map_data, type){
         console.log(map_data)
         let matrix = map_data.matrix
-
+        const dot_margin = 30
         // create a new svg
         let svg = this.svg_list.append('svg')
+        let svg_dot = this.svg_list.append('svg')
+                            
         switch (type) {
             case 'rect':
                 svg
                     .attr('width', matrix.width)
                     .attr('height', matrix.height)
                     .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                svg_dot
+                    .attr('width', matrix.width)
+                    .attr('height', matrix.height)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                    .attr('class', 'svg_dot')
+
                 break;
 
             case 'circle':
@@ -328,12 +336,41 @@ class BaseMap extends Component {
         })
 
         points.map((d, i) => {
-            svg.append('circle')
+            svg_dot.append('circle')
                 .attr('cx', d[0])
                 .attr('cy', d[1])
                 .attr('fill', '#be62d5')
                 .attr('r', '.5')
         })
+
+        let pos_arr = this.getPointsArrFromMatrix(rect_sample9.matrix)
+        let lineStr = this.getLinePathStr(pos_arr)
+        console.log(pos_arr, lineStr)
+
+        svg_dot.append('path')
+                .attr('class', 'outline')
+                .attr('d', lineStr)
+                .attr('stroke', "#000")
+                .attr('fill', 'none')
+
+        // circleAry.map((d, i) => {
+        //     if ( i % 10 == 0 ) {
+        //         console.log(d)
+        //         svg.append('circle')
+        //             .attr('cx', d.centerX)
+        //             .attr('cy', d.centerY)
+        //             .attr('stroke', "#000")
+        //             .attr('fill', 'none')
+        //             .attr('r', d.radius)
+        //     }
+
+        // })
+
+        // svg.append('path')
+        //     .attr('class', 'outline')
+        //     .attr('d', lineStr)
+        //     .attr('stroke', "#000")
+
 
         // newSegPolyList.map((d=>{
         //     svg.append('path')
@@ -407,7 +444,7 @@ class BaseMap extends Component {
             let simplifiedAreaProjected = simplified_coordinates.map((d)=> {return this.autoProjection(d)})
 
             let [circleAry,segPolyList,strPath] = getDensity(select("#mySvg"),simplifiedAreaProjected,setSegNumb)
-            
+            console.log(circleAry)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             let newSegPolyList = []
@@ -493,7 +530,8 @@ class BaseMap extends Component {
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if (prevState.subSegList !== this.state.subSegList) {
-            //console.log('pointsData update', this.state.subSegList)
+
+
             var pointsDataProjected = this.state.pointsData.map((e) => {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
@@ -609,6 +647,15 @@ class BaseMap extends Component {
         })
         return path_str.join(' ')
     }
+    getPointsArrFromMatrix = (matrix) => {
+        let pos_arr = [] 
+        pos_arr.push([matrix.x, matrix.y])
+        pos_arr.push([matrix.x + matrix.width, matrix.y])
+        pos_arr.push([matrix.x + matrix.width, matrix.y + matrix.height])
+        pos_arr.push([matrix.x, matrix.y + matrix.height])
+        pos_arr.push([matrix.x, matrix.y])
+        return pos_arr
+       }
 
     render() {
         // define province shapes with chinaGeoData
@@ -616,7 +663,7 @@ class BaseMap extends Component {
 
             let inscribledCircles
             if(this.state.inscribledCircles) {
-                console.log('inscribledCircles')
+                console.log(this.state.inscribledCircles)
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
                         return (
@@ -633,6 +680,7 @@ class BaseMap extends Component {
                         )
                 })
             }
+
 
             // let segPoly
             // if(this.state.segPolyList) {
@@ -772,7 +820,7 @@ class BaseMap extends Component {
             />
             )
         })
-        let Heatmap = <HeatMap data = {this.state.heatmapPointData}/>
+        let Heatmap = <HeatMap data = {rect_sample9}/>
                 
 
 
@@ -800,9 +848,12 @@ class BaseMap extends Component {
                     <path id="calc_path"></path>
                 </svg>
                 <div id="svg_list">
-
+                    <div className="heatmapContainer">
+                        { Heatmap }
+                    </div>
                 </div>
-                { Heatmap }
+
+
             </div>
         )
     }

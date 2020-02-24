@@ -1,8 +1,8 @@
 /* normal grid
 */
-    var orInsidept1 = getGrid2([350, 120], 300, "normal", 5.2, false)
-    var orInsidept2 = getGrid([400, 120], 400, "leftSkewed", 5)
-    var orInsidept  = orInsidept1.concat(orInsidept2)
+    // var orInsidept1 = getGrid2([350, 120], 300, "normal", 5.2, false)
+    // var orInsidept2 = getGrid([400, 120], 400, "leftSkewed", 5)
+    // var orInsidept  = orInsidept1.concat(orInsidept2)
 /* data
 */
     const matrix = { x:360, y:120, width: 400, height: 300 }

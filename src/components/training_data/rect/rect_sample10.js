@@ -1,22 +1,22 @@
     
 /* normal grid
 */
-const rect_matrix = { x:400, y:120, width: 400, height: 300 }
-const rect_margin = { x:30, y:40 }
+// const rect_matrix = { x:400, y:120, width: 400, height: 300 }
+// const rect_margin = { x:30, y:40 }
 
-var orInsidept1 = getGrid2([350, 120], 800, "normal", 10, false)
-var orInsidept2 = getGrid2([350, 120], 800,  "normal", 18, false)
-var orInsidept  = orInsidept1.concat(orInsidept2)
+// var orInsidept1 = getGrid2([350, 120], 800, "normal", 10, false)
+// var orInsidept2 = getGrid2([350, 120], 800,  "normal", 18, false)
+// var orInsidept  = orInsidept1.concat(orInsidept2)
 
-orInsidept_large = getPointsInsideRect(rect_matrix.x, rect_matrix.y, width=rect_matrix.width, height=rect_matrix.height, orInsidept1)
-orInsidept_small = getPointsInsideRect(rect_matrix.x + rect_margin.x, rect_matrix.y + rect_margin.y, width=rect_matrix.width - 2*rect_margin.x, height=rect_matrix.height- 2*rect_margin.y, orInsidept1)
+// orInsidept_large = getPointsInsideRect(rect_matrix.x, rect_matrix.y, width=rect_matrix.width, height=rect_matrix.height, orInsidept1)
+// orInsidept_small = getPointsInsideRect(rect_matrix.x + rect_margin.x, rect_matrix.y + rect_margin.y, width=rect_matrix.width - 2*rect_margin.x, height=rect_matrix.height- 2*rect_margin.y, orInsidept1)
 
-orInsidept_large_second = getPointsInsideRect(rect_matrix.x + rect_margin.x, rect_matrix.y + rect_margin.y, width=rect_matrix.width - rect_margin.x, height=rect_matrix.height- rect_margin.y, orInsidept2)
-orInsidept_small_second = getPointsInsideRect(rect_matrix.x + 2* rect_margin.x, rect_matrix.y + 2* rect_margin.y, width=rect_matrix.width - 4*rect_margin.x, height=rect_matrix.height- 4*rect_margin.y, orInsidept2)
+// orInsidept_large_second = getPointsInsideRect(rect_matrix.x + rect_margin.x, rect_matrix.y + rect_margin.y, width=rect_matrix.width - rect_margin.x, height=rect_matrix.height- rect_margin.y, orInsidept2)
+// orInsidept_small_second = getPointsInsideRect(rect_matrix.x + 2* rect_margin.x, rect_matrix.y + 2* rect_margin.y, width=rect_matrix.width - 4*rect_margin.x, height=rect_matrix.height- 4*rect_margin.y, orInsidept2)
 
-let intersection1 = orInsidept_large.filter(d => !orInsidept_small.includes(d))
-let intersection2 = orInsidept_large_second.filter(d => !orInsidept_small_second.includes(d))
-let intersection = intersection1.concat(intersection2)
+// let intersection1 = orInsidept_large.filter(d => !orInsidept_small.includes(d))
+// let intersection2 = orInsidept_large_second.filter(d => !orInsidept_small_second.includes(d))
+// let intersection = intersection1.concat(intersection2)
 /* data
 */
 const matrix = { x:400, y:120, width: 400, height: 300 }

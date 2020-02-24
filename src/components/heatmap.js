@@ -1,11 +1,16 @@
 import React, {useEffect} from "react";
 import h337 from "heatmap.js";
 // import {sampleData} from './sampleData.js'
-import rect_sample2 from './training_data/rect/rect_sample2.js'
+// import sampleData from './training_data/rect/sampleData.js'
+import './style.css'
 
 function HeatMap(props) {
 
-        console.log('heatmap')
+        const sampleData = props.data
+        // sample2 
+        // const transform_matrix = {x: -120, y: -420}
+        // sample9 && sample10
+        const transform_matrix = {x: -120, y: -70}
         useEffect(() => {
 
         var heatmapInstance = h337.create({
@@ -26,10 +31,11 @@ function HeatMap(props) {
 
    const getPointsArrFromMatrix = (matrix) => {
     let pos_arr = [] 
-    pos_arr.push([matrix.x, matrix.y])
-    pos_arr.push([matrix.x + matrix.width, matrix.y])
-    pos_arr.push([matrix.x + matrix.width, matrix.y + matrix.height])
-    pos_arr.push([matrix.x, matrix.y + matrix.height])
+    pos_arr.push([matrix.x + transform_matrix.x, matrix.y + transform_matrix.y])
+    pos_arr.push([matrix.x + matrix.width + transform_matrix.x, matrix.y + transform_matrix.y])
+    pos_arr.push([matrix.x + matrix.width + transform_matrix.x, matrix.y + matrix.height + transform_matrix.y])
+    pos_arr.push([matrix.x + transform_matrix.x, matrix.y + matrix.height + transform_matrix.y])
+    pos_arr.push([matrix.x + transform_matrix.x, matrix.y + transform_matrix.y])
     return pos_arr
    }
 
@@ -45,32 +51,39 @@ function HeatMap(props) {
     return path_str.join(' ')
   }
 
-  let pos_arr = getPointsArrFromMatrix(rect_sample2.matrix)
+  let pos_arr = getPointsArrFromMatrix(sampleData.matrix)
   let lineStr = getLinePathStr(pos_arr)
   console.log(pos_arr, lineStr)
 
   // if you have a set of datapoints always use setData instead of addData
   // for data initialization
-  let sample = rect_sample2.dots.map((d,i) => {
+  let sample = sampleData.dots.map((d,i) => {
     return {
-      "x": parseInt(d.x),
-      "y": parseInt(d.y),
-      "value": 15
+      "x": parseInt(d.x + transform_matrix.x),
+      "y": parseInt(d.y + transform_matrix.y),
+      "value": 1
     }
   })
   const data = {
-    max: 15,
+    max: 20,
     data: sample
   }
+  console.log(data)
   heatmapInstance.setData(data);
   let canvas = document.querySelector('.heatmap-canvas')
 
   let ctx = canvas.getContext('2d')
+  // console.log(ctx)
+
   ctx.fillStyle = 'purple';
   data.data.forEach((d,i) => {
+    // console.log(d.x, d.y)
     ctx.beginPath();
     ctx.arc(d.x, d.y, 0.5, 0, 2 * Math.PI);
     ctx.fill();
+    // ctx.beginPath();
+    // ctx.arc(800, 550, 50, 0, 2 * Math.PI);
+    // ctx.stroke();
   })
 
 //   let splitStr = lineStr.match(/<path\b([\s\S]*?)\/>/g)

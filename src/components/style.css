@@ -2,3 +2,16 @@
     width: 30%;
     margin: 0 auto
 }
+
+.heatmap-canvas {
+    height: 100vh
+}
+
+.heatmapContainer {
+    width: 100vw;
+    height: 50vh
+}
+
+.svg_dot {
+    margin-left: 1em
+}
