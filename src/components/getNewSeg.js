@@ -1,19 +1,12 @@
-import polygonClipping from 'polygon-clipping'
+// import polygonClipping from 'polygon-clipping'
 import {Point,Path} from 'paper'
 
-export function getNewSeg(segPoly, strPath ,index) {
+export function getNewSeg(segPoly, strPath, index) {
 
     var polyPath = new Path(strPath);
     var segPath1 = new Path();
     var segPath2 = new Path();
 
-    //
-    // for (var i = 0; i < clip_boundary.length; i++) {
-    //   var temp_point = new Point (clip_boundary[i][0],clip_boundary[i][1])
-    //   polyPath.add (temp_point)
-    // }
-    //
-    //
 
     var ptC1 = new Point (segPoly[3][0],segPoly[3][1])
     var ptC2 = new Point (segPoly[2][0],segPoly[2][1])
@@ -31,15 +24,22 @@ export function getNewSeg(segPoly, strPath ,index) {
     let newPt2 = interSect2[0]
     if(!newPt2) {
       console.log(index, segPoly)
+    }else{
+
     }
 
     let newAry = []
     newAry.push(segPoly[3])
     newAry.push(segPoly[2])
-    newAry.push([newPt1.point.x,newPt1.point.y])
-    newAry.push([newPt2.point.x,newPt2.point.y])
+    newAry.push([newPt2.point.x, newPt2.point.y])
+    newAry.push([newPt1.point.x, newPt1.point.y])
 
+    return newAry
 
-    return ([segPoly[3],segPoly[2],[interSect2[0].point.x,interSect2[0].point.y], [interSect1[0].point.x,interSect1[0].point.y]]);
-    // return polygonClipping.intersection([segPoly], [clip_boundary])[0][0]
+    // return ([
+    //   segPoly[3],
+    //   segPoly[2],
+    //   [newPt2.point.x, newPt2.point.y], 
+    //   [newPt1.point.x, newPt1.point.y]
+    // ])
 }

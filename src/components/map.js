@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv, extent, select, nest, scaleLinear, polygonCentroid } from 'd3'
+import { csv, extent, select, nest, scaleLinear, path } from 'd3'
 import { legendColor } from 'd3-svg-legend'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -14,9 +14,10 @@ import {getBeltSeg} from './getBeltSeg.js'
 import "./style.css"
 import keyBy from 'lodash.keyby'
 
-import {rect_matrix, dots} from './training_data/rect/rect_sample6.js'
+import rect_sample1 from './training_data/rect/rect_sample1.js'
+import circle_sample1 from './training_data/circle/circle_sample1.js'
 
-const setSegNumb = 5000
+const setSegNumb = 1000
 const slidingBins = 50
 
 
@@ -33,13 +34,16 @@ class BaseMap extends Component {
             segment_path_len: 0.1,
             simplifiedContours: null,
 
-            segmentBoxObjArray: null
+            segmentBoxObjArray: null,
+
+            // New
+            rect1_cells: null
         }
 
         this.svgMargin = 50;
         this.autoProjection = geoMercator()
-        this.svg_w = 960
-        this.svg_h = 600
+        this.svg_w = 400
+        this.svg_h = 300
 
         // offset
         this.offset = new Offset()
@@ -56,60 +60,75 @@ class BaseMap extends Component {
         this.contour_num = 5
         this.contour_padding_len = -4.2
         this.contour_padding_len_unit = -0.007
+
+
+        // New
+        this.svg_list = null
     }
 
     /* when component will mount, fetch geojson and csv data locally */
     componentDidMount(){
         let _me = this
 
-        paper.setup('myCanvas')
+        paper.setup('mySvg')
 
-        Promise
-            .all([fetch("/chinaGeo.geojson"), csv('/religious_data_all.csv')])
-            .then(result=>{
-                let response = result[0],
-                    religious_data = result[1]
+        /**
+         * prepare
+         */
+        this.svg_list = select('#svg_list')
 
-                /**
-                 * religious_data
-                 */
-                religious_data.forEach(d => {
-                    d["id"] = +d["id"];
-                    d["Latitude"] = +d["Latitude"]
-                    d["Longitude"] = +d["Longitude"]
-                    d["year"] = +d["year"]
-                })
-                let entries = nest()
-                    .key(d=>d.province)
-                    .entries(religious_data)
+        /**
+         * Start draw
+         */
+        _me.drawOneMap(rect_sample1, 'rect')
+        // _me.drawOneMap(circle_sample1, 'circle')
 
-                let entriesObj = keyBy(entries, d=>d.key)
+        // Promise
+        //     .all([fetch("/chinaGeo.geojson"), csv('/religious_data_all.csv')])
+        //     .then(result=>{
+        //         let response = result[0],
+        //             religious_data = result[1]
 
-                _me.pointsDataNest = entriesObj
+        //         /**
+        //          * religious_data
+        //          */
+        //         religious_data.forEach(d => {
+        //             d["id"] = +d["id"];
+        //             d["Latitude"] = +d["Latitude"]
+        //             d["Longitude"] = +d["Longitude"]
+        //             d["year"] = +d["year"]
+        //         })
+        //         let entries = nest()
+        //             .key(d=>d.province)
+        //             .entries(religious_data)
 
-                /**
-                 * chinaGeo
-                 */
-                response.json().then(chinaGeoData => {
-                    // this.autoProjection = geoMercator().fitExtent([[this.svgMargin*3, this.svgMargin*3],[this.svg_w- this.svgMargin*3 , this.svg_h-this.svgMargin*3]], chinaGeoData)
+        //         let entriesObj = keyBy(entries, d=>d.key)
 
-                    let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
+        //         _me.pointsDataNest = entriesObj
 
-                    _me.chinaGeoDataNest = featuresObj
+        //         /**
+        //          * chinaGeo
+        //          */
+        //         response.json().then(chinaGeoData => {
+        //             // this.autoProjection = geoMercator().fitExtent([[this.svgMargin*3, this.svgMargin*3],[this.svg_w- this.svgMargin*3 , this.svg_h-this.svgMargin*3]], chinaGeoData)
 
-                    // console.log('Promise currGeoData', _me.chinaGeoDataNest);
+        //             let featuresObj = keyBy(chinaGeoData.features, d=>d.properties.name)
 
-                    _me.setState ({
-                        chinaGeoData: chinaGeoData.features,
-                        currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
-                        pointsData: _me.pointsDataNest[_me.state.province_en].values
-                    })
-                })
+        //             _me.chinaGeoDataNest = featuresObj
 
-            })
-            .catch(error=>{
-                //console.error(error)
-            })
+        //             // console.log('Promise currGeoData', _me.chinaGeoDataNest);
+
+        //             _me.setState ({
+        //                 chinaGeoData: chinaGeoData.features,
+        //                 currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
+        //                 pointsData: _me.pointsDataNest[_me.state.province_en].values
+        //             })
+        //         })
+
+        //     })
+        //     .catch(error=>{
+        //         //console.error(error)
+        //     })
     }
 
     /* Helper function for getting even_point */
@@ -118,114 +137,6 @@ class BaseMap extends Component {
             [x1, y1] = point2
 
         return Math.sqrt((x0 - x1)*(x0 - x1) + (y0 - y1)*(y0 - y1))
-    }
-
-    getEvenPointsFromCoordinates(coordinates, segment_len) {
-        let _me = this,
-            total_len = coordinates.length,
-            remain_len = 0,
-            result = []
-
-        coordinates.forEach((e, i)=>{
-            let curr_point, next_point
-
-            if(i === total_len - 1){
-                curr_point = coordinates[total_len - 1]
-                next_point = coordinates[0]
-            }else{
-                curr_point = coordinates[i]
-                next_point = coordinates[++i]
-            }
-
-            let dis = _me.calcDistanceFromTwoPoints(curr_point, next_point),
-                curr_len = remain_len + dis
-
-            if(curr_len < segment_len){
-                remain_len += dis
-            }else{
-                let start_len = segment_len - remain_len,
-                    point_num = Math.floor(curr_len / segment_len),
-                    thetaX = next_point[0] - curr_point[0],
-                    thetaY = next_point[1] - curr_point[1]
-
-                for (let i = 0; i < point_num; i++) {
-                    let temp = []
-
-                    temp[0] = curr_point[0] + (start_len + i * segment_len) / dis * thetaX
-                    temp[1] = curr_point[1] + (start_len + i * segment_len) / dis * thetaY
-
-                    result.push(temp)
-                }
-
-                remain_len = curr_len - segment_len * point_num
-            }
-        })
-
-        return result
-    }
-
-    getMedianPointsFromEvenPoint(arr) {
-        let _me = this
-        let MedianPoints = [],
-        A, B
-
-        for (let i = 0; i< arr.length; i++) {
-            if(i === arr.length - 1){
-                A = {
-                    x: arr[arr.length-1][0],
-                    y: arr[arr.length-1][1]
-                }
-                B = {
-                    x: arr[0][0],
-                    y: arr[0][1]
-                }
-            }else{
-                A = {
-                    x: arr[i][0],
-                    y: arr[i][1]
-                }
-                B = {
-                    x: arr[i+1][0],
-                    y: arr[i+1][1]
-                }
-            }
-
-            let M = {
-                x: (B.x + A.x) / 2,
-                y: (B.y + A.y) / 2
-            }
-
-            let median = _me.autoProjection([M.x, M.y])
-            //////console.log(median)
-                MedianPoints.push(median)
-        }
-        return MedianPoints
-
-    }
-
-    getOuterBoundaryContours(coordinates, num) {
-        let contours = []
-        const margin = 0.2
-        for(let i=1; i< num+1; i++) {
-            let offsetContour = new Offset(coordinates).offset(margin* i)
-            if (i == 1) {
-                this.outerBoundaryCoordinates = offsetContour.filter(e => !!e)
-            }
-
-            let outerBoundaryCoordinates = offsetContour.filter(e => !!e)
-            let paddinged = {
-                type: 'Feature',
-                properties: {
-                },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: outerBoundaryCoordinates
-                }
-            }
-            contours.push(paddinged)
-        }
-
-        return contours
     }
 
     getInnerBoundaryContours(coordinates, num, contour_padding_len) {
@@ -241,63 +152,207 @@ class BaseMap extends Component {
         let offsetContour = this.offset.offset(padding)
         this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
 
-        let paddinged = {
-            type: 'Feature',
-            properties: {
-            },
-            geometry: {
-                type: 'Polygon',
-                coordinates: this.innerBoundaryCoordinates
-            }
-        }
-        contours.push(paddinged)
-
-        // for(let i=1; i< num+1 ; i++) {
-
-        //     // console.log('padding', padding* i)
-        //     let offsetContour = this.offset.offset(padding* i)
-        //     // console.log('offsetContour', offsetContour)
-        //     // Set the first contour as clipping_boundary
-        //     if (i === 1) {
-        //         this.innerBoundaryCoordinates = offsetContour.filter(e => !!e)
-        //     }
-
-        //     let innerBoundaryCoordinates = offsetContour.filter(e => !!e)
-
-        //     let paddinged = {
-        //         type: 'Feature',
-        //         properties: {
-        //         },
-        //         geometry: {
-        //             type: 'Polygon',
-        //             coordinates: innerBoundaryCoordinates
-        //         }
-        //     }
-        //     contours.push(paddinged)
-        // }
+        contours.push(this.innerBoundaryCoordinates)
 
         return contours
     }
 
-    getCoordinatesFromRect(rect){
-        let temp = [],
-            p0 = [rect.x, rect.y],
-            p1 = [rect.x + rect.width, rect.y],
-            p2 = [rect.x + rect.width, rect.y + rect.height],
-            p3 = [rect.x, rect.y + rect.height]
+    drawRectPath(shape_data) {
+        let context = path()
 
-        return [].concat(p0, p1, p2, p3, p0)
+        context.rect(shape_data.x, shape_data.y, shape_data.width, shape_data.height)
+      
+        return context
+    }
+      
+    drawCirclePath(shape_data) {
+        let context = path()
+
+        context.arc(shape_data.x + shape_data.r, shape_data.y + shape_data.r, shape_data.r, 0, Math.PI * 2)
+        
+        return context
     }
 
-    drawOneMap(map_data){
-        let coordinates = this.getCoordinatesFromRect(map_data.rect_matrix)
+    getPaddingBoundaryPath(matrix, type){
+        let padding_len = 30,
+            new_matrix = {}
+
+        switch (type) {
+            case 'rect':
+                new_matrix.x = matrix.x + padding_len
+                new_matrix.y = matrix.y + padding_len
+                new_matrix.width = matrix.width - padding_len * 2
+                new_matrix.height = matrix.height - padding_len * 2
+
+                return this.drawRectPath(new_matrix)
+
+            case 'circle':
+                new_matrix.x = matrix.x
+                new_matrix.y = matrix.y
+                new_matrix.r = matrix.r - padding_len
+
+                return this.drawCirclePath(new_matrix)
+        
+            default:
+                break;
+        }
+    }
+
+    pointsObjToArr(points){
+        return points.map(d=>{
+            return [d.x, d.y]
+        })
+    }
+
+    drawOneMap(map_data, type){
+        let matrix = map_data.matrix
+
+        // create a new svg
+        let svg = this.svg_list.append('svg')
+        switch (type) {
+            case 'rect':
+                svg
+                    .attr('width', matrix.width)
+                    .attr('height', matrix.height)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                break;
+
+            case 'circle':
+                svg
+                    .attr('width', matrix.r * 2)
+                    .attr('height', matrix.r * 2)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.r * 2} ${matrix.r * 2}`)
+                break;
+        
+            default:
+                break;
+        }
 
         let [circleAry, segPolyList, strPath] = getDensity(
-            select("#myCanvas"),
-            coordinates,
-            setSegNumb)
+            svg,
+            matrix,
+            setSegNumb,
+            type  // 'rect' or 'circle'
+        )
+        // console.log('TEST strPath', strPath, segPolyList)
+
+        let newSegPolyList = []
+        segPolyList.forEach((d, i) => {
+            let newSegPoly = getNewSeg(d, strPath, i)
+
+            newSegPolyList.push(newSegPoly)
+        })
+        // console.log('newSegPolyList', newSegPolyList)
+
+        /**
+         * divide newSegPoly for count inner points
+        */
+        let subSegList = []
+        let subSegNum = 10 // set how many subsegments we divide each seg
+        newSegPolyList.forEach((d,i) => {
+            let subSeg = interpolateSegment(d, subSegNum)
+
+            subSegList.push(subSeg)
+        })
+        // console.log('subSegList', subSegList)
+
+        /**
+         * calc padding boundary
+         */
+        let clip_boundary = this.getPaddingBoundaryPath(matrix, type)
+        let beltSegList = []
+        segPolyList.forEach((d, i) => {
+            let beltSeg = getBeltSeg(d, strPath, clip_boundary)
+
+            beltSegList.push(beltSeg)
+        })
+        // console.log('beltSegList', beltSegList)
+
+        /**
+         * divide beltSeg for map color
+         */
+        let beltCellList = []
+        beltSegList.forEach((d) => {
+            let subCell = interpolateSegment(d, subSegNum)
+
+            beltCellList.push(subCell)
+        })
+        // console.log('beltCellList', beltCellList)
+
+        /**
+         * Count inner points as density
+         */
+        let points = this.pointsObjToArr(map_data.dots)
+        let [densityGroup, areGroup] = insideCounter(subSegList, beltCellList, points, setSegNumb, slidingBins)
+        // console.log('insideCounter', densityGroup)
+
+        /**
+         * calc drawing cell obj
+         */
+        let cellObjArr = []
+        for(let i=0; i< densityGroup.length; i++) {
+            for(let j=0; j< densityGroup[i].length; j++) {
+                let cellObj = {}
+                cellObj.coor = beltCellList[i][j]
+                cellObj.dens = densityGroup[i][j]
+                cellObjArr.push(cellObj)
+            }
+        }
+
+        /**
+         * calc cell color scale
+         */
+        let cell_extent = extent(cellObjArr, (d)=>{
+            return d.dens
+        })
+        let deltaColor = (cell_extent[1]-cell_extent[0])/9
+        let colors = []
+        for (var i = 0; i < 9; i++) {
+          var temp = cell_extent[0]+i*deltaColor
+          colors.push(temp)
+        }
+
+        let color_scale = scaleLinear()
+            .domain(colors)
+            .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818","#d7191c"])
 
         // TODO: 
+        cellObjArr.map((d, i) => {
+            svg.append('path')
+                .attr('class', `cell-${i}`)
+                .attr('d', this.getLinePathStr(d.coor))
+                .attr('fill', color_scale(d.dens))
+        })
+
+        points.map((d, i) => {
+            svg.append('circle')
+                .attr('cx', d[0])
+                .attr('cy', d[1])
+                .attr('fill', '#be62d5')
+                .attr('r', '.5')
+        })
+
+        // newSegPolyList.map((d=>{
+        //     svg.append('path')
+        //         .attr('class', `cell-${i}`)
+        //         .attr('d', this.getLinePathStr(d))
+        //         .attr('fill', 'none')
+        //         .attr('stroke', '#000')
+        //         .attr('stroke-width', '.1')
+        // }))
+        // subSegList.map((d=>{
+        //     d.map(e=>{
+        //         svg.append('path')
+        //             .attr('class', `cell-${i}`)
+        //             .attr('d', this.getLinePathStr(e))
+        //             .attr('fill', 'none')
+        //             .attr('stroke', '#000')
+        //             .attr('stroke-width', '.1')
+        //     })
+        // }))
+
+        return cellObjArr
+        
     }
 
     componentDidUpdate(prevPros, prevState){
@@ -339,27 +394,25 @@ class BaseMap extends Component {
 
             _me.state.simplifiedArea = simplified_coordinates
 
-            let even_points = _me.getEvenPointsFromCoordinates(simplified_coordinates, 0.05)
+            // let even_points = _me.getEvenPointsFromCoordinates(simplified_coordinates, 0.05)
 
-            let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
+            // let MedianPoints = _me.getMedianPointsFromEvenPoint(even_points)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // convert boundary to path for computing.
             // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
 
             let simplifiedAreaProjected = simplified_coordinates.map((d)=> {return this.autoProjection(d)})
 
-            let [circleAry,segPolyList,strPath, bigest_circle] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
-            console.log('bigest_circle', bigest_circle, _me.autoProjection.scale());
+            let [circleAry,segPolyList,strPath] = getDensity(select("#mySvg"),simplifiedAreaProjected,setSegNumb)
             
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             let newSegPolyList = []
 
-            segPolyList.forEach((d,i) => {
-                let newSegPoly = getNewSeg(d,strPath,i)
+            segPolyList.forEach((d, i) => {
+                let newSegPoly = getNewSeg(d, strPath, i)
 
                 newSegPolyList.push(newSegPoly)
-
             })
 
             //console.log(newSegPolyList)
@@ -379,12 +432,12 @@ class BaseMap extends Component {
             /**
              * Compute inner contours
              */
-            _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplified_coordinates, _me.contour_num, bigest_circle.radius)
+            // _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplified_coordinates, _me.contour_num, 1)
             // console.log('simplifiedContours', _me.state.simplifiedContours)
 /*
         belt
 */
-            console.log('innerBoundaryCoordinates', this.innerBoundaryCoordinates)
+            // console.log('innerBoundaryCoordinates', this.innerBoundaryCoordinates)
             //Compute belt from newSegPolyList
             let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
                 return this.autoProjection(d)
@@ -412,8 +465,8 @@ class BaseMap extends Component {
             this.setState({
                 // rea: mainArea,
                 // simplifiedArea: simplifiedArea,
-                even_points: even_points,
-                MedianPoints: MedianPoints,
+                // even_points: even_points,
+                // MedianPoints: MedianPoints,
                 inscribledCircles :circleAry,
                 linePts : simplifiedAreaProjected,
                 subSegList:subSegList,
@@ -722,7 +775,10 @@ class BaseMap extends Component {
                 <div className="Control">
                     <h1>12 Training Maps</h1>
                 </div>
-                <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
+                <svg 
+                    id="mySvg" width = "1" height = "1" 
+                    viewBox = {`550 100 400 300`}>
+
                     <g className="Regions">
                         {Regions}
                     </g>
@@ -737,7 +793,9 @@ class BaseMap extends Component {
                     </g>
                     <path id="calc_path"></path>
                 </svg>
+                <div id="svg_list">
 
+                </div>
             </div>
         )
     }

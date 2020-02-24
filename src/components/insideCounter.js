@@ -31,14 +31,14 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
             var subSeg = subSegGroup[j]
             var subBeltCell = subBeltGroup[j]
             var counter = 0 // init the counter
-            if (i == 0) {
+            if (i === 0) {
               densityBystripe.push([])
               areaBystripe.push([])
             }
 
             dataPts.forEach((pt, i) => {
-              if (inside(pt,subSeg) == true) {
-                counter ++ ;
+              if (inside(pt, subSeg)) {
+                counter++
               }
             });
 
@@ -63,7 +63,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           areaGroup.push(subAreaGroup)
         }
 
-        for (var i = 0; i < densityBystripe.length; i++) {
+        for (let i = 0; i < densityBystripe.length; i++) {
           let newDensitySub
 
 
@@ -71,7 +71,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
           newDensitySub = slidingCalSum(segNumb,2*slidingNumb,newDensitySub)
           newDensitySub = newDensitySub.map(function(item){
             item = item*scaleFactor;
-            if (item ==0) {item=0.01} ;
+            if (item === 0) {item=0.01} ;
             return item;})
 
 
@@ -81,14 +81,14 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         // refactor back to old structure
 
 
-        for (var i = 0; i < densityGroup.length; i++) {
-          for (var j = 0; j < newDensityGroup.length; j++) {
+        for (let i = 0; i < densityGroup.length; i++) {
+          for (let j = 0; j < newDensityGroup.length; j++) {
             densityGroup[i].push(newDensityGroup[j][i])
           }
         }
 
         let perpenDensity=[];
-        for (var i = 0; i < densityGroup.length; i++) {
+        for (let i = 0; i < densityGroup.length; i++) {
           let result = slidingCalSumPerp(7,densityGroup[i])
           // var j=1
           // while (j < len+1) {
@@ -109,7 +109,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         densityGroup =perpenDensity
 
 
-        console.log(densityGroup);
+        // console.log(densityGroup);
         // we do sliding and average process over here. For index i, it is the stripe of the subsegment
 
 
@@ -149,8 +149,8 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
             var xi = vs[i][0], yi = vs[i][1];
             var xj = vs[j][0], yj = vs[j][1];
 
-            var intersect = ((yi >= y) != (yj >= y))
-                && (x <= (xj - xi) * (y - yi) / (yj - yi) + xi);
+            var intersect = ((yi >= y) !== (yj >= y)) && (x <= (xj - xi) * (y - yi) / (yj - yi) + xi);
+
             if (intersect) inside = !inside;
         }
 

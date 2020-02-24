@@ -1,56 +1,90 @@
 import * as d3 from 'd3';
-import {Point,Path} from 'paper'
-import {insideCounter} from './insideCounter'
+// import {Point,Path} from 'paper'
+// import {insideCounter} from './insideCounter'
 import {roundPathCorners} from './rounding'
 
 /*
 params: points array of boundary
 */
-var bigest_circle = {
-  radius: 0
+// var bigest_circle = {
+//   radius: 0
+// }
+function drawRect(context, shape_data) {
+  context.rect(shape_data.x, shape_data.y, shape_data.width, shape_data.height)
+
+  return context
 }
 
-export function getDensity(svg, pts_ary, segment_num) {
-  /* convert it to path and divide the path
-    init an empty svg for calculating purpose
+function drawCircle(context, shape_data) {
+  context.arc(shape_data.x + shape_data.r, shape_data.y + shape_data.r, shape_data.r, 0, Math.PI * 2)
+
+  return context
+}
+
+export function getDensity(svg, shape_data, segment_num, shape_type) {
+  /** 
+   * convert it to path and divide the path 
+   * init an empty svg for calculating purpose
   */
 
-  var strPath = getLinePathStr(pts_ary)
-  strPath = roundPathCorners(strPath, 0.1, true)
-  console.log(strPath);
-
-  var p = svg.select("#calc_path")
+  /**
+   * TODO: Now, we need draw Rect or Circle shape
+   */
+  // var strPath = getLinePathStr(shape_data)
+  // strPath = roundPathCorners(strPath, 0.1, true)
+  // console.log(strPath);
+  var strPath
+  var shape = svg.append("path")
     .style("fill", "none")
     .style("stroke", "orange")
     .style("stroke-width", "1px")
-    .attr("d", draw(d3.path(), strPath));
+  //   .attr("d", draw(d3.path(), strPath));
 
+  // function draw(context, strPath) {
+  //   var split = strPath.split(/(?=[LMC])/)
+  //   for (var i = 0; i < split.length; i++) {
+  //     let current = split[i]
+  //     current = current.split(" ")
+  //     if (current[0] == "M") {
+  //       context.moveTo(Number(current[1]), Number(current[2]));
+  //     }
+  //     if (current[0] == "L") {
+  //       context.lineTo(Number(current[1]), Number(current[2]))
+  //     }
+  //     if (current[0] == "C") {
+  //       context.bezierCurveTo(Number(current[1]), Number(current[2]), Number(current[3]), Number(current[4]), Number(current[5]), Number(current[6]))
+  //     }
+  //   }
+  //   return context; // not mandatory, but will make it easier to chain operations
+  // }
+  switch (shape_type) {
+    case 'rect':
+      shape.attr('d', drawRect(d3.path(), shape_data))
 
-  function draw(context, strPath) {
-    var split = strPath.split(/(?=[LMC])/)
-    for (var i = 0; i < split.length; i++) {
-      let current = split[i]
-      current = current.split(" ")
-      if (current[0] == "M") {
-        context.moveTo(Number(current[1]), Number(current[2]));
-      }
-      if (current[0] == "L") {
-        context.lineTo(Number(current[1]), Number(current[2]))
-      }
-      if (current[0] == "C") {
-        context.bezierCurveTo(Number(current[1]), Number(current[2]), Number(current[3]), Number(current[4]), Number(current[5]), Number(current[6]))
-      }
-    }
-    return context; // not mandatory, but will make it easier to chain operations
+      strPath = drawRect(d3.path(), shape_data).toString()
+      break;
+
+    case 'circle':
+      shape.attr('d', drawCircle(d3.path(), shape_data))
+
+      strPath = drawCircle(d3.path(), shape_data).toString()
+      break;
+  
+    default:
+      break;
   }
 
-  var path = p.node();
+
+  /**
+   * Start calculating
+   */
+  var path = shape.node();
 
   let widget = path.getTotalLength() / segment_num,
-    new_pts = []
+    new_pts = [], temp_index
 
   let prevValue = path.getPointAtLength((segment_num - 1) * widget)
-
+  
   for (var i = 0; i < segment_num; i++) {
     var point = path.getPointAtLength(i * widget);
     var newPoint = {
@@ -61,7 +95,7 @@ export function getDensity(svg, pts_ary, segment_num) {
 
     new_pts.push(newPoint)
   }
-
+  
   // quarterly split the list to advoid max exceeding
   let dictAllmin1Q = [];
   let dictAllmin2Q = [];
@@ -109,7 +143,9 @@ export function getDensity(svg, pts_ary, segment_num) {
 
   for (var index = 3 * segment_num / 4; index < segment_num; index++) {
     var result;
+    
     result = minCircle(index, new_pts)
+
     let circle = {
       index: index,
       radius: result[0],
@@ -117,25 +153,33 @@ export function getDensity(svg, pts_ary, segment_num) {
       centerY: result[2]
     }
     
-    dictAllmin4Q.push(circle)
+    // TODO: some questional data in dictAllmin4Q
+    if(result[0] && result[1] && result[2]){
+      dictAllmin4Q.push(circle)
+    }
   }
 
   let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q, dictAllmin3Q, dictAllmin4Q)
-
-  //console.log(dictAllmin);
+  temp_index = dictAllmin.length
+  // console.log('dictAllmin4Q', dictAllmin4Q);
 
 
   let segPolyList = []
-  for (var i = 0; i < new_pts.length; i++) {
+  // for (var i = 0; i < new_pts.length; i++) {
+  for (var i = 0; i < temp_index; i++) {
     var center1 = [dictAllmin[i].centerX, dictAllmin[i].centerY]
     var pt1 = [new_pts[i].x, new_pts[i].y]
 
     var center2, pt2;
-    if (i !== new_pts.length - 1) {
+    if (i !== temp_index - 1) {
+      if(!dictAllmin[i + 1]){
+        console.log(i, temp_index, dictAllmin[i + 1]);
+        
+      }
       center2 = [dictAllmin[i + 1].centerX, dictAllmin[i + 1].centerY]
       pt2 = [new_pts[i + 1].x, new_pts[i + 1].y]
     }
-    if (i === new_pts.length - 1) {
+    if (i === temp_index - 1) {
       center2 = [dictAllmin[0].centerX, dictAllmin[0].centerY]
       pt2 = [new_pts[0].x, new_pts[0].y]
     }
@@ -175,11 +219,11 @@ export function getDensity(svg, pts_ary, segment_num) {
 }
 
 // calculate the Bigest circle
-function getBigestCircle(next_circle) {
-  if(bigest_circle.radius < next_circle.radius){
-    bigest_circle = next_circle
-  }
-}
+// function getBigestCircle(next_circle) {
+//   if(bigest_circle.radius < next_circle.radius){
+//     bigest_circle = next_circle
+//   }
+// }
 
 function minCircle (pt_index,newpts_list){
     var pt1;
@@ -204,19 +248,24 @@ function minCircle (pt_index,newpts_list){
         }
         if (i === pt_index||i===secondbnd) {
           continue;
-          }
-            var pt3 = newpts_list[i]
-            // this circlePara will give three parameters regarding radius, and centerX, centerY
-            var ciclePara =  threePointsCircle(pt1,pt2,pt3);
-            //
-            radiusList.push(ciclePara[0])
-            radius_XList.push(ciclePara[1])
-            radius_YList.push(ciclePara[2])
+        }
+        var pt3 = newpts_list[i]
+        // this circlePara will give three parameters regarding radius, and centerX, centerY
+        var ciclePara = threePointsCircle(pt1,pt2,pt3);
+        
+        //
+        radiusList.push(ciclePara[0])
+        radius_XList.push(ciclePara[1])
+        radius_YList.push(ciclePara[2])
     }
     var minRadius =  findMinRadius(pt1,pt2,radiusList,radius_XList,radius_YList);
     var minIndex = radiusList.indexOf(minRadius)
     var p3_X = radius_XList[minIndex]
     var p3_Y = radius_YList[minIndex]
+
+    // if(pt_index > 750){
+    //   console.log('minCircle', minRadius, radiusList);
+    // }
 
     return [minRadius,p3_X,p3_Y];
 
@@ -286,28 +335,50 @@ function findMinRadius(input_pt1,input_pt2,radiusList,radius_XList,radius_YList)
         radiusList[minIndex] = 50000;
         runCount++;
         try {
-            return findMinRadius(pt1,pt2,radiusList,radius_XList,radius_YList)
-            } catch (e ) {
-              if ( e instanceof RangeError) {
-                  console.log("workingFunc():: " + e +  ": " + runCount );
-              }
-            }
+          return findMinRadius(pt1,pt2,radiusList,radius_XList,radius_YList)
+        } catch (e ) {
+          if ( e instanceof RangeError) {
+              console.log("workingFunc():: " + e +  ": " + runCount );
+          }
+        }
     }
     else {
         return minRadius;
     }
 }
 
+// function findMinMax(arr) {
+//     let min = arr[0], max = arr[0];
+
+//     for (let i = 1, len=arr.length; i < len; i++) {
+//         let v = arr[i];
+//         min = (v < min) ? v : min;
+//         max = (v > max) ? v : max;
+//     }
+
+//     return [min, max];
+// }
 function findMinMax(arr) {
-    let min = arr[0], max = arr[0];
+  let min, max, len=arr.length, i, j
 
-    for (let i = 1, len=arr.length; i < len; i++) {
-        let v = arr[i];
-        min = (v < min) ? v : min;
-        max = (v > max) ? v : max;
+  for (j = 0; j < len; j++) {
+    if(!!arr[j]){
+      min = arr[j]
+      max = arr[j]
+
+      break
     }
+  }
 
-    return [min, max];
+  for (i = j + 1; i < len; i++) {
+    let v = arr[i];
+    if(!!v){
+      min = (v < min) ? v : min
+      max = (v > max) ? v : max
+    }
+  }
+
+  return [min, max]
 }
 
 function threePointsCircle (pt1,pt2,pt3){

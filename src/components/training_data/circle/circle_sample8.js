@@ -1,7 +1,3 @@
-/* normal grid
-*/
-var orInsidept1 = getGrid2([340, 120], 500, "leftSkewed", 6, false)
-var orInsidept2 = getGrid([350, 800], 800 
 
 /* data
 */
