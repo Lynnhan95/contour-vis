@@ -455,6 +455,7 @@ class BaseMap extends Component {
                 let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
                     return this.autoProjection(d)
                 })
+                this.clip_boundary = clip_innerboundary
                 let beltSegList = []
                 segPolyList.forEach((d, i) => {
                     let beltSeg = getBeltSeg(d, strPath, clip_innerboundary, i)
@@ -526,7 +527,8 @@ class BaseMap extends Component {
                     beltCellList: beltCellList,
                     beltSegList:beltSegList,
                     segPolyList: segPolyList,
-                    newSegPolyList:newSegPolyList
+                    newSegPolyList:newSegPolyList,
+                    clip_boundary: clip_boundary
 
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
@@ -685,8 +687,8 @@ class BaseMap extends Component {
 
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-                  if (i===624)
-              {      return (
+                if (i == 300 || i===600 || i === 2000 || i === 2700|| i === 3500 )
+                { return (
                         <circle
                         cx = {d.centerX }
                         cy = {d.centerY}
@@ -694,11 +696,27 @@ class BaseMap extends Component {
                         r = {d.radius}
                         stroke = "#000"
                         fill = "none"
-                        strokeWidth = "0.1"
+                        strokeWidth = "0.5"
                         />
                     )}
                 })
             }
+            // console.log(this.clip_boundary)
+            let clip_boundary 
+            if(this.state.clip_boundary) {
+                clip_boundary = <path
+
+                className = "clip-boundary"
+                key = {'clip-boundary'}
+                d = { getLinePathStr(this.clip_boundary)}
+                stroke = "black"
+                strokeWidth = "0.1"
+                fill = 'none'
+
+             />
+            }
+
+            // this.clip_boundary
 
             let segPoly
             if(this.state.segPolyList) {
@@ -883,6 +901,7 @@ class BaseMap extends Component {
                     //outsideBoundary,
                     //simplified_Outboundary,
                     // inscribledCircles,
+                    //clip_boundary
                     //linePts,
                     cells0,
                     // cells1,
@@ -1009,9 +1028,9 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots">
+             {/* <g className="Dots">
                 {Dots}
-            </g>
+            </g> */}
             <g className="test_near">
                 {test_near}
             </g>

@@ -24,8 +24,8 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
 
   var p = svg.append("path")
                   .style("fill","none")
-                  .style("stroke","orange")
-                  .style("stroke-width","1px")
+                  .style("stroke","black")
+                  .style("stroke-width","2px")
                   .attr("d",draw(d3.path(),strPath));
 
 
