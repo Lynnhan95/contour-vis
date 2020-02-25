@@ -16,7 +16,8 @@ function drawRect(context, shape_data) {
 }
 
 function drawCircle(context, shape_data) {
-  context.arc(shape_data.x + shape_data.r, shape_data.y + shape_data.r, shape_data.r, 0, Math.PI * 2)
+  // context.arc(shape_data.x + shape_data.r, shape_data.y + shape_data.r, shape_data.r, 0, Math.PI * 2)
+  context.arc(shape_data.x, shape_data.y, shape_data.r, 0, Math.PI * 2)
 
   return context
 }
@@ -95,6 +96,9 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
 
     new_pts.push(newPoint)
   }
+
+  // console.log('new_pts', new_pts);
+  
   
   // quarterly split the list to advoid max exceeding
   let dictAllmin1Q = [];
@@ -102,8 +106,8 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
   let dictAllmin3Q = [];
   let dictAllmin4Q = [];
 
-  for (var index = 0; index < segment_num / 4; index++) {
-    var result;
+  for (let index = 0; index < segment_num / 4; index++) {
+    let result;
     result = minCircle(index, new_pts)
     let circle = {
       index: index,
@@ -112,11 +116,14 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
       centerY: result[2]
     }
     
-    dictAllmin1Q.push(circle)
+    if(result[0] && result[1] && result[2]){
+      dictAllmin1Q.push(circle)
+    }
+    
   }
 
-  for (var index = segment_num / 4; index < segment_num / 2; index++) {
-    var result;
+  for (let index = segment_num / 4; index < segment_num / 2; index++) {
+    let result;
     result = minCircle(index, new_pts)
     let circle = {
       index: index,
@@ -125,11 +132,14 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
       centerY: result[2]
     }
     
-    dictAllmin2Q.push(circle)
+    // if(result[0] && result[1] && result[2]){
+      dictAllmin2Q.push(circle)
+    // }
+    
   }
 
-  for (var index = segment_num / 2; index < 3 * segment_num / 4; index++) {
-    var result;
+  for (let index = segment_num / 2; index < 3 * segment_num / 4; index++) {
+    let result;
     result = minCircle(index, new_pts)
     let circle = {
       index: index,
@@ -138,11 +148,14 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
       centerY: result[2]
     }
     
-    dictAllmin3Q.push(circle)
+    if(result[0] && result[1] && result[2]){
+      dictAllmin3Q.push(circle)
+    }
+    
   }
 
-  for (var index = 3 * segment_num / 4; index < segment_num; index++) {
-    var result;
+  for (let index = 3 * segment_num / 4; index < segment_num; index++) {
+    let result;
     
     result = minCircle(index, new_pts)
 
@@ -161,7 +174,7 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
 
   let dictAllmin = dictAllmin1Q.concat(dictAllmin2Q, dictAllmin3Q, dictAllmin4Q)
   temp_index = dictAllmin.length
-  // console.log('dictAllmin4Q', dictAllmin4Q);
+  // console.log('dictAllmin', dictAllmin);
 
 
   let segPolyList = []
@@ -250,20 +263,27 @@ function minCircle (pt_index,newpts_list){
           continue;
         }
         var pt3 = newpts_list[i]
+        
         // this circlePara will give three parameters regarding radius, and centerX, centerY
         var ciclePara = threePointsCircle(pt1,pt2,pt3);
         
+        // if(pt_index === 485){
+        //   console.log('pt1 pt2 pt3', pt1, pt2, pt3, ciclePara);
+        // }
         //
         radiusList.push(ciclePara[0])
         radius_XList.push(ciclePara[1])
         radius_YList.push(ciclePara[2])
     }
+    // if(pt_index === 485){
+    //   console.log('minCircle', radiusList);
+    // }
     var minRadius =  findMinRadius(pt1,pt2,radiusList,radius_XList,radius_YList);
     var minIndex = radiusList.indexOf(minRadius)
     var p3_X = radius_XList[minIndex]
     var p3_Y = radius_YList[minIndex]
 
-    // if(pt_index > 750){
+    // if(pt_index === 485){
     //   console.log('minCircle', minRadius, radiusList);
     // }
 

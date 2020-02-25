@@ -1,4 +1,4 @@
-    const circle_matrix = {x: 800, y: 300, r: 200}
+    const matrix = {x: 800, y: 300, r: 200}
 const dots = [
   {
     "x": 618.5417427473731,
@@ -12733,3 +12733,5 @@ const dots = [
     "y": 420.70990803270445
   }
 ]
+
+export default {matrix, dots}

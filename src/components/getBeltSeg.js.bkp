@@ -11,8 +11,7 @@ export function getBeltSeg(segPoly, strPath, clip_boundary) {
   let offsetPath = clip_boundary.toString()
   // offsetPath = roundPathCorners(offsetPath,0.1,true)
   var clipPath = new Path(offsetPath)
-  // console.log('segPoly', segPoly)
-  
+
   var ptC1 = new Point (segPoly[3][0],segPoly[3][1])
   var ptC2 = new Point (segPoly[2][0],segPoly[2][1])
   var ptP1 = new Point (segPoly[0][0],segPoly[0][1])
@@ -34,12 +33,7 @@ export function getBeltSeg(segPoly, strPath, clip_boundary) {
     //console.log(interSect1, interSect2)
   }
 
-  if(interSect3.length === 0 || interSect4.length === 0){
-    interSect3 = [{point: {x:segPoly[0][0], y:segPoly[0][1]}}]
-    interSect4 = [{point: {x:segPoly[1][0], y:segPoly[1][1]}}]
-  }
-
-  // console.log(interSect1, interSect2, interSect3, interSect4)
+  //console.log(interSect1, interSect2, interSect3, interSect4)
   return ([
     [interSect1[0].point.x, interSect1[0].point.y],
     [interSect2[0].point.x, interSect2[0].point.y],

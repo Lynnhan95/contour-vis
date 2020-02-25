@@ -3,13 +3,13 @@
     margin: 0 auto
 }
 
-.heatmap-canvas {
+/* .heatmap-canvas {
     height: 100vh
-}
+} */
 
 .heatmapContainer {
     width: 100vw;
-    height: 50vh
+    /* height: 50vh */
 }
 
 .svg_dot {

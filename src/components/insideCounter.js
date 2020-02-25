@@ -5,7 +5,7 @@
 */
 
 
-export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 50){
+export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segNumb,slidingNumb,scaleFactor = 50, shape_type){
         // for each subseg
 
         var densityGroup = []
@@ -22,7 +22,12 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
         for (var i = 0; i < subSegGroup_ary.length; i++) {
           // there are three subseg for each item
 
-          var subSegGroup  = subSegGroup_ary[i] // it has four points
+          var subSegGroup // it has four points
+          if(shape_type === 'circle'){
+            subSegGroup = subSegGroup_ary[i].reverse()
+          }else{
+            subSegGroup = subSegGroup_ary[i]
+          }
           var subBeltGroup = beltSegGroup_ary[i]
           var subDensityGroup = []
           var subAreaGroup = []

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import h337 from "heatmap.js";
 // import {sampleData} from './sampleData.js'
 // import sampleData from './training_data/rect/sampleData.js'
@@ -6,15 +6,18 @@ import './style.css'
 
 function HeatMap(props) {
 
+  let my_canvas = useRef()
+
         const sampleData = props.data
         // sample2 
         // const transform_matrix = {x: -120, y: -420}
         // sample9 && sample10
         const transform_matrix = {x: -120, y: -70}
         useEffect(() => {
-
+          
         var heatmapInstance = h337.create({
-            container: document.querySelector('.App'),
+            // container: document.querySelector('.App'),
+            container: my_canvas.current,
             gradient: {
 
                 '0.11':'#2c7bb6', 
@@ -98,10 +101,22 @@ function HeatMap(props) {
 
  })
 
+  let c_height
+  switch (props.type) {
+    case 'rect':
+      c_height = sampleData.matrix.height + 100
+      break;
 
+    case 'circle':
+      c_height = sampleData.matrix.r * 3
+      break;
+  
+    default:
+      break;
+  }
 
   return (
-    <div className="myCanvas">
+    <div className="myCanvas" ref={my_canvas} style={{height: `${c_height}px`}}>
     </div>
   );
 }
