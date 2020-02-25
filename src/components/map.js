@@ -95,7 +95,7 @@ class BaseMap extends Component {
         return context
     }
 
-    getPaddingBoundaryPath(matrix, type){
+    getPaddingBoundaryPath(matrix, type, polygon){
         let padding_len = 30,
             new_matrix = {}
 
@@ -105,7 +105,7 @@ class BaseMap extends Component {
                 new_matrix.y = matrix.y + padding_len
                 new_matrix.width = matrix.width - padding_len * 2
                 new_matrix.height = matrix.height - padding_len * 2
-
+                console.log(this.drawRectPath(new_matrix))
                 return this.drawRectPath(new_matrix)
 
             case 'circle':
@@ -173,31 +173,32 @@ class BaseMap extends Component {
 
                 break;
 
-                case 'nut':
-                    console.log('nut ready')
-                    svg
-                        .attr('width', matrix.width)
-                        .attr('height', matrix.height)
-                        .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
-    
-                    svg_dot
-                        .attr('width', matrix.width)
-                        .attr('height', matrix.height)
-                        .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
-                        .attr('class', 'svg_dot')
-    
-                    let [arg111, arg222, arg333] = getDensity(
-                        svg,
-                        matrix,
-                        setSegNumb,
-                        type  // 'rect' or 'circle' or 'nut'
-                    )
+            case 'nut':
+                console.log('nut ready')
+                svg
+                    .attr('width', matrix.width)
+                    .attr('height', matrix.height)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
 
-                    circleAry = arg111
-                    segPolyList = arg222
-                    strPath = arg333
-    
-                    break;
+                svg_dot
+                    .attr('width', matrix.width)
+                    .attr('height', matrix.height)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                    .attr('class', 'svg_dot')
+
+                let [arg111, arg222, arg333] = getDensity(
+                    svg,
+                    matrix,
+                    setSegNumb,
+                    type, // 'rect' or 'circle' or 'nut'
+                    polygon
+                )
+
+                circleAry = arg111
+                segPolyList = arg222
+                strPath = arg333
+
+                break;
 
             case 'circle':
                 svg

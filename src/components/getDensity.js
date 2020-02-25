@@ -9,9 +9,20 @@ params: points array of boundary
 // var bigest_circle = {
 //   radius: 0
 // }
+
+
 function drawRect(context, shape_data) {
   context.rect(shape_data.x, shape_data.y, shape_data.width, shape_data.height)
 
+  return context
+}
+
+function drawPolygon(context, shape_polygon) {
+  context.moveTo(shape_polygon[0][0], shape_polygon[0][1])
+  for(let i= 1; i< shape_polygon.length; i++) {
+    context.lineTo(shape_polygon[i][0], shape_polygon[i][1])
+  }
+  // context.curve(d3.curveCatmullRomClosed)
   return context
 }
 
@@ -22,7 +33,7 @@ function drawCircle(context, shape_data) {
   return context
 }
 
-export function getDensity(svg, shape_data, segment_num, shape_type) {
+export function getDensity(svg, shape_data, segment_num, shape_type, shape_polygon) {
   /** 
    * convert it to path and divide the path 
    * init an empty svg for calculating purpose
@@ -72,9 +83,9 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
       break;
     
     case 'nut':
-      shape.attr('d', drawRect(d3.path(), shape_data))
+      shape.attr('d', drawPolygon(d3.path(), shape_polygon))
 
-      strPath = drawRect(d3.path(), shape_data).toString()
+      strPath = drawRect(d3.path(), shape_polygon).toString()
       break;
   
     default:

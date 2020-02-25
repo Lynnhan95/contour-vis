@@ -9,6 +9,7 @@ export function getBeltSeg(segPoly, strPath, clip_boundary, type) {
   var segPath2 = new Path();
   
   let offsetPath = clip_boundary.toString()
+  // console.log(offsetPath)
   // offsetPath = roundPathCorners(offsetPath,0.1,true)
   var clipPath = new Path(offsetPath)
   // console.log('segPoly', segPoly)
