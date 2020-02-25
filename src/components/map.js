@@ -36,8 +36,21 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
+            /* Render Hunan
+            */ 
             province_en: 'Hunan',
             province_cn: '湖南',
+
+            /* Render Yunnan
+            */ 
+            //province_en: 'Yunnan',
+            //province_cn: '云南',
+
+            /* Render Sichuan
+            */ 
+            //province_en: 'Sichuan',
+            //province_cn: '四川',
+            
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -95,7 +108,17 @@ class BaseMap extends Component {
 
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
+        /* Render Hunan
+        */ 
         Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
+
+        /* Render Yunnan
+        */ 
+    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
+
+        /* Render Sichuan
+        */ 
+    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -345,10 +368,7 @@ class BaseMap extends Component {
 
         // if(prevState.chinaGeoData !== this.state.chinaGeoData) {
         if(prevState.currGeoData !== this.state.currGeoData){
-            //console.log('currGeoData update')
-            // this.state.chinaGeoData.map((d,i)=> {
-            // if (d.properties.name === '湖南'){
-                // store computed dots and paths
+
                 const d = this.state.currGeoData
                 //console.warn('dddddd', d);
 
@@ -846,7 +866,7 @@ class BaseMap extends Component {
             let outsideBoundary
 
             this.state.chinaGeoData.map((d, i) => {
-                if(d.properties.name === '湖南'){
+                if(d.properties.name === this.state.province_cn){
                     //////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
                     this.autoProjection.fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], d)
                     outsideBoundary = <path
