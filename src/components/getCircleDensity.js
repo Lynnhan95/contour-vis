@@ -35,7 +35,8 @@ function getCircleDensity(svg, shape_data, segment_num, shape_type) {
 
     let segPolyList = [],
         prevValue = path.getPointAtLength((segment_num - 1) * widget)
-    
+        // console.log(prev)
+    // TODO: fix circke drawing sequence
     for (var i = 0; i < segment_num; i++) {
         let point = path.getPointAtLength(i * widget)
         

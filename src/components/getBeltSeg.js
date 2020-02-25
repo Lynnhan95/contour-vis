@@ -2,7 +2,7 @@
 import {Point,Path} from 'paper'
 import {roundPathCorners} from './rounding'
 
-export function getBeltSeg(segPoly, strPath, clip_boundary) {
+export function getBeltSeg(segPoly, strPath, clip_boundary, type) {
   var outPolyPath = new Path(strPath)
 
   var segPath1 = new Path();
@@ -40,12 +40,24 @@ export function getBeltSeg(segPoly, strPath, clip_boundary) {
   }
 
   // console.log(interSect1, interSect2, interSect3, interSect4)
-  return ([
-    [interSect1[0].point.x, interSect1[0].point.y],
-    [interSect2[0].point.x, interSect2[0].point.y],
-    [interSect4[0].point.x, interSect4[0].point.y],
-    [interSect3[0].point.x, interSect3[0].point.y]
-  ])
+  if (type === "rect") {
+    return ([
+
+      [interSect4[0].point.x, interSect4[0].point.y],
+      [interSect3[0].point.x, interSect3[0].point.y],
+      [interSect1[0].point.x, interSect1[0].point.y],
+      [interSect2[0].point.x, interSect2[0].point.y]
+    ])
+  } else {
+    return ([
+      
+      [interSect1[0].point.x, interSect1[0].point.y],
+      [interSect2[0].point.x, interSect2[0].point.y],
+      [interSect4[0].point.x, interSect4[0].point.y],
+      [interSect3[0].point.x, interSect3[0].point.y],
+    ])
+  }
+
 }
 
 function getLinePathStr(arr) {

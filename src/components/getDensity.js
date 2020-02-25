@@ -70,6 +70,12 @@ export function getDensity(svg, shape_data, segment_num, shape_type) {
 
       strPath = drawCircle(d3.path(), shape_data).toString()
       break;
+    
+    case 'nut':
+      shape.attr('d', drawRect(d3.path(), shape_data))
+
+      strPath = drawRect(d3.path(), shape_data).toString()
+      break;
   
     default:
       break;

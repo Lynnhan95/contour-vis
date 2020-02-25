@@ -18,9 +18,10 @@ import HeatMap from './heatmap.js'
 
 import rect_sample9 from './training_data/rect/rect_sample9.js'
 import circle_sample1 from './training_data/circle/circle_sample1.js'
+import nut_sample1 from './training_data/nut/nut_sample1.js'
 
 const setSegNumb = 1000
-const slidingBins = 8
+const slidingBins = 50
 
 
 // global varibales:
@@ -74,6 +75,7 @@ class BaseMap extends Component {
       
         _me.drawOneMap(select('#circle1_box'), circle_sample1, 'circle')
 
+        _me.drawOneMap(select('#nut1_box'), nut_sample1, 'nut')
 
     }
 
@@ -112,6 +114,14 @@ class BaseMap extends Component {
                 new_matrix.r = matrix.r - padding_len
 
                 return this.drawCirclePath(new_matrix)
+
+            case 'nut':
+                new_matrix.x = matrix.x + padding_len
+                new_matrix.y = matrix.y + padding_len
+                new_matrix.width = matrix.width - padding_len * 2
+                new_matrix.height = matrix.height - padding_len * 2
+
+                return this.drawRectPath(new_matrix)
         
             default:
                 break;
@@ -125,8 +135,12 @@ class BaseMap extends Component {
     }
 
     drawOneMap(box, map_data, type){
-        console.log(map_data)
+
         let matrix = map_data.matrix
+        let polygon = map_data.polygon
+        if(type === "nut") {
+            console.log(matrix)
+        }
 
         // create a new svg
         let svg = box.append('svg')
@@ -159,6 +173,32 @@ class BaseMap extends Component {
 
                 break;
 
+                case 'nut':
+                    console.log('nut ready')
+                    svg
+                        .attr('width', matrix.width)
+                        .attr('height', matrix.height)
+                        .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+    
+                    svg_dot
+                        .attr('width', matrix.width)
+                        .attr('height', matrix.height)
+                        .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                        .attr('class', 'svg_dot')
+    
+                    let [arg111, arg222, arg333] = getDensity(
+                        svg,
+                        matrix,
+                        setSegNumb,
+                        type  // 'rect' or 'circle' or 'nut'
+                    )
+
+                    circleAry = arg111
+                    segPolyList = arg222
+                    strPath = arg333
+    
+                    break;
+
             case 'circle':
                 svg
                     .attr('width', matrix.r * 2)
@@ -169,6 +209,7 @@ class BaseMap extends Component {
                     .attr('width', matrix.r * 2)
                     .attr('height', matrix.r * 2)
                     .attr('viewBox', `${matrix.x - matrix.r} ${matrix.y - matrix.r} ${matrix.r * 2} ${matrix.r * 2}`)
+                    .attr('class', 'svg_dot')
 
                 let [arg22, arg33] = getCircleDensity(
                     svg,
@@ -208,8 +249,9 @@ class BaseMap extends Component {
         //             .attr('stroke-width', '.1')
         //     })
         // }))
-
-
+        if (type === "nut") {
+            console.log(segPolyList)
+        }
         /**
          * calc padding boundary
          */
@@ -222,10 +264,11 @@ class BaseMap extends Component {
         let beltSegList = []
         segPolyList.forEach((d, i) => {
             
-            let beltSeg = getBeltSeg(d, strPath, clip_boundary)
+            let beltSeg = getBeltSeg(d, strPath, clip_boundary, type)
 
             beltSegList.push(beltSeg)
         })
+
         // console.log('beltSegList', beltSegList)
         // beltSegList.map((d=>{
         //     d.map((e, i)=>{
@@ -250,6 +293,7 @@ class BaseMap extends Component {
             beltCellList.push(subCell)
         })
         // console.log('beltCellList', beltCellList)
+  
 
 
         /**
@@ -354,6 +398,27 @@ class BaseMap extends Component {
                     .attr('stroke-width', '#000')
 
                 break;
+
+                case 'nut':
+                    svg_dot.append('rect')
+                        .attr('x', matrix.x)
+                        .attr('y', matrix.y)
+                        .attr('width', matrix.width)
+                        .attr('height', matrix.height)
+                        .attr('fill', 'none')
+                        .attr('stroke', '#000')
+                        .attr('stroke-width', '#000')
+    
+                    svg.append('rect')
+                        .attr('x', matrix.x)
+                        .attr('y', matrix.y)
+                        .attr('width', matrix.width)
+                        .attr('height', matrix.height)
+                        .attr('fill', 'none')
+                        .attr('stroke', '#000')
+                        .attr('stroke-width', '#000')
+    
+                    break;
         
             default:
                 break;
@@ -405,6 +470,8 @@ class BaseMap extends Component {
         
         let HeatmapRect9 = <HeatMap data = {rect_sample9} type="rect" />
         let HeatmapCircle1 = <HeatMap data = {circle_sample1} type="circle" />
+        let HeatmapNut1 = <HeatMap data = {nut_sample1} type="nut" />
+
 
         return (
             <div>
@@ -419,6 +486,11 @@ class BaseMap extends Component {
                     <div id="circle1_box" className="heatmapContainer">
                         { HeatmapCircle1 }
                     </div>
+                    
+                    <div id="nut1_box" className="heatmapContainer">
+                        { HeatmapNut1 }
+                    </div>
+                    
                 </div>
             </div>
         )
