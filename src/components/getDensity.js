@@ -56,7 +56,7 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
     .style("fill", "none")
     .style("stroke", "orange")
     .style("stroke-width", "1px")
-    var path = shape.node();
+  
   //   .attr("d", draw(d3.path(), strPath));
 
   // function draw(context, strPath) {
@@ -103,7 +103,7 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
   }
 
   /**
-   * get points from curve
+   * TODO: get points from curve
    */
 
   
@@ -124,7 +124,7 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
    * Start calculating
    */
 
-  
+  var path = shape.node()
 
   let widget = path.getTotalLength() / segment_num,
     new_pts = [], temp_index
@@ -143,7 +143,7 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
     new_pts.push(newPoint)
   }
 
-  
+  pointsAtcurve = new_pts
   
   // quarterly split the list to advoid max exceeding
   let dictAllmin1Q = [];
