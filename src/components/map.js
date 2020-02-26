@@ -104,7 +104,7 @@ class BaseMap extends Component {
         return context
     }
 
-    getPaddingBoundaryPath(matrix, type, polygon){
+    getPaddingBoundaryPath(matrix, type, polygon, pointsAtcurve){
         let padding_len = 30,
             new_matrix = {}
 
@@ -125,8 +125,11 @@ class BaseMap extends Component {
                 return this.drawCirclePath(new_matrix)
 
             case 'nut':
-                const offsetPadding = -0.3
-                let new_polygon = new Offset(polygon).offset(offsetPadding)
+                console.log(polygon)
+                console.log(pointsAtcurve)
+                const offsetPadding = -0.1
+                let new_polygon = new Offset(pointsAtcurve).offset(offsetPadding)
+                console.log(new_polygon)
                 // console.log(temp)
                 // new_matrix.x = matrix.x + padding_len
                 // new_matrix.y = matrix.y + padding_len
@@ -158,7 +161,8 @@ class BaseMap extends Component {
         let svg = box.append('svg')
         let svg_dot = box.append('svg')
 
-        let circleAry, segPolyList, strPath
+        let circleAry, segPolyList, strPath, pointsAtcurve
+
                             
         switch (type) {
             case 'rect':
@@ -198,7 +202,7 @@ class BaseMap extends Component {
                     .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
                     .attr('class', 'svg_dot')
 
-                let [arg111, arg222, arg333] = getDensity(
+                let [arg111, arg222, arg333, arg444] = getDensity(
                     svg,
                     matrix,
                     setSegNumb,
@@ -209,6 +213,7 @@ class BaseMap extends Component {
                 circleAry = arg111
                 segPolyList = arg222
                 strPath = arg333
+                pointsAtcurve = arg444
 
                 break;
 
@@ -268,7 +273,7 @@ class BaseMap extends Component {
         /**
          * calc padding boundary
          */
-        let clip_boundary = this.getPaddingBoundaryPath(matrix, type, polygon)
+        let clip_boundary = this.getPaddingBoundaryPath(matrix, type, polygon, pointsAtcurve)
         // svg.append('path')
         //     .attr('d', clip_boundary.toString())
         //     .attr('fill', 'none')
