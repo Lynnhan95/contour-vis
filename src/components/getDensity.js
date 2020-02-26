@@ -22,7 +22,7 @@ function drawPolygon(context, shape_polygon) {
   for(let i= 1; i< shape_polygon.length; i++) {
     context.lineTo(shape_polygon[i][0], shape_polygon[i][1])
   }
-  // context.curve(d3.curveCatmullRomClosed)
+
   return context
 }
 
@@ -226,7 +226,7 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
     var d2 = Math.pow(((center2[0] - pt2[0]) * (center2[0] - pt2[0]) + (center2[1] - pt2[1]) * (center2[1] - pt2[1])), 0.5)
 
 
-    var extendMetric = 10
+    var extendMetric = 12
     var scale1 = (d1 + extendMetric) / d1
     var scale2 = (d2 + extendMetric) / d2
 
