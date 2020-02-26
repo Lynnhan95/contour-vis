@@ -12,7 +12,7 @@ function HeatMap(props) {
 
   // Helper function
   const getPointsArrFromMatrix = (matrix) => {
-    let pos_arr = [] 
+    let pos_arr = []
     pos_arr.push([matrix.x + transform_matrix.x, matrix.y + transform_matrix.y])
     pos_arr.push([matrix.x + matrix.width + transform_matrix.x, matrix.y + transform_matrix.y])
     pos_arr.push([matrix.x + matrix.width + transform_matrix.x, matrix.y + matrix.height + transform_matrix.y])
@@ -33,20 +33,20 @@ function HeatMap(props) {
     return path_str.join(' ')
   }
   useEffect(() => {
-    
+
     var heatmapInstance = h337.create({
         container: my_canvas.current,
         gradient: {
 
-            '0.11':'#2c7bb6', 
-            '0.22':'#00a6ca', 
-            '0.33':'#00ccbc', 
+            '0.11':'#2c7bb6',
+            '0.22':'#00a6ca',
+            '0.33':'#00ccbc',
             '0.44':'#90eb9d',
             '0.55':'#ffff8c',
             '0.66':'#f9d057',
             '0.77':'#f29e2e',
-            '0.88':'#e76818', 
-            '0.99':'#d7191c' 
+            '0.88':'#e76818',
+            '0.99':'#d7191c'
           },
     });
 
@@ -65,14 +65,14 @@ function HeatMap(props) {
       }
     })
     const data = {
-      max: 15,
+      max: 50,
       data: sample
     }
 
     // Setup heatmap data instance
     heatmapInstance.setData(data);
 
-    // Draw rect path 
+    // Draw rect path
     switch (props.type) {
       case 'rect':
         let pos_arr = getPointsArrFromMatrix(sampleData.matrix)
@@ -81,13 +81,13 @@ function HeatMap(props) {
         ctx.strokeStyle = "#000";
         ctx.lineWidth = 0.3;
         ctx.stroke(p);
-        break; 
-      
-      case 'circle': 
+        break;
+
+      case 'circle':
         // TODO: draw circle
         // const circle_matrix = props.data.matrix
         // console.log(circle_matrix.x + transform_matrix.x, circle_matrix.y + transform_matrix.y);
-        
+
         // ctx.strokeStyle = "#000";
         // ctx.lineWidth = 0.3;
         // ctx.arc(circle_matrix.x + transform_matrix.x,  circle_matrix.y + transform_matrix.y, circle_matrix.r, 0, 2 * Math.PI)
@@ -122,7 +122,7 @@ function HeatMap(props) {
     case 'circle':
       c_height = sampleData.matrix.r * 3
       break;
-  
+
     default:
       break;
   }
