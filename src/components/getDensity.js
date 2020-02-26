@@ -11,27 +11,28 @@ params: points array of boundary
 // }
 
 
-function drawRect(context, shape_data) {
+function drawRect(shape_data) {
+  let context = d3.path()
+
   context.rect(shape_data.x, shape_data.y, shape_data.width, shape_data.height)
 
   return context
 }
 
-function drawPolygon(context, shape_polygon) {
-  // context.moveTo(shape_polygon[0][0], shape_polygon[0][1])
-  // for(let i= 1; i< shape_polygon.length; i++) {
-  //   context.lineTo(shape_polygon[i][0], shape_polygon[i][1])
-  // }
+function drawPolygon(shape_polygon) {
+  let context = d3.line().curve(d3.curveCatmullRomClosed)
 
   // return context
   let curveStr = context(shape_polygon)
+
   console.log(curveStr);
   
   return curveStr
 }
 
-function drawCircle(context, shape_data) {
-  // context.arc(shape_data.x + shape_data.r, shape_data.y + shape_data.r, shape_data.r, 0, Math.PI * 2)
+function drawCircle(shape_data) {
+  let context = d3.path()
+
   context.arc(shape_data.x, shape_data.y, shape_data.r, 0, Math.PI * 2)
 
   return context
@@ -57,42 +58,24 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
     .style("stroke", "orange")
     .style("stroke-width", "1px")
   
-  //   .attr("d", draw(d3.path(), strPath));
 
-  // function draw(context, strPath) {
-  //   var split = strPath.split(/(?=[LMC])/)
-  //   for (var i = 0; i < split.length; i++) {
-  //     let current = split[i]
-  //     current = current.split(" ")
-  //     if (current[0] == "M") {
-  //       context.moveTo(Number(current[1]), Number(current[2]));
-  //     }
-  //     if (current[0] == "L") {
-  //       context.lineTo(Number(current[1]), Number(current[2]))
-  //     }
-  //     if (current[0] == "C") {
-  //       context.bezierCurveTo(Number(current[1]), Number(current[2]), Number(current[3]), Number(current[4]), Number(current[5]), Number(current[6]))
-  //     }
-  //   }
-  //   return context; // not mandatory, but will make it easier to chain operations
-  // }
   switch (shape_type) {
     case 'rect':
-      shape.attr('d', drawRect(d3.path(), shape_data))
+      shape.attr('d', drawRect(shape_data))
 
-      strPath = drawRect(d3.path(), shape_data).toString()
+      strPath = drawRect(shape_data).toString()
       break;
 
     case 'circle':
-      shape.attr('d', drawCircle(d3.path(), shape_data))
+      shape.attr('d', drawCircle(shape_data))
 
-      strPath = drawCircle(d3.path(), shape_data).toString()
+      strPath = drawCircle(shape_data).toString()
       break;
     
     case 'nut':
-      shape.attr('d', drawPolygon(d3.line().curve(d3.curveCatmullRomClosed), shape_polygon))
+      shape.attr('d', drawPolygon(shape_polygon))
 
-      strPath = drawPolygon(d3.line().curve(d3.curveCatmullRomClosed), shape_polygon)
+      strPath = drawPolygon(shape_polygon)
 
       // pointsAtcurve
       
@@ -109,14 +92,14 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
   
   pointsAtcurve = 
     [
-      [550, 250],
-      [650, 100],
-      [750, 175],
-      [950, 250],
-      [880, 400],
-      [750, 300],
-      [650, 400],
-      [550, 250]
+      // [550, 250],
+      // [650, 100],
+      // [750, 175],
+      // [950, 250],
+      // [880, 400],
+      // [750, 300],
+      // [650, 400],
+      // [550, 250]
     ]
 
 
@@ -141,9 +124,9 @@ export function getDensity(svg, shape_data, segment_num, shape_type, shape_polyg
     prevValue = point
 
     new_pts.push(newPoint)
-  }
 
-  pointsAtcurve = new_pts
+    pointsAtcurve.push([newPoint.x, newPoint.y])
+  }
   
   // quarterly split the list to advoid max exceeding
   let dictAllmin1Q = [];

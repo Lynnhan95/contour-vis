@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { geoPath, geoMercator } from "d3-geo"
-import { csv, extent, select, nest, scaleLinear, path } from 'd3'
+import { csv, extent, select, nest, scaleLinear, path, line, curveCatmullRomClosed, polygonContains } from 'd3'
 import { legendColor } from 'd3-svg-legend'
 import Offset from 'polygon-offset'
 import simplify from 'simplify-js'
@@ -93,14 +93,53 @@ class BaseMap extends Component {
         
         return context
     }
-    drawpolygonPath(shape_polygon) {
-        console.log(shape_polygon)
-        let context = path()
-        context.moveTo(shape_polygon[0][0], shape_polygon[0][1])
-        for(let i= 1; i< shape_polygon.length; i++) {
-          context.lineTo(shape_polygon[i][0], shape_polygon[i][1])
+
+    drawNutPath(shape_polygon){
+        let context = line().curve(curveCatmullRomClosed)
+
+        return context(shape_polygon)
+    }
+
+    getNutCurvePolygon(polygon){
+        let shape = select('#for_calc')
+            .attr('d', this.drawNutPath(polygon))
+
+        let dom_path = shape.node()
+        
+        // Weird: sub_num must smaller than a number(e.g 500), the result will be fine
+        let sub_num = 450,
+            widget = dom_path.getTotalLength() / sub_num,
+            pointsAtcurve = []
+            // prevValue = path.getPointAtLength((setSegNumb - 1) * widget)
+        
+        for (let i = 0; i <= sub_num; i++) {
+            let point = dom_path.getPointAtLength(i * widget)
+        
+            pointsAtcurve.push([point.x, point.y])
         }
-        console.log(context)
+
+        return pointsAtcurve
+    }
+
+    processNutPoints(points, polygon){
+        return points.filter(p => {
+            let pp = [p.x, p.y]
+
+            return polygonContains(polygon, pp)
+        })
+    }
+
+    drawPolygonPath(shape_polygon) {
+        let context = path()
+
+        context.moveTo(shape_polygon[0][0], shape_polygon[0][1])
+
+        for(let i= 1; i< shape_polygon.length; i++) {
+            // console.log('drawPolygonPath', shape_polygon[i][0], shape_polygon[i][1]);
+            
+            context.lineTo(shape_polygon[i][0], shape_polygon[i][1])
+        }
+
         return context
     }
 
@@ -125,19 +164,33 @@ class BaseMap extends Component {
                 return this.drawCirclePath(new_matrix)
 
             case 'nut':
-                console.log(polygon)
-                console.log(pointsAtcurve)
-                const offsetPadding = -0.1
-                let new_polygon = new Offset(pointsAtcurve).offset(offsetPadding)
-                console.log(new_polygon)
-                // console.log(temp)
-                // new_matrix.x = matrix.x + padding_len
-                // new_matrix.y = matrix.y + padding_len
-                // new_matrix.width = matrix.width - padding_len * 2
-                // new_matrix.height = matrix.height - padding_len * 2
-                return this.drawpolygonPath(new_polygon[0])
+                // calc pointsAtcurve in here to reduce coupling
 
-        
+                /**
+                 * Solution 1: offset initial polygon first, then draw path by curve()
+                 */
+                // const offsetPadding = -20
+
+                // let new_polygon = new Offset(polygon).offset(offsetPadding)
+                // console.log('new_polygon', new_polygon, this.drawNutPath(new_polygon[0]))
+                
+                // return this.drawNutPath(new_polygon[0])
+
+                /**
+                 * 
+                 * Solution 2: 
+                 * draw path from initial polygon first, 
+                 * then get polygon points from subdivide path,
+                 * offset new polygon finally
+                 * 
+                 */
+
+                let padding_polygon = new Offset([pointsAtcurve]).offset(-30)
+
+                console.log('padding_polygon', padding_polygon, 'pointsAtcurve', pointsAtcurve)
+
+                return this.drawPolygonPath(padding_polygon[0])
+
             default:
                 break;
         }
@@ -152,7 +205,7 @@ class BaseMap extends Component {
     drawOneMap(box, map_data, type){
 
         let matrix = map_data.matrix
-        let polygon = map_data.polygon
+        let nut_polygon = map_data.polygon
         if(type === "nut") {
             console.log(matrix)
         }
@@ -163,7 +216,9 @@ class BaseMap extends Component {
 
         let circleAry, segPolyList, strPath, pointsAtcurve
 
-                            
+        /**
+         * get Density 
+         */                
         switch (type) {
             case 'rect':
                 svg
@@ -194,12 +249,12 @@ class BaseMap extends Component {
                 svg
                     .attr('width', matrix.width)
                     .attr('height', matrix.height)
-                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width + 20} ${matrix.height}`)
 
                 svg_dot
                     .attr('width', matrix.width)
                     .attr('height', matrix.height)
-                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width} ${matrix.height}`)
+                    .attr('viewBox', `${matrix.x} ${matrix.y} ${matrix.width + 20} ${matrix.height}`)
                     .attr('class', 'svg_dot')
 
                 let [arg111, arg222, arg333, arg444] = getDensity(
@@ -207,13 +262,15 @@ class BaseMap extends Component {
                     matrix,
                     setSegNumb,
                     type, // 'rect' or 'circle' or 'nut'
-                    polygon
+                    nut_polygon
                 )
 
                 circleAry = arg111
                 segPolyList = arg222
                 strPath = arg333
-                pointsAtcurve = arg444
+                pointsAtcurve = this.getNutCurvePolygon(nut_polygon)
+
+                map_data.dots = this.processNutPoints(map_data.dots, pointsAtcurve)
 
                 break;
 
@@ -273,12 +330,12 @@ class BaseMap extends Component {
         /**
          * calc padding boundary
          */
-        let clip_boundary = this.getPaddingBoundaryPath(matrix, type, polygon, pointsAtcurve)
-        // svg.append('path')
-        //     .attr('d', clip_boundary.toString())
-        //     .attr('fill', 'none')
-        //     .attr('stroke', '#000')
-        //     .attr('stroke-width', '1')
+        let clip_boundary = this.getPaddingBoundaryPath(matrix, type, nut_polygon, pointsAtcurve)
+        svg.append('path')
+            .attr('d', clip_boundary.toString())
+            .attr('fill', 'none')
+            .attr('stroke', '#000')
+            .attr('stroke-width', '1')
         let beltSegList = []
         segPolyList.forEach((d, i) => {
             
@@ -418,23 +475,17 @@ class BaseMap extends Component {
                 break;
 
                 case 'nut':
-                    svg_dot.append('rect')
-                        .attr('x', matrix.x)
-                        .attr('y', matrix.y)
-                        .attr('width', matrix.width)
-                        .attr('height', matrix.height)
-                        .attr('fill', 'none')
-                        .attr('stroke', '#000')
-                        .attr('stroke-width', '#000')
+                    svg_dot.append('path')
+                        .style("fill", "none")
+                        .style("stroke", "#000")
+                        .style("stroke-width", "1px")
+                        .attr('d', this.drawNutPath(nut_polygon))
     
-                    svg.append('rect')
-                        .attr('x', matrix.x)
-                        .attr('y', matrix.y)
-                        .attr('width', matrix.width)
-                        .attr('height', matrix.height)
-                        .attr('fill', 'none')
-                        .attr('stroke', '#000')
-                        .attr('stroke-width', '#000')
+                    svg.append('path')
+                        .style("fill", "none")
+                        .style("stroke", "#000")
+                        .style("stroke-width", "1px")
+                        .attr('d', this.drawNutPath(nut_polygon))
     
                     break;
         
@@ -508,8 +559,17 @@ class BaseMap extends Component {
                     <div id="nut1_box" className="heatmapContainer">
                         { HeatmapNut1 }
                     </div>
-                    
                 </div>
+
+                <svg width="1" height="1">
+                    <path id="for_calc" style={{
+                        fill: 'none',
+                        stroke: '#0f0',
+                        strokeWidth: '1px'
+                        }}>
+
+                    </path>
+                </svg>
             </div>
         )
     }
