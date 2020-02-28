@@ -22,6 +22,7 @@ export function getDensity (svg,pts_ary,segment_num = 5000){
 
   var strPath = getLinePathStr(pts_ary)
   strPath = roundPathCorners(strPath,0.18,true)
+  console.log( strPath )
 
   var p = svg.append("path")
                   .style("fill","none")

@@ -40,8 +40,8 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Sichuan',
-            province_cn: '四川',
+            province_en: 'Yunnan',
+            province_cn: '云南',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -106,7 +106,7 @@ class BaseMap extends Component {
         // this.setState({ heatmapInstance:  h337.create({container: document.querySelector('#heatMap')}) })
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -1039,7 +1039,7 @@ class BaseMap extends Component {
             </div> */}
             <div className="myCanvas">
                 <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
-                {/* <g className="Regions">
+                <g className="Regions">
                     {Regions}
                 </g>
                 <g className="Dots">
@@ -1053,7 +1053,7 @@ class BaseMap extends Component {
                 </g>
                 <g className="outerBoundary">
                     {outerBoundary}
-                </g> */}
+                </g>
                 <g className = "legend" ref = {this.legendRef}>
 
                 </g>
@@ -1061,7 +1061,7 @@ class BaseMap extends Component {
 
                 </g>    
                 </svg>
-                { Heatmap }
+                {/* { Heatmap } */}
             </div>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
             {/* { this.state.heatmapPointData } ? <HeatMap data = {this.state.heatmapPointData}/> : '' */}
