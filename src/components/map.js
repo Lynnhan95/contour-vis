@@ -23,7 +23,7 @@ import ProviencesNames from './chinaProvincesName'
 import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
 import h337 from 'heatmap.js'
-import ReactHeatmap from 'react-heatmap'
+// import ReactHeatmap from 'react-heatmap'
 import HeatMap from './heatmap'
 
 const { Option } = Select
@@ -40,8 +40,8 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            province_en: 'Sichuan',
+            province_cn: '四川',
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -106,7 +106,7 @@ class BaseMap extends Component {
         // this.setState({ heatmapInstance:  h337.create({container: document.querySelector('#heatMap')}) })
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/religious_data.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
 
             .then(result=>{
                 let response = result[0],
