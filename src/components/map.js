@@ -22,11 +22,11 @@ import "./style.css"
 import ProviencesNames from './chinaProvincesName'
 import chinaProvincesName from './chinaProvincesName'
 import keyBy from 'lodash.keyby'
-import h337 from 'heatmap.js'
-// import ReactHeatmap from 'react-heatmap'
 import HeatMap from './heatmap'
 
+
 const { Option } = Select
+
 
 const setSegNumb = 5000
 const slidingBins = 50
@@ -40,8 +40,21 @@ class BaseMap extends Component {
     constructor(){
         super();
         this.state = {
-            province_en: 'Yunnan',
-            province_cn: '云南',
+            /* Render Hunan
+            */ 
+            province_en: 'Sichuan',
+            province_cn: '四川',
+
+            /* Render Yunnan
+            */ 
+            //province_en: 'Yunnan',
+            //province_cn: '云南',
+
+            /* Render Sichuan
+            */ 
+            //province_en: 'Sichuan',
+            //province_cn: '四川',
+            
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -49,8 +62,7 @@ class BaseMap extends Component {
             segment_path_len: 0.1,
             simplifiedContours: null,
 
-            segmentBoxObjArray: null,
-            cfg: null 
+            segmentBoxObjArray: null
         }
 
         this.svgMargin = 50;
@@ -70,14 +82,9 @@ class BaseMap extends Component {
         this.chinaGeoDataNest = null
         this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
 
-        // legend ref 
+        // legend ref
         this.legendRef = React.createRef()
         this.gradientLegendRef = React.createRef()
-        this.myCanvasRef = React.createRef()
-
-        // Config heatmap initialization object 
-
-
     }
 
     onAfterChange = value => {
@@ -103,10 +110,19 @@ class BaseMap extends Component {
 
         paper.setup('myCanvas')
 
-        // this.setState({ heatmapInstance:  h337.create({container: document.querySelector('#heatMap')}) })
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
+        /* Render Hunan
+        */ 
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
+
+        /* Render Yunnan
+        */ 
+    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
+
+        /* Render Sichuan
+        */ 
+    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -356,10 +372,7 @@ class BaseMap extends Component {
 
         // if(prevState.chinaGeoData !== this.state.chinaGeoData) {
         if(prevState.currGeoData !== this.state.currGeoData){
-            //console.log('currGeoData update')
-            // this.state.chinaGeoData.map((d,i)=> {
-            // if (d.properties.name === '湖南'){
-                // store computed dots and paths
+
                 const d = this.state.currGeoData
                 //console.warn('dddddd', d);
 
@@ -446,6 +459,7 @@ class BaseMap extends Component {
                 let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
                     return this.autoProjection(d)
                 })
+                this.clip_boundary = clip_innerboundary
                 let beltSegList = []
                 segPolyList.forEach((d, i) => {
                     let beltSeg = getBeltSeg(d, strPath, clip_innerboundary, i)
@@ -517,7 +531,8 @@ class BaseMap extends Component {
                     beltCellList: beltCellList,
                     beltSegList:beltSegList,
                     segPolyList: segPolyList,
-                    newSegPolyList:newSegPolyList
+                    newSegPolyList:newSegPolyList,
+                    clip_boundary: clip_boundary
 
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
@@ -558,26 +573,17 @@ class BaseMap extends Component {
             //console.log(pointsDataProjected)
             //console.log(deleteDuplicatePoints)
 
+            let heatmapPointData = deleteDuplicatePoints.map((d) => {
+                return {
+                    x: parseInt(d[0]),
+                    y: parseInt(d[1]),
+                    value: 1
+                }
+            })
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Create point initialization with heatmap.js 
-        
-
-        let heatmapPointData = deleteDuplicatePoints.map((d) => {
-            return {
-                x: parseInt(d[0]),
-                y: parseInt(d[1]),
-                value: 1
-            }
-        })
-
-        console.log(heatmapPointData)
-
-
-
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
 ///////////////slidng window and scaler are applied
 
@@ -607,56 +613,56 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-            // this.legend = legendColor().scale(this.color_scale).cells(10)
-            // // console.log('colorscale', )
-            //     /////////////Create cell legend/////////////////////
-            //     const node = this.legendRef.current
-            //     console.log("node", node)
-            //     select(node)
-            //         .call(this.legend)
-    
-            //     ////////////Create gradient legend /////////////////
-            //     var color_scheme = [ 
-            //         '#2c7bb6', 
-            //         '#00a6ca', 
-            //         '#00ccbc', 
-            //         '#90eb9d',
-            //         '#ffff8c',
-            //         '#f9d057',
-            //         '#f29e2e',
-            //         '#e76818', 
-            //         '#d7191c' ];
-            //     const gradientNode = this.gradientLegendRef.current 
-            //     const element = 
-            //     select(gradientNode)
-            //         // .attr('width', 50)
-            //         // .attr('height', 300)
-    
-            //     element.append('rect')
-            //     .attr('x', 100)
-            //     .attr('y', 0)
-            //     .attr('width', 20)
-            //     .attr('height', 180)
-            //     .style('fill', 'url(#grad)');
-    
-            //     let grad = element.append('defs')
-            //     .append('linearGradient')
-            //     .attr('id', 'grad')
-            //     .attr('x1', '0%')
-            //     .attr('x2', '0%')
-            //     .attr('y1', '0%')
-            //     .attr('y2', '100%');
-    
-            //     grad.selectAll('stop')
-            //     .data(color_scheme)
-            //     .enter()
-            //     .append('stop')
-            //     .style('stop-color', function(d){ return d; })
-            //     .attr('offset', function(d,i){
-            //     return 100 * (i / (colors.length - 1)) + '%';
-            //     })
+                                        this.legend = legendColor().scale(this.color_scale).cells([0, 100, 200,300, 400, 500, 600])
+                                        // console.log('colorscale', )
+                                         /////////////Create cell legend/////////////////////
+                                         const node = this.legendRef.current
+                                         console.log("node", node)
+                                         select(node)
+                                             .call(this.legend)
 
-                                         
+                                         ////////////Create gradient legend /////////////////
+                                         var color_scheme = [
+                                             '#2c7bb6',
+                                             '#00a6ca',
+                                             '#00ccbc',
+                                             '#90eb9d',
+                                             '#ffff8c',
+                                             '#f9d057',
+                                             '#f29e2e',
+                                             '#e76818',
+                                             '#d7191c' ];
+                                         const gradientNode = this.gradientLegendRef.current
+                                         const element =
+                                         select(gradientNode)
+                                             // .attr('width', 50)
+                                             // .attr('height', 300)
+
+                                         element.append('rect')
+                                         .attr('x', 100)
+                                         .attr('y', 0)
+                                         .attr('width', 20)
+                                         .attr('height', 120)
+                                         .style('fill', 'url(#grad)');
+
+                                         let grad = element.append('defs')
+                                         .append('linearGradient')
+                                         .attr('id', 'grad')
+                                         .attr('x1', '0%')
+                                         .attr('x2', '0%')
+                                         .attr('y1', '0%')
+                                         .attr('y2', '100%');
+
+                                         grad.selectAll('stop')
+                                         .data(color_scheme)
+                                         .enter()
+                                         .append('stop')
+                                         .style('stop-color', function(d){ return d; })
+                                         .attr('offset', function(d,i){
+                                           return 100 * (i / (colors.length - 1)) + '%';
+                                         })
+
+
             this.setState({
                 cellObjArr: cellObjArr,
                 heatmapPointData: heatmapPointData
@@ -668,20 +674,6 @@ class BaseMap extends Component {
         if (prevState.inputValue !== this.state.inputValue) {
             //console.log(this.state.inputValue)
         }
-
-        // if(prevState.heatmapPointData!== this.state.heatmapPointData ) {
-        //     if (this.state.heatmapInstance) {
-        //         console.log(this.state.heatmapInstance)
-        //         this.state.heatmapInstance.setData(
-        //             { 
-        //                 max: 50, 
-        //                 data: this.state.heatmapPointData
-        //               }
-        //          );
-        //     }
-
-     
-        // }
     }
 
     render() {
@@ -707,8 +699,8 @@ class BaseMap extends Component {
 
                 inscribledCircles = this.state.inscribledCircles.map((d,i) => {
 
-                  if (i===624)
-              {      return (
+                if (i == 300 || i===600 || i === 2000 || i === 2700|| i === 3500 )
+                { return (
                         <circle
                         cx = {d.centerX }
                         cy = {d.centerY}
@@ -716,11 +708,27 @@ class BaseMap extends Component {
                         r = {d.radius}
                         stroke = "#000"
                         fill = "none"
-                        strokeWidth = "0.1"
+                        strokeWidth = "0.5"
                         />
                     )}
                 })
             }
+            // console.log(this.clip_boundary)
+            let clip_boundary 
+            if(this.state.clip_boundary) {
+                clip_boundary = <path
+
+                className = "clip-boundary"
+                key = {'clip-boundary'}
+                d = { getLinePathStr(this.clip_boundary)}
+                stroke = "black"
+                strokeWidth = "0.1"
+                fill = 'none'
+
+             />
+            }
+
+            // this.clip_boundary
 
             let segPoly
             if(this.state.segPolyList) {
@@ -888,7 +896,7 @@ class BaseMap extends Component {
             let outsideBoundary
 
             this.state.chinaGeoData.map((d, i) => {
-                if(d.properties.name === '湖南'){
+                if(d.properties.name === this.state.province_cn){
                     //////console.log(d)fitExtent([this.svgMargin/2, this.svgMargin/2],[_me.svg_w- this.svgMargin/2 , _me.svg_h-this.svgMargin/2], chinaGeoData)
                     this.autoProjection.fitExtent([[this.svgMargin/2, this.svgMargin/2],[this.svg_w- this.svgMargin/2 , this.svg_h-this.svgMargin/2]], d)
                     outsideBoundary = <path
@@ -905,6 +913,7 @@ class BaseMap extends Component {
                     //outsideBoundary,
                     //simplified_Outboundary,
                     // inscribledCircles,
+                    //clip_boundary
                     //linePts,
                     cells0,
                     // cells1,
@@ -998,6 +1007,11 @@ class BaseMap extends Component {
 
         }
 
+        let Heatmap
+        if(this.state.heatmapPointData) {
+            Heatmap = <HeatMap data = { this.state.heatmapPointData }/>
+        }
+
         let options = []
         chinaProvincesName.forEach((e, i)=>{
             options.push(
@@ -1005,19 +1019,12 @@ class BaseMap extends Component {
             )
         })
 
-        let Heatmap 
-        if(this.state.heatmapPointData) {
-
-            Heatmap = <HeatMap data = {this.state.heatmapPointData}/>
-                
-        }
-
         return (
 
         <div>
             <div className="Control">
                 <p>Basemap</p>
-                {/* <Slider defaultValue={30} onAfterChange={this.onAfterChange}/> */}
+                <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
 
                 <Select
                     showSearch
@@ -1034,42 +1041,31 @@ class BaseMap extends Component {
                 </Select>
 
             </div>
-            {/* <ReactHeatmap style={ {width:960, height: 800}} className = "ReactHeatmap" max={5} data={this.state.heatmapPointData}/> */}
-            {/* <div width = {this.svg_w} height = {this.svg_h} id="heatMap">
-            </div> */}
-            <div className="myCanvas">
-                <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
-                <g className="Regions">
-                    {Regions}
-                </g>
-                <g className="Dots">
-                    {Dots}
-                </g>
-                <g className="test_near">
-                    {test_near}
-                </g>
-                <g className="innerBoundary">
-                    {innerBoundary}
-                </g>
-                <g className="outerBoundary">
-                    {outerBoundary}
-                </g>
-                <g className = "legend" ref = {this.legendRef}>
+            <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
+            {/* <g className="Regions">
+                {Regions}
+            </g> */}
+             {/* <g className="Dots">
+                {Dots}
+            </g> */}
+            {/* <g className="test_near">
+                {test_near}
+            </g> */}
+            {/* <g className="innerBoundary">
+                {innerBoundary}
+            </g>
+            <g className="outerBoundary">
+                {outerBoundary}
+            </g> */}
+            {/* <g className = "legend" ref = {this.legendRef}>
 
-                </g>
-                <g className = "gradientLegend" ref = {this.gradientLegendRef}>
+            </g>
+            <g className = "gradientLegend" ref = {this.gradientLegendRef}>
 
-                </g>    
-                </svg>
-                {/* { Heatmap } */}
-            </div>
+            </g> */}
+            </svg>
             {/* <CountPoint mainArea = {this.state.mainArea} points = {this.state.pointsData}/> */}
-            {/* { this.state.heatmapPointData } ? <HeatMap data = {this.state.heatmapPointData}/> : '' */}
-            {/* <div>
-                { this.state.heatmapPointData !== undefined } ? {console.log(this.state.heatmapPointData)} : ''
-            </div> */}
-
-
+            { Heatmap }
         </div>
 
         )
