@@ -37,20 +37,20 @@ class BaseMap extends Component {
         super();
         this.state = {
             /* Render Hunan
-            */ 
+            */
             province_en: 'Shandong',
             province_cn: '山东',
 
             /* Render Yunnan
-            */ 
+            */
             //province_en: 'Yunnan',
             //province_cn: '云南',
 
             /* Render Sichuan
-            */ 
+            */
             //province_en: 'Sichuan',
             //province_cn: '四川',
-            
+
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -109,15 +109,15 @@ class BaseMap extends Component {
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
-        */ 
+        */
         Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_shandong.csv')])
 
         /* Render Yunnan
-        */ 
+        */
     //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
 
         /* Render Sichuan
-        */ 
+        */
     //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
 
             .then(result=>{
@@ -338,8 +338,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.20
-            ////console.log(padding)
+            const padding = -0.15            ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -602,7 +601,7 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 450, 600])
+                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 350, 400])
                                         // console.log('colorscale', )
                                          /////////////Create cell legend/////////////////////
                                          const node = this.legendRef.current
@@ -702,7 +701,7 @@ class BaseMap extends Component {
                 })
             }
             // console.log(this.clip_boundary)
-            let clip_boundary 
+            let clip_boundary
             if(this.state.clip_boundary) {
                 clip_boundary = <path
 
