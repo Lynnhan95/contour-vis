@@ -38,8 +38,8 @@ class BaseMap extends Component {
         this.state = {
             /* Render Hunan
             */ 
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            province_en: 'Shandong',
+            province_cn: '山东',
 
             /* Render Yunnan
             */ 
@@ -110,7 +110,7 @@ class BaseMap extends Component {
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
         */ 
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_shandong.csv')])
 
         /* Render Yunnan
         */ 
@@ -338,7 +338,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = (-1.6/num)
+            const padding = -0.20
             ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
@@ -602,7 +602,7 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells([0, 100, 200,300, 400, 500, 600])
+                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 450, 600])
                                         // console.log('colorscale', )
                                          /////////////Create cell legend/////////////////////
                                          const node = this.legendRef.current
@@ -631,7 +631,7 @@ class BaseMap extends Component {
                                          .attr('x', 100)
                                          .attr('y', 0)
                                          .attr('width', 20)
-                                         .attr('height', 120)
+                                         .attr('height', 165)
                                          .style('fill', 'url(#grad)');
 
                                          let grad = element.append('defs')
@@ -1028,9 +1028,9 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             {/* <g className="Dots">
+             <g className="Dots">
                 {Dots}
-            </g> */}
+            </g>
             <g className="test_near">
                 {test_near}
             </g>
