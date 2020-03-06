@@ -38,8 +38,8 @@ class BaseMap extends Component {
         this.state = {
             /* Render Hunan
             */
-            province_en: 'Shandong',
-            province_cn: '山东',
+            province_en: 'Hunan',
+            province_cn: '湖南',
 
             /* Render Yunnan
             */
@@ -57,7 +57,7 @@ class BaseMap extends Component {
             resDots: null,
             segment_path_len: 0.1,
             simplifiedContours: null,
-
+            simplifiedOuter: null,
             segmentBoxObjArray: null
         }
 
@@ -110,7 +110,7 @@ class BaseMap extends Component {
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
         */
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_shandong.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
 
         /* Render Yunnan
         */
@@ -394,8 +394,9 @@ class BaseMap extends Component {
 
                 _me.state.simplifiedArea = simplifiedArea
 
-                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
-                ////console.log('mainArea', _me.state.simplifiedContours)
+                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 1)
+                _me.state.simplifiedOuter = _me.getOuterBoundaryContours(simplifiedArea, 1)
+                console.log('mainArea', _me.state.simplifiedOuter)
 
                 let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
 
@@ -561,10 +562,13 @@ class BaseMap extends Component {
         if (prevState.subSegList !== this.state.subSegList) {
             //console.log('pointsData update', this.state.subSegList)
             var pointsDataProjected = this.state.pointsData.map((e) => {
+
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
             let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
+
+            console.log( deleteDuplicatePoints )
             //console.log(pointsDataProjected)
             //console.log(deleteDuplicatePoints)
 
@@ -974,20 +978,20 @@ class BaseMap extends Component {
         }
 
         let outerBoundary
-        if(this.state.simplifiedOutContours){
+        if(this.state.simplifiedOuter){
             //console.log('render simplifiedContours', this.state.simplifiedContours)
             outerBoundary =
-            this.state.simplifiedOutContours.map((d, i) => {
+            this.state.simplifiedOuter.map((d, i) => {
             return (
             <path
                 key = {`contours-${i}`}
                 d = { geoPath().projection(this.autoProjection)(d) }
                 stroke = "#000"
                 strokeWidth = "0.2"
-                //fill = "#edc949"
+                // fill = "#edc949"
                 fill = "transparent"
                 //fillOpacity = "0.8"
-                className = "inner-boundary"
+                className = "outter-boundary"
                 />
                 )
             })
@@ -1035,10 +1039,10 @@ class BaseMap extends Component {
             </g>
             {/* <g className="innerBoundary">
                 {innerBoundary}
-            </g>
+            </g> */}
             <g className="outerBoundary">
                 {outerBoundary}
-            </g> */}
+            </g>
             <g className = "legend" ref = {this.legendRef}>
 
             </g>
