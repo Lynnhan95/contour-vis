@@ -2,24 +2,25 @@
 import {Point,Path} from 'paper'
 import {roundPathCorners} from './rounding'
 
-export function getBeltSeg(segPoly, strPath, clip_boundary ,index) {
+export function getBeltSeg(segPoly, strPath, clip_boundary ,index, twoPaths=false) {
   var outPolyPath = new Path(strPath)
 
   var segPath1 = new Path();
   var segPath2 = new Path();
-  //
-  // for (var i = 0; i < clip_outBoundary.length; i++) {
-  //   var temp_point = new Point (clip_outBoundary[i][0],clip_outBoundary[i][1])
-  //   outPolyPath.add (temp_point)
-  // }
-  //
-  // for (var i = 0; i < clip_boundary.length; i++) {
-  //   var temp_point = new Point (clip_boundary[i][0],clip_boundary[i][1])
-  //   polyPath.add (temp_point)
-  // }
-  let offsetPath = getLinePathStr(clip_boundary)
-  offsetPath = roundPathCorners(offsetPath,0.1,true)
-  var polyPath = new Path(offsetPath)
+
+  let offsetPath,polyPath;
+  
+  if (twoPaths) {
+    polyPath= new Path(clip_boundary)
+  }
+
+  else {
+    offsetPath = getLinePathStr(clip_boundary)
+    offsetPath = roundPathCorners(offsetPath,0.1,true)
+    polyPath= new Path(offsetPath)
+  }
+
+
 
   var ptC1 = new Point (segPoly[3][0],segPoly[3][1])
   var ptC2 = new Point (segPoly[2][0],segPoly[2][1])

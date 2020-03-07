@@ -7,7 +7,7 @@ import {roundPathCorners} from './rounding'
 params: points array of boundary
 */
 
-export function getDensity (svg,pts_ary,segment_num = 5000) {
+export function getDensity (svg,pts_ary,segment_num = 5000,extendMetric = 3) {
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
@@ -124,7 +124,6 @@ export function getDensity (svg,pts_ary,segment_num = 5000) {
     var d2 = Math.pow(((center2[0]-pt2[0])*(center2[0]-pt2[0])+(center2[1]-pt2[1])*(center2[1]-pt2[1])),0.5)
 
 
-    var extendMetric = 3
     var scale1 = (d1+extendMetric)/d1
     var scale2 = (d2+extendMetric)/d2
 
