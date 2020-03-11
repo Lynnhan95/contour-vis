@@ -4,9 +4,9 @@ import { csv } from 'd3'
 import { findMats, traverseEdges } from 'flo-mat'
 import Offset from 'polygon-offset'
 import paper from 'paper'
-const intersect = require('path-intersection')
 
 import simplify from 'simplify-geojson'
+const intersect = require('path-intersection')
 
 console.log('paper', paper)
 
