@@ -338,7 +338,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.15            ////console.log(padding)
+            const padding = -0.2            ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -416,7 +416,7 @@ class BaseMap extends Component {
                     return this.autoProjection(d)
                 })
 
-                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5)
+                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5,false)
 
                 console.log(segPolyList_out);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -472,7 +472,7 @@ class BaseMap extends Component {
 
                 })
 
-              console.log(subSegList_out)
+
 
 /*
             belt
@@ -675,7 +675,7 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 350, 400])
+                                        this.legend = legendColor().scale(this.color_scale).cells([0,100,200,300,400,500,600,700,800])
                                         // console.log('colorscale', )
                                          /////////////Create cell legend/////////////////////
                                          const node = this.legendRef.current
@@ -971,7 +971,7 @@ class BaseMap extends Component {
                     //linePts,
                     cells0,
                     // cells1,
-                    cells2,
+                    // cells2,
                     //segPoly
                     //boundaryDots
                ]
@@ -1103,9 +1103,9 @@ class BaseMap extends Component {
             {/* <g className="innerBoundary">
                 {innerBoundary}
             </g> */}
-            <g className="outerBoundary">
+            {/* <g className="outerBoundary">
                 {outerBoundary}
-            </g>
+            </g> */}
             <g className = "legend" ref = {this.legendRef}>
 
             </g>

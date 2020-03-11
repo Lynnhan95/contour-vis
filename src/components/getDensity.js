@@ -7,7 +7,7 @@ import {roundPathCorners} from './rounding'
 params: points array of boundary
 */
 
-export function getDensity (svg,pts_ary,segment_num = 5000,extendMetric = 3) {
+export function getDensity (svg,pts_ary,segment_num = 5000,extendMetric = 3,drawOutline =true) {
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
@@ -22,12 +22,18 @@ export function getDensity (svg,pts_ary,segment_num = 5000,extendMetric = 3) {
   strPath = roundPathCorners(strPath,0.2,true)
   console.log(strPath);
 
+
+
   var p = svg.append("path")
                   .style("fill","none")
-                  .style("stroke","black")
                   .style("stroke-width","2px")
                   .attr("d",draw(d3.path(),strPath));
-
+  if (drawOutline) {
+    p.style("stroke","black")
+  }
+  else{
+    p.style("stroke","none")
+  }
 
   function draw(context,strPath) {
     var split = strPath.split(/(?=[LMC])/)
