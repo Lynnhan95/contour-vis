@@ -89,7 +89,7 @@ export function insideCounter (subSegGroup_ary, beltSegGroup_ary,  dataPts, segN
 
         let perpenDensity=[];
         for (var i = 0; i < densityGroup.length; i++) {
-          let result = slidingCalSumPerp(7,densityGroup[i])
+          let result = slidingCalSumPerp(17,densityGroup[i])
           // var j=1
           // while (j < len+1) {
           //   if (j == len) {

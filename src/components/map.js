@@ -38,18 +38,21 @@ class BaseMap extends Component {
         this.state = {
             /* Render Hunan
             */
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            // province_en: 'Hunan',
+            // province_cn: '湖南',
 
             /* Render Yunnan
             */
-            //province_en: 'Yunnan',
-            //province_cn: '云南',
+            // province_en: 'Yunnan',
+            // province_cn: '云南',
 
             /* Render Sichuan
             */
-            //province_en: 'Sichuan',
-            //province_cn: '四川',
+            // province_en: 'Sichuan',
+            // province_cn: '四川',
+
+            province_en: 'Guizhou',
+            province_cn: '贵州',
 
             currGeoData: [],
             chinaGeoData: [],
@@ -110,15 +113,19 @@ class BaseMap extends Component {
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
         */
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
+        // Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
 
         /* Render Yunnan
         */
-    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
+       // Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
 
         /* Render Sichuan
         */
-    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
+       // Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
+
+       /* Render Guizhou
+       */
+      Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_guizhou.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -338,7 +345,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.15            ////console.log(padding)
+            const padding = -0.2       ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -432,7 +439,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 20 // set how many subsegments we divide each seg
+                const subSegNum = 60 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -594,7 +601,7 @@ class BaseMap extends Component {
             let cell_extent = extent(cellObjArr, (d)=>{
                 return d.dens
             })
-            let deltaColor = (cell_extent[1]-cell_extent[0])/9
+            let deltaColor = (720-cell_extent[0])/9
             let colors = []
             for (var i = 0; i < 9; i++) {
               var temp = cell_extent[0]+i*deltaColor
@@ -605,7 +612,7 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 350, 400])
+                                        this.legend = legendColor().scale(this.color_scale).cells([0,100,200,300,400,500,600,700,800])
                                         // console.log('colorscale', )
                                          /////////////Create cell legend/////////////////////
                                          const node = this.legendRef.current
@@ -1031,18 +1038,18 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots">
+             {/* <g className="Dots">
                 {Dots}
-            </g>
+            </g> */}
             <g className="test_near">
                 {test_near}
             </g>
             {/* <g className="innerBoundary">
                 {innerBoundary}
             </g> */}
-            <g className="outerBoundary">
+            {/* <g className="outerBoundary">
                 {outerBoundary}
-            </g>
+            </g> */}
             <g className = "legend" ref = {this.legendRef}>
 
             </g>
