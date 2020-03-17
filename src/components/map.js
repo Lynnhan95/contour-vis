@@ -51,8 +51,15 @@ class BaseMap extends Component {
             // province_en: 'Sichuan',
             // province_cn: '四川',
 
-            province_en: 'Guizhou',
-            province_cn: '贵州',
+            // province_en: 'Guizhou',
+            // province_cn: '贵州',
+
+            // province_en: 'Shandong',
+            // province_cn: '山东',
+
+            province_en: 'Anhui',
+            province_cn: '安徽',
+
 
             currGeoData: [],
             chinaGeoData: [],
@@ -125,7 +132,7 @@ class BaseMap extends Component {
 
        /* Render Guizhou
        */
-      Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_guizhou.csv')])
+      Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_anhui.csv')])
 
             .then(result=>{
                 let response = result[0],
@@ -439,7 +446,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 60 // set how many subsegments we divide each seg
+                const subSegNum = 30 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -601,7 +608,7 @@ class BaseMap extends Component {
             let cell_extent = extent(cellObjArr, (d)=>{
                 return d.dens
             })
-            let deltaColor = (720-cell_extent[0])/9
+            let deltaColor = (cell_extent[1]-cell_extent[0])/9
             let colors = []
             for (var i = 0; i < 9; i++) {
               var temp = cell_extent[0]+i*deltaColor
