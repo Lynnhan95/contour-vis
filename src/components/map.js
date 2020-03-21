@@ -25,7 +25,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 50
+const slidingBins = 30
 
 const intersect = require('path-intersection')
 
@@ -54,6 +54,7 @@ class BaseMap extends Component {
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
+            point_ToyData:[],
             resDots: null,
             segment_path_len: 0.1,
             simplifiedContours: null,
@@ -75,6 +76,7 @@ class BaseMap extends Component {
 
         // nest data
         this.pointsDataNest = null
+        this.pointsToy_DataNest = null
         this.chinaGeoDataNest = null
         this.chinaProvincesNameNest = keyBy(chinaProvincesName, d=>d.provincePhonetic)
 
@@ -110,7 +112,7 @@ class BaseMap extends Component {
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
         */
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/hunan_buddhism.csv'), csv('/new_hunan_other.csv')])
 
         /* Render Yunnan
         */
@@ -122,7 +124,8 @@ class BaseMap extends Component {
 
             .then(result=>{
                 let response = result[0],
-                    religious_data = result[1]
+                    religious_data = result[1],
+                    toy_data = result[2]
 
                 /**
                  * religious_data
@@ -141,6 +144,25 @@ class BaseMap extends Component {
 
                 _me.pointsDataNest = entriesObj
 
+
+                /***
+                TOY DATA FOR DOUBLE LAYERS
+                ***/
+
+                toy_data.forEach(d => {
+                    d["id"] = +d["id"];
+                    d["Latitude"] = +d["Latitude"]
+                    d["Longitude"] = +d["Longitude"]
+                    d["year"] = +d["year"]
+                })
+                let toy_entries = nest()
+                    .key(d=>d.province)
+                    .entries(toy_data)
+
+                let toy_entriesObj = keyBy(toy_entries, d=>d.key)
+
+                _me.pointsToy_DataNest = toy_entriesObj
+
                 /**
                  * chinaGeo
                  */
@@ -156,7 +178,8 @@ class BaseMap extends Component {
                     _me.setState ({
                         chinaGeoData: chinaGeoData.features,
                         currGeoData: _me.chinaGeoDataNest[_me.state.province_cn],
-                        pointsData: _me.pointsDataNest[_me.state.province_en].values
+                        pointsData: _me.pointsDataNest[_me.state.province_en].values,
+                        point_ToyData: _me.pointsToy_DataNest[_me.state.province_en].values
                     })
                 })
 
@@ -308,7 +331,7 @@ class BaseMap extends Component {
 
     getOuterBoundaryContours(coordinates, num) {
         let contours = []
-        const margin = 0.2
+        const margin = 0.22
         for(let i=1; i< num+1; i++) {
             let offsetContour = new Offset(coordinates).offset(margin* i)
             if (i == 1) {
@@ -338,7 +361,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.15            ////console.log(padding)
+            const padding = -0.22            ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -416,7 +439,7 @@ class BaseMap extends Component {
                     return this.autoProjection(d)
                 })
 
-                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5)
+                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5,false)
 
                 console.log(segPolyList_out);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +479,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 20 // set how many subsegments we divide each seg
+                const subSegNum = 40 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -612,15 +635,23 @@ class BaseMap extends Component {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
 
-            console.log( deleteDuplicatePoints )
+            var points_ToyDataProjected = this.state.point_ToyData.map((e) => {
+
+                return _me.autoProjection([ e.Longitude, e.Latitude ])
+            })
+
+            console.log(points_ToyDataProjected);
+
+            let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
+            let deleteDuplicate_TpyPoints = deleteDuplicate(points_ToyDataProjected)
+            // console.log( deleteDuplicatePoints )
             //console.log(pointsDataProjected)
-            //console.log(deleteDuplicatePoints)
+            console.log(deleteDuplicate_TpyPoints)
 
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
-            var [densityGroup2, areGroup2] = insideCounter(this.state.subSegList_out, this.state.beltCellList_out,deleteDuplicatePoints,setSegNumb,slidingBins)
+            var [densityGroup2, areGroup2] = insideCounter(this.state.subSegList_out, this.state.beltCellList_out,deleteDuplicate_TpyPoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
@@ -662,10 +693,34 @@ class BaseMap extends Component {
             let cell_extent = extent(cellObjArr, (d)=>{
                 return d.dens
             })
+
+            console.log(cell_extent);
             let deltaColor = (cell_extent[1]-cell_extent[0])/9
             let colors = []
+            // for (var i = 0; i < 9; i++) {
+            //   var temp = cell_extent[0]+i*deltaColor
+            //   colors.push(temp)
+            // }
+
+//////////////////////////////////////////////////draw legend
+
+            let cell_extent2 = extent(cellObjArr2, (d)=>{
+                return d.dens
+            })
+
+            console.log(cell_extent2);
+            let maxAll;
+            if (cell_extent2[1]>cell_extent[1]) {
+              maxAll = cell_extent2[1]
+            }
+            else {
+              maxAll = cell_extent[1]
+            }
+
+            let deltaColor2 = (maxAll-cell_extent[0])/9
+            let colors2 = []
             for (var i = 0; i < 9; i++) {
-              var temp = cell_extent[0]+i*deltaColor
+              var temp = cell_extent[0]+i*deltaColor2
               colors.push(temp)
             }
 
@@ -675,54 +730,63 @@ class BaseMap extends Component {
                                 .domain(colors)
                                 .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 350, 400])
-                                        // console.log('colorscale', )
-                                         /////////////Create cell legend/////////////////////
-                                         const node = this.legendRef.current
-                                         console.log("node", node)
-                                         select(node)
-                                             .call(this.legend)
 
-                                         ////////////Create gradient legend /////////////////
-                                         var color_scheme = [
-                                             '#2c7bb6',
-                                             '#00a6ca',
-                                             '#00ccbc',
-                                             '#90eb9d',
-                                             '#ffff8c',
-                                             '#f9d057',
-                                             '#f29e2e',
-                                             '#e76818',
-                                             '#d7191c' ];
-                                         const gradientNode = this.gradientLegendRef.current
-                                         const element =
-                                         select(gradientNode)
-                                             // .attr('width', 50)
-                                             // .attr('height', 300)
+            this.color_scale2 = scaleLinear()
+                                .domain(colors2)
+                                .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
+                                        "#f9d057","#f29e2e","#e76818","#d7191c"]);
 
-                                         element.append('rect')
-                                         .attr('x', 100)
-                                         .attr('y', 0)
-                                         .attr('width', 20)
-                                         .attr('height', 165)
-                                         .style('fill', 'url(#grad)');
 
-                                         let grad = element.append('defs')
-                                         .append('linearGradient')
-                                         .attr('id', 'grad')
-                                         .attr('x1', '0%')
-                                         .attr('x2', '0%')
-                                         .attr('y1', '0%')
-                                         .attr('y2', '100%');
 
-                                         grad.selectAll('stop')
-                                         .data(color_scheme)
-                                         .enter()
-                                         .append('stop')
-                                         .style('stop-color', function(d){ return d; })
-                                         .attr('offset', function(d,i){
-                                           return 100 * (i / (colors.length - 1)) + '%';
-                                         })
+
+          this.legend = legendColor().scale(this.color_scale).cells([0, 200, 400, 600, 800, 1000, 1200, 1400, 1500])
+          // console.log('colorscale', )
+           /////////////Create cell legend/////////////////////
+           const node = this.legendRef.current
+           console.log("node", node)
+           select(node)
+               .call(this.legend)
+
+           ////////////Create gradient legend /////////////////
+           var color_scheme = [
+               '#2c7bb6',
+               '#00a6ca',
+               '#00ccbc',
+               '#90eb9d',
+               '#ffff8c',
+               '#f9d057',
+               '#f29e2e',
+               '#e76818',
+               '#d7191c' ];
+           const gradientNode = this.gradientLegendRef.current
+           const element =
+           select(gradientNode)
+               // .attr('width', 50)
+               // .attr('height', 300)
+
+           element.append('rect')
+           .attr('x', 100)
+           .attr('y', 0)
+           .attr('width', 20)
+           .attr('height', 165)
+           .style('fill', 'url(#grad)');
+
+           let grad = element.append('defs')
+           .append('linearGradient')
+           .attr('id', 'grad')
+           .attr('x1', '0%')
+           .attr('x2', '0%')
+           .attr('y1', '0%')
+           .attr('y2', '100%');
+
+           grad.selectAll('stop')
+           .data(color_scheme)
+           .enter()
+           .append('stop')
+           .style('stop-color', function(d){ return d; })
+           .attr('offset', function(d,i){
+             return 100 * (i / (colors.length - 1)) + '%';
+           })
 
 
             this.setState({
@@ -998,8 +1062,20 @@ class BaseMap extends Component {
             key = {`dot-${ i }`}
             cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
             cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
-            fill="purple"
-            r = "0.75"
+            fill="#0000A0"
+            r = "0.6"
+            />
+            )
+        })
+
+        const Toy_Dots = this.state.point_ToyData.map((d,i) => {
+            return (
+            <circle
+            key = {`dot-${ i }`}
+            cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
+            cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
+            fill="red"
+            r = "0.6"
             />
             )
         })
@@ -1071,7 +1147,7 @@ class BaseMap extends Component {
         return (
 
         <div>
-            <div className="Control">
+            {/* <div className="Control">
                 <p>Basemap</p>
                 <Slider defaultValue={30} onAfterChange={this.onAfterChange}/>
 
@@ -1089,14 +1165,18 @@ class BaseMap extends Component {
                     { options }
                 </Select>
 
-            </div>
+            </div> */}
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots">
+             {/* <g className="Dots">
                 {Dots}
             </g>
+
+            <g className="toy_Dots">
+               {Toy_Dots}
+           </g> */}
             <g className="test_near">
                 {test_near}
             </g>
