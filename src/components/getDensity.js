@@ -19,7 +19,7 @@ export function getDensity (svg,pts_ary,segment_num = 5000) {
 
 
   var strPath = getLinePathStr(pts_ary)
-  strPath = roundPathCorners(strPath,0.1,true)
+  strPath = roundPathCorners(strPath,0.05,true)
   console.log(strPath);
 
   var p = svg.append("path")
@@ -124,7 +124,7 @@ export function getDensity (svg,pts_ary,segment_num = 5000) {
     var d2 = Math.pow(((center2[0]-pt2[0])*(center2[0]-pt2[0])+(center2[1]-pt2[1])*(center2[1]-pt2[1])),0.5)
 
 
-    var extendMetric = 10
+    var extendMetric = 3
     var scale1 = (d1+extendMetric)/d1
     var scale2 = (d2+extendMetric)/d2
 

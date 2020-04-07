@@ -25,7 +25,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 50
+const slidingBins = 30
 
 const intersect = require('path-intersection')
 
@@ -37,20 +37,20 @@ class BaseMap extends Component {
         super();
         this.state = {
             /* Render Hunan
-            */ 
-            province_en: 'Shandong',
-            province_cn: '山东',
+            */
+            province_en: 'Hunan',
+            province_cn: '湖南',
 
             /* Render Yunnan
-            */ 
+            */
             //province_en: 'Yunnan',
             //province_cn: '云南',
 
             /* Render Sichuan
-            */ 
+            */
             //province_en: 'Sichuan',
             //province_cn: '四川',
-            
+
             currGeoData: [],
             chinaGeoData: [],
             pointsData:[],
@@ -109,15 +109,15 @@ class BaseMap extends Component {
 
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
-        */ 
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_shandong.csv')])
+        */
+        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
 
         /* Render Yunnan
-        */ 
+        */
     //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
 
         /* Render Sichuan
-        */ 
+        */
     //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
 
             .then(result=>{
@@ -338,7 +338,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.20
+            const padding = -0.15
             ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
@@ -373,7 +373,7 @@ class BaseMap extends Component {
                 //console.warn('dddddd', d);
 
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 0.4
+                const simplifiedFactor = 0.1
 
                 // Compute simplified area
                 let res = []
@@ -702,7 +702,7 @@ class BaseMap extends Component {
                 })
             }
             // console.log(this.clip_boundary)
-            let clip_boundary 
+            let clip_boundary
             if(this.state.clip_boundary) {
                 clip_boundary = <path
 
