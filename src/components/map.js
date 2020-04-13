@@ -38,18 +38,18 @@ class BaseMap extends Component {
         this.state = {
             /* Render Hunan
             */
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            // province_en: 'Shandong',
+            // province_cn: '山东',
 
             /* Render Yunnan
             */
-            //province_en: 'Yunnan',
-            //province_cn: '云南',
+            province_en: 'Guizhou',
+            province_cn: '贵州',
 
             /* Render Sichuan
             */
-            //province_en: 'Sichuan',
-            //province_cn: '四川',
+            // province_en: 'Sichuan',
+            // province_cn: '四川',
 
             currGeoData: [],
             chinaGeoData: [],
@@ -110,11 +110,11 @@ class BaseMap extends Component {
         //Promise.all([fetch("/chinaGeo-simplify.json"), csv('/religious_data.csv')])
         /* Render Hunan
         */
-        Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
+        // Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_sichuan.csv')])
 
         /* Render Yunnan
         */
-    //    Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_yunnan.csv')])
+       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_guizhou.csv')])
 
         /* Render Sichuan
         */
@@ -432,7 +432,7 @@ class BaseMap extends Component {
 */
 
                 let subSegList = []
-                const subSegNum = 20 // set how many subsegments we divide each seg
+                const subSegNum = 25 // set how many subsegments we divide each seg
                 newSegPolyList.forEach((d,i) => {
 
                     let subSeg = interpolateSegment(d, subSegNum,i)
@@ -1028,9 +1028,9 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots">
+             {/* <g className="Dots">
                 {Dots}
-            </g>
+            </g> */}
             <g className="test_near">
                 {test_near}
             </g>
