@@ -338,7 +338,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.15
+            const padding = -0.2
             ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
@@ -373,7 +373,7 @@ class BaseMap extends Component {
                 //console.warn('dddddd', d);
 
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 0.1
+                const simplifiedFactor = 0.4
 
                 // Compute simplified area
                 let res = []
@@ -600,56 +600,56 @@ class BaseMap extends Component {
 
             this.color_scale = scaleLinear()
                                 .domain(colors)
-                                .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
+                                // .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
+                                //         "#f9d057","#f29e2e","#e76818","#d7191c"]);
+                                .range(["#d3d3d3","#2c7bb6","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
-                                        this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 450, 600])
-                                        // console.log('colorscale', )
-                                         /////////////Create cell legend/////////////////////
-                                         const node = this.legendRef.current
-                                         console.log("node", node)
-                                         select(node)
-                                             .call(this.legend)
 
-                                         ////////////Create gradient legend /////////////////
-                                         var color_scheme = [
-                                             '#2c7bb6',
-                                             '#00a6ca',
-                                             '#00ccbc',
-                                             '#90eb9d',
-                                             '#ffff8c',
-                                             '#f9d057',
-                                             '#f29e2e',
-                                             '#e76818',
-                                             '#d7191c' ];
-                                         const gradientNode = this.gradientLegendRef.current
-                                         const element =
-                                         select(gradientNode)
-                                             // .attr('width', 50)
-                                             // .attr('height', 300)
 
-                                         element.append('rect')
-                                         .attr('x', 100)
-                                         .attr('y', 0)
-                                         .attr('width', 20)
-                                         .attr('height', 165)
-                                         .style('fill', 'url(#grad)');
+            // this.color_scale = scaleSequential(interpolateOrRd).domain(cell_extent)
 
-                                         let grad = element.append('defs')
-                                         .append('linearGradient')
-                                         .attr('id', 'grad')
-                                         .attr('x1', '0%')
-                                         .attr('x2', '0%')
-                                         .attr('y1', '0%')
-                                         .attr('y2', '100%');
 
-                                         grad.selectAll('stop')
-                                         .data(color_scheme)
-                                         .enter()
-                                         .append('stop')
-                                         .style('stop-color', function(d){ return d; })
-                                         .attr('offset', function(d,i){
-                                           return 100 * (i / (colors.length - 1)) + '%';
-                                         })
+          this.legend = legendColor().scale(this.color_scale).cells([0, 50, 100, 150, 200, 250, 300, 450, 600])
+          // console.log('colorscale', )
+           /////////////Create cell legend/////////////////////
+           const node = this.legendRef.current
+           console.log("node", node)
+           select(node)
+               .call(this.legend)
+
+           ////////////Create gradient legend /////////////////
+           var color_scheme = [
+             "#d3d3d3","#2c7bb6","#00ccbc","#90eb9d","#ffff8c",
+                     "#f9d057","#f29e2e","#e76818","#d7191c" ];
+           const gradientNode = this.gradientLegendRef.current
+           const element =
+           select(gradientNode)
+               // .attr('width', 50)
+               // .attr('height', 300)
+
+           element.append('rect')
+           .attr('x', 100)
+           .attr('y', 0)
+           .attr('width', 20)
+           .attr('height', 165)
+           .style('fill', 'url(#grad)');
+
+           let grad = element.append('defs')
+           .append('linearGradient')
+           .attr('id', 'grad')
+           .attr('x1', '0%')
+           .attr('x2', '0%')
+           .attr('y1', '0%')
+           .attr('y2', '100%');
+
+           grad.selectAll('stop')
+           .data(color_scheme)
+           .enter()
+           .append('stop')
+           .style('stop-color', function(d){ return d; })
+           .attr('offset', function(d,i){
+             return 100 * (i / (colors.length - 1)) + '%';
+           })
 
 
             this.setState({
