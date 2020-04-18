@@ -361,7 +361,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.22            ////console.log(padding)
+            const padding = -0.32           ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -426,10 +426,13 @@ class BaseMap extends Component {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // convert boundary to path for computing.
                 // get an array of all max inscribled circles [Object:{radius,centerX,centerY}]
+                let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
+                    return this.autoProjection(d)
+                })
 
                 let simplifiedAreaProjected = simplifiedArea.map((d)=> {return this.autoProjection(d)})
-
-                let [circleAry,segPolyList,strPath] = getDensity(select("#myCanvas"),simplifiedAreaProjected,setSegNumb)
+                // svg,pts_ary,segment_num = 5000, extendMetric = 3, plotBoundary= true, inner_pts_ary
+                let [circleAry,segPolyList,strPath] = getDensity(select("#myCanvas"),simplifiedAreaProjected, setSegNumb, 3, true, clip_innerboundary)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -439,7 +442,7 @@ class BaseMap extends Component {
                     return this.autoProjection(d)
                 })
 
-                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5,false)
+                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5, true, clip_outterboundary)
 
                 console.log(segPolyList_out);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -501,9 +504,8 @@ class BaseMap extends Component {
             belt
 */
                 //Compute belt from newSegPolyList
-                let clip_innerboundary = this.innerBoundaryCoordinates[0].map((d) => {
-                    return this.autoProjection(d)
-                })
+
+                console.log(clip_innerboundary)
                 this.clip_boundary = clip_innerboundary
                 let beltSegList = []
                 segPolyList.forEach((d, i) => {
@@ -1183,9 +1185,9 @@ class BaseMap extends Component {
             {/* <g className="innerBoundary">
                 {innerBoundary}
             </g> */}
-            <g className="outerBoundary">
+            {/* <g className="outerBoundary">
                 {outerBoundary}
-            </g>
+            </g> */}
             <g className = "legend" ref = {this.legendRef}>
 
             </g>
