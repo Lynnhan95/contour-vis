@@ -25,7 +25,7 @@ import keyBy from 'lodash.keyby'
 const { Option } = Select
 
 const setSegNumb = 5000
-const slidingBins = 30
+const slidingBins = 20
 
 const intersect = require('path-intersection')
 
@@ -361,7 +361,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.32           ////console.log(padding)
+            const padding = -0.22           ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
             if (i == 1) {
@@ -730,12 +730,12 @@ class BaseMap extends Component {
 
             this.color_scale = scaleLinear()
                                 .domain(colors)
-                                .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
+                                .range(["#d3d3d3","#2c7bb6","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
 
             this.color_scale2 = scaleLinear()
                                 .domain(colors2)
-                                .range(["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c",
+                                .range(["#d3d3d3","#2c7bb6","#00ccbc","#90eb9d","#ffff8c",
                                         "#f9d057","#f29e2e","#e76818","#d7191c"]);
 
 
@@ -1172,13 +1172,13 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             {/* <g className="Dots">
+             <g className="Dots">
                 {Dots}
             </g>
 
             <g className="toy_Dots">
                {Toy_Dots}
-           </g> */}
+           </g>
             <g className="test_near">
                 {test_near}
             </g>

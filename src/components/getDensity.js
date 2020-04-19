@@ -19,26 +19,26 @@ export function getDensity (svg,pts_ary,segment_num = 5000, extendMetric = 3, pl
 
 
   var strPath = getLinePathStr(pts_ary)
-  strPath = roundPathCorners(strPath,0.15,true)
+  strPath = roundPathCorners(strPath,0.12,true)
   console.log(strPath)
 
   var inner_strPath = getLinePathStr(inner_pts_ary)
   inner_strPath = roundPathCorners(inner_strPath, 0.12, true)
   console.log(inner_strPath);
 
-  var p,g 
+  var p,g
   if (plotBoundary) {
     p = svg.append("path")
                    .style("fill","none")
                    .style("stroke","black")
-                   .style("stroke-width","2px")
+                   .style("stroke-width","0.5px")
                    .attr("d",draw(d3.path(),strPath))
                    .attr("class", "mid");
 
     g = svg.append("path")
                   .style("fill","none")
                   .style("stroke","black")
-                  .style("stroke-width","2px")
+                  .style("stroke-width","0.5px")
                   .attr("d",draw(d3.path(),inner_strPath))
                   .attr("class", "out-in");
   }
