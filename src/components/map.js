@@ -62,10 +62,10 @@ class BaseMap extends Component {
             segmentBoxObjArray: null
         }
 
-        this.svgMargin = 50;
+        this.svgMargin = 200;
         this.autoProjection = null
-        this.svg_w = 960
-        this.svg_h = 600
+        this.svg_w = 1560
+        this.svg_h = 1000
 
         // offset
         this.offset = new Offset()
@@ -160,6 +160,7 @@ class BaseMap extends Component {
                     .entries(toy_data)
 
                 let toy_entriesObj = keyBy(toy_entries, d=>d.key)
+                // console.log(toy_entriesObj)
 
                 _me.pointsToy_DataNest = toy_entriesObj
 
@@ -337,6 +338,9 @@ class BaseMap extends Component {
             if (i == 1) {
                 this.outerBoundaryCoordinates = offsetContour.filter(e => !!e)
             }
+            if (i == 2) {
+                this.outerSecondBoundaryCoordinates = offsetContour.filter(e => !!e)
+            }
 
             let outerBoundaryCoordinates = offsetContour.filter(e => !!e)
             let paddinged = {
@@ -418,7 +422,7 @@ class BaseMap extends Component {
                 _me.state.simplifiedArea = simplifiedArea
 
                 _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 1)
-                _me.state.simplifiedOuter = _me.getOuterBoundaryContours(simplifiedArea, 1)
+                _me.state.simplifiedOuter = _me.getOuterBoundaryContours(simplifiedArea, 3)
 
                 let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
 
@@ -442,9 +446,18 @@ class BaseMap extends Component {
                     return this.autoProjection(d)
                 })
 
-                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary,setSegNumb,5, true, clip_outterboundary)
+                let clip_outterboundary_second = this.outerSecondBoundaryCoordinates[0].map((d) => {
+                    return this.autoProjection(d)
+                })
 
-                console.log(segPolyList_out);
+                // console.log(clip_outterboundary_second)
+
+                let [circleAry_out,segPolyList_out,strPath_out] = getDensity(select("#myCanvas"),clip_outterboundary, setSegNumb,5, true, clip_outterboundary)
+                let [circleAry_out_second,segPolyList_second_out,strPath_second_out] = getDensity(select("#myCanvas"),clip_outterboundary_second,setSegNumb, 20, true, clip_outterboundary_second)
+
+                // console.log(segPolyList_second_out, strPath_second_out)
+                // console.log(segPolyList_out);
+                // console.log(segPolyList_second_out);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 // create new segList by clipping from mainArea polygon
                 let clip_boundary = simplifiedArea.map((d) => {
@@ -460,10 +473,8 @@ class BaseMap extends Component {
 
                 })
 
-                //console.log(newSegPolyList)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
                 let newSegPolyList_out = []
 
@@ -474,7 +485,16 @@ class BaseMap extends Component {
 
                 })
 
-//console.log(newSegPolyList)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                let newSegPolyListSecond_out = []
+
+                segPolyList_second_out.forEach((d,i) => {
+                    let newSegPolySecond = getNewSeg(d,strPath_second_out,i)
+
+                    newSegPolyListSecond_out.push(newSegPolySecond)
+                })
+
+// console.log(newSegPolyListSecond_out)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /*
@@ -498,15 +518,25 @@ class BaseMap extends Component {
 
                 })
 
-              console.log(subSegList_out)
+                let subSegListSecond_out = []
+                newSegPolyListSecond_out.forEach((d,i) => {
+
+                    let subSeg = interpolateSegment(d, subSegNum, i)
+                    subSegListSecond_out.push(subSeg)
+                })
+
+            //   console.log(subSegListSecond_out)
+
+
 
 /*
             belt
 */
                 //Compute belt from newSegPolyList
 
-                console.log(clip_innerboundary)
+                // console.log(clip_innerboundary)
                 this.clip_boundary = clip_innerboundary
+
                 let beltSegList = []
                 segPolyList.forEach((d, i) => {
                     let beltSeg = getBeltSeg(d, strPath, clip_innerboundary, i,false)
@@ -520,6 +550,12 @@ class BaseMap extends Component {
                     beltSegList_out.push(beltSeg)
                 })
 
+                let beltSegListSecond_out = []
+                segPolyList_second_out.forEach((d, i) => {
+                    let beltSeg = getBeltSeg(d, strPath_second_out, strPath, i, true)
+                    beltSegListSecond_out.push(beltSeg)
+                })
+                console.log(beltSegListSecond_out)
 
 
 
@@ -539,11 +575,17 @@ class BaseMap extends Component {
                     beltCellList_out.push(subCell)
                 })
 
+                let beltCellListSecond_out = []
+                beltSegListSecond_out.forEach((d) => {
+                    let subCell = interpolateSegment(d, subSegNum)
+                    beltCellListSecond_out.push(subCell)
+                })
+
                 ////console.log(beltCellList)
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
-
+                console.log(beltCellListSecond_out)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -592,11 +634,13 @@ class BaseMap extends Component {
                     linePts : simplifiedAreaProjected,
                     subSegList:subSegList,
                     subSegList_out:subSegList_out,
+                    subSegListSecond_out: subSegListSecond_out,
                     beltCellList: beltCellList,
                     beltCellList_out: beltCellList_out,
+                    beltCellListSecond_out: beltCellListSecond_out,
                     beltSegList:beltSegList,
                     segPolyList: segPolyList,
-                    beltSegList_out:beltSegList_out,
+                    beltSegList_out: beltSegList_out,
                     segPolyList_out: segPolyList_out,
                     newSegPolyList:newSegPolyList,
                     clip_boundary: clip_boundary
@@ -637,23 +681,38 @@ class BaseMap extends Component {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
+            let point_ToyData_first = this.state.point_ToyData.filter((e) => {
+                return e.Name_Type === "Daoism"
+            })
+            let point_ToyData_second = this.state.point_ToyData.filter((e) => {
+                return e.Name_Type !== "Daoism"
+            })
 
-            var points_ToyDataProjected = this.state.point_ToyData.map((e) => {
+            var points_ToyDataProjected = point_ToyData_first.map((e) => {
 
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            console.log(points_ToyDataProjected);
+            var points_ToyDataProjected_second = point_ToyData_second.map((e) => {
+
+                return _me.autoProjection([ e.Longitude, e.Latitude ])
+            })
+
+            // console.log(points_ToyDataProjected);
 
             let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
             let deleteDuplicate_TpyPoints = deleteDuplicate(points_ToyDataProjected)
+            let deleteDuplicate_TpyPoints_second = deleteDuplicate(points_ToyDataProjected_second)
+
             // console.log( deleteDuplicatePoints )
             //console.log(pointsDataProjected)
-            console.log(deleteDuplicate_TpyPoints)
+            // console.log(deleteDuplicate_TpyPoints)
 
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             var [densityGroup2, areGroup2] = insideCounter(this.state.subSegList_out, this.state.beltCellList_out,deleteDuplicate_TpyPoints,setSegNumb,slidingBins)
+            var [densityGroup3, areGroup3] = insideCounter(this.state.subSegListSecond_out, this.state.beltCellListSecond_out,deleteDuplicate_TpyPoints_second,setSegNumb,slidingBins)
+
             //console.log(densityGroup);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
@@ -662,9 +721,11 @@ class BaseMap extends Component {
 
             var cellGroup = this.state.beltCellList
             var cellGroup2 = this.state.beltCellList_out
+            var cellGroup3 = this.state.beltCellListSecond_out
             ////console.log(cellGroup[0], densityGroup[0])
             let cellObjArr = []
             let cellObjArr2 = []
+            let cellObjArr3 = []
 
             for(let i=0; i< densityGroup.length; i++) {
                 for(let j=0; j< densityGroup[i].length; j++) {
@@ -688,7 +749,17 @@ class BaseMap extends Component {
                   }
               }
 
+//////////////////////////////////////////////////////// draw third belt
 
+            for(let i=0; i< densityGroup3.length; i++) {
+                for(let j=0; j< densityGroup3[i].length; j++) {
+                    let cellObj = {}
+                    cellObj.coor = cellGroup3[i][j]
+                    cellObj.dens = densityGroup3[i][j]
+                    cellObjArr3.push(cellObj)
+                }
+            }
+            console.log(cellObjArr3)
 
 //////////////////////////////////////////////////draw legend
 
@@ -696,7 +767,7 @@ class BaseMap extends Component {
                 return d.dens
             })
 
-            console.log(cell_extent);
+            // console.log(cell_extent);
             let deltaColor = (cell_extent[1]-cell_extent[0])/9
             let colors = []
             // for (var i = 0; i < 9; i++) {
@@ -710,14 +781,21 @@ class BaseMap extends Component {
                 return d.dens
             })
 
-            console.log(cell_extent2);
+            let cell_extent3 = extent(cellObjArr3, (d)=>{
+                return d.dens
+            })
+
+            // console.log(cell_extent2);
             let maxAll;
-            if (cell_extent2[1]>cell_extent[1]) {
-              maxAll = cell_extent2[1]
-            }
-            else {
-              maxAll = cell_extent[1]
-            }
+            // if (cell_extent2[1]>cell_extent[1]) {
+            //   maxAll = cell_extent2[1]
+            // }
+            // else {
+            //   maxAll = cell_extent[1]
+            // }
+            console.log(cell_extent, cell_extent2, cell_extent3)
+            maxAll = Math.max(cell_extent[1], cell_extent2[1], cell_extent3[1])
+            console.log(maxAll)
 
             let deltaColor2 = (maxAll-cell_extent[0])/9
             let colors2 = []
@@ -745,7 +823,7 @@ class BaseMap extends Component {
           // console.log('colorscale', )
            /////////////Create cell legend/////////////////////
            const node = this.legendRef.current
-           console.log("node", node)
+        //    console.log("node", node)
            select(node)
                .call(this.legend)
 
@@ -794,6 +872,7 @@ class BaseMap extends Component {
             this.setState({
                 cellObjArr: cellObjArr,
                 cellObjArr2:cellObjArr2,
+                cellObjArr3:cellObjArr3,
             })
 
 
@@ -949,7 +1028,7 @@ class BaseMap extends Component {
 
             }
 
-            let cells0,cells1,cells2
+            let cells0,cells1,cells2, cells3
             if(this.state.cellObjArr){
                 cells0 = this.state.cellObjArr.map((d, i) => {
                     let pathStr0 = getLinePathStr(d.coor)
@@ -982,6 +1061,22 @@ class BaseMap extends Component {
 
               })
             }
+
+            if(this.state.cellObjArr3){
+                cells3 = this.state.cellObjArr3.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d.coor)
+  
+                      return (
+                          <path
+                          key = {`split_boundary_segments3-${i}`}
+                          className = {`split_boundary_segments3-${i}`}
+                          d = {pathStr0}
+                          fill = {this.color_scale(d.dens)}
+                          />
+                      )
+  
+                })
+              }
 
 
 
@@ -1038,6 +1133,7 @@ class BaseMap extends Component {
                     cells0,
                     // cells1,
                     cells2,
+                    cells3,
                     //segPoly
                     //boundaryDots
                ]

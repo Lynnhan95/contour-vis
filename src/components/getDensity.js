@@ -7,7 +7,7 @@ import {roundPathCorners} from './rounding'
 params: points array of boundary
 */
 
-export function getDensity (svg,pts_ary,segment_num = 5000, extendMetric = 3, plotBoundary= true, inner_pts_ary) {
+export function getDensity (svg,pts_ary,segment_num = 5000, extendMetric, plotBoundary= true, inner_pts_ary) {
   /* convert it to path and divide the path
     init an empty svg for calculating purpose
   */
