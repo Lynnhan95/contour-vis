@@ -21,6 +21,8 @@ import "antd/dist/antd.css";
 import "./style.css"
 import ProviencesNames from './chinaProvincesName'
 import chinaProvincesName from './chinaProvincesName'
+import {hoMo} from './homography'
+import {constructPtInSeg} from './constructPtInSeg'
 import keyBy from 'lodash.keyby'
 const { Option } = Select
 
@@ -43,8 +45,8 @@ class BaseMap extends Component {
 
             /* Render Yunnan
             */
-            province_en: 'Guizhou',
-            province_cn: '贵州',
+            province_en: 'Anhui',
+            province_cn: '安徽',
 
             /* Render Sichuan
             */
@@ -114,7 +116,7 @@ class BaseMap extends Component {
 
         /* Render Yunnan
         */
-       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_guizhou.csv')])
+       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_anhui.csv')])
 
         /* Render Sichuan
         */
@@ -477,7 +479,6 @@ class BaseMap extends Component {
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 // ////console.log(MedianPoints)
@@ -528,7 +529,8 @@ class BaseMap extends Component {
                     beltSegList:beltSegList,
                     segPolyList: segPolyList,
                     newSegPolyList:newSegPolyList,
-                    clip_boundary: clip_boundary
+                    clip_boundary: clip_boundary,
+                    // transformPts:transformPts
 
                     // paper_inter: nk_intersect_points[1],
                     //segments: segments,
@@ -572,6 +574,9 @@ class BaseMap extends Component {
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
             //console.log(densityGroup);
+            var slicePts_in_Seg = constructPtInSeg(this.state.segPolyList,deleteDuplicatePoints)
+            var transformPts = hoMo(this.state.segPolyList,this.state.beltSegList,slicePts_in_Seg)
+            console.log(transformPts)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////after getting the density, we need to adjust the values based on empirical settings/////
 ///////////////slidng window and scaler are applied
@@ -653,7 +658,8 @@ class BaseMap extends Component {
 
 
             this.setState({
-                cellObjArr: cellObjArr
+                cellObjArr: cellObjArr,
+                transDots:transformPts
             })
             //console.log(cellObjArr)
 
@@ -933,10 +939,26 @@ class BaseMap extends Component {
             cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
             cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
             fill="purple"
-            r = "0.75"
+            r = "0.5"
             />
             )
         })
+
+        let transDots
+        if (this.state.transDots) {
+          console.log(this.state.transDots);
+          transDots = this.state.transDots[0].map((d,i) => {
+              return (
+              <circle
+              key = {`transdot-${ i }`}
+              cx = { d[0]}
+              cy = { d[1]}
+              fill="red"
+              r = "0.5"
+              />
+              )
+          })
+        }
 
         let test_near
         if(this.state.test_near_points){
@@ -1034,6 +1056,9 @@ class BaseMap extends Component {
             <g className="test_near">
                 {test_near}
             </g>
+            {/* <g className="transDots">
+               {transDots}
+           </g> */}
             {/* <g className="innerBoundary">
                 {innerBoundary}
             </g>
