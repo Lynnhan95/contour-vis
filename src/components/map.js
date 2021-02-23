@@ -674,18 +674,29 @@ class BaseMap extends Component {
             return uniques;
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if ((prevState.subSegList !== this.state.subSegList) && (prevState.subSegList_out !== this.state.subSegList_out)) {
+        if ((prevState.subSegList !== this.state.subSegList) && (prevState.subSegList_out !== this.state.subSegList_out) && this.state.pointsData) {
             //console.log('pointsData update', this.state.subSegList)
-            var pointsDataProjected = this.state.pointsData.map((e) => {
 
-                return _me.autoProjection([ e.Longitude, e.Latitude ])
-            })
+            // var pointsDataProjected = this.state.pointsData.map((e) => {
 
-            let point_ToyData_first = this.state.point_ToyData.filter((e) => {
+            //     return _me.autoProjection([ e.Longitude, e.Latitude ])
+            // })
+
+            // console.log(pointsDataProjected)
+
+            // var pointsDataProjectedFilter = pointsDataProjected.filter((e) => {
+            //     return e.Name_Type == "Daoism" || e.Name_Type == "Buddism"
+            // })
+            console.log(this.state.pointsData)
+            let point_Data = this.state.pointsData.filter((e) => {
                 return e.Name_Type === "Daoism"
             })
+            console.log(point_Data)
+            let point_ToyData_first = this.state.point_ToyData.filter((e) => {
+                return e.Name_Type === "Daoism" || e.Name_Type === "Buddism"
+            })
             let point_ToyData_second = this.state.point_ToyData.filter((e) => {
-                return e.Name_Type !== "Daoism"
+                return e.Name_Type !== "Daoism" && e.Name_Type !== "Buddism"
             })
 
             var points_ToyDataProjected = point_ToyData_first.map((e) => {
@@ -698,9 +709,14 @@ class BaseMap extends Component {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            // console.log(points_ToyDataProjected);
+            var points_dataProjected = point_Data.map((e) => {
 
-            let deleteDuplicatePoints = deleteDuplicate(pointsDataProjected)
+                return _me.autoProjection([ e.Longitude, e.Latitude ])
+            })
+
+            console.log(points_dataProjected);
+
+            let deleteDuplicatePoints = deleteDuplicate(points_dataProjected)
             let deleteDuplicate_TpyPoints = deleteDuplicate(points_ToyDataProjected)
             let deleteDuplicate_TpyPoints_second = deleteDuplicate(points_ToyDataProjected_second)
 
@@ -1268,13 +1284,13 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             <g className="Dots">
+             {/* <g className="Dots">
                 {Dots}
             </g>
 
             <g className="toy_Dots">
                {Toy_Dots}
-           </g>
+           </g> */}
             <g className="test_near">
                 {test_near}
             </g>
