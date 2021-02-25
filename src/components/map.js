@@ -555,7 +555,7 @@ class BaseMap extends Component {
                     let beltSeg = getBeltSeg(d, strPath_second_out, strPath, i, true)
                     beltSegListSecond_out.push(beltSeg)
                 })
-                console.log(beltSegListSecond_out)
+                // console.log(beltSegListSecond_out)
 
 
 
@@ -585,7 +585,7 @@ class BaseMap extends Component {
 
 
                 //let beltSeg = getBeltSegment(segPoly, clip_boundary)
-                console.log(beltCellListSecond_out)
+                // console.log(beltCellListSecond_out)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -675,30 +675,18 @@ class BaseMap extends Component {
         }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if ((prevState.subSegList !== this.state.subSegList) && (prevState.subSegList_out !== this.state.subSegList_out) && this.state.pointsData) {
-            //console.log('pointsData update', this.state.subSegList)
-
-            // var pointsDataProjected = this.state.pointsData.map((e) => {
-
-            //     return _me.autoProjection([ e.Longitude, e.Latitude ])
-            // })
-
-            // console.log(pointsDataProjected)
-
-            // var pointsDataProjectedFilter = pointsDataProjected.filter((e) => {
-            //     return e.Name_Type == "Daoism" || e.Name_Type == "Buddism"
-            // })
-            console.log(this.state.pointsData)
-            let point_Data = this.state.pointsData.filter((e) => {
-                return e.Name_Type === "Daoism"
+            let point_Data = this.state.pointsData.filter((e,i) => {
+                return i <= 300
             })
-            console.log(point_Data)
+
             let point_ToyData_first = this.state.point_ToyData.filter((e) => {
-                return e.Name_Type === "Daoism" || e.Name_Type === "Buddism"
+                return e.Name_Type === "Daoism" || e.Name_Type === "Buddism" || e.Name_Type === "Catholicism" || e.Name_Type === "Protestantism"
             })
             let point_ToyData_second = this.state.point_ToyData.filter((e) => {
-                return e.Name_Type !== "Daoism" && e.Name_Type !== "Buddism"
+                return e.Name_Type !== "Daoism" && e.Name_Type !== "Buddism" && e.Name_Type !== "Catholicism" && e.Name_Type !== "Protestantism"
             })
 
+            console.log(point_ToyData_first, point_ToyData_second)
             var points_ToyDataProjected = point_ToyData_first.map((e) => {
 
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
@@ -714,15 +702,15 @@ class BaseMap extends Component {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            console.log(points_dataProjected);
+            // console.log(points_dataProjected);
 
             let deleteDuplicatePoints = deleteDuplicate(points_dataProjected)
             let deleteDuplicate_TpyPoints = deleteDuplicate(points_ToyDataProjected)
             let deleteDuplicate_TpyPoints_second = deleteDuplicate(points_ToyDataProjected_second)
 
-            // console.log( deleteDuplicatePoints )
-            //console.log(pointsDataProjected)
-            // console.log(deleteDuplicate_TpyPoints)
+            console.log( deleteDuplicatePoints )
+            console.log(deleteDuplicate_TpyPoints)
+            console.log(deleteDuplicate_TpyPoints_second)
 
             // var [densityGroup, areGroup] = insideCounter(this.state.subSegList,pointsDataProjected,setSegNumb,slidingBins)
             var [densityGroup, areGroup] = insideCounter(this.state.subSegList, this.state.beltCellList,deleteDuplicatePoints,setSegNumb,slidingBins)
@@ -775,7 +763,6 @@ class BaseMap extends Component {
                     cellObjArr3.push(cellObj)
                 }
             }
-            console.log(cellObjArr3)
 
 //////////////////////////////////////////////////draw legend
 
@@ -809,9 +796,9 @@ class BaseMap extends Component {
             // else {
             //   maxAll = cell_extent[1]
             // }
-            console.log(cell_extent, cell_extent2, cell_extent3)
+            // console.log(cell_extent, cell_extent2, cell_extent3)
             maxAll = Math.max(cell_extent[1], cell_extent2[1], cell_extent3[1])
-            console.log(maxAll)
+            // console.log(maxAll)
 
             let deltaColor2 = (maxAll-cell_extent[0])/9
             let colors2 = []
@@ -889,6 +876,9 @@ class BaseMap extends Component {
                 cellObjArr: cellObjArr,
                 cellObjArr2:cellObjArr2,
                 cellObjArr3:cellObjArr3,
+                deleteDuplicatePoints: deleteDuplicatePoints,
+                deleteDuplicate_TpyPoints: deleteDuplicate_TpyPoints,
+                deleteDuplicate_TpyPoints_second: deleteDuplicate_TpyPoints_second,
             })
 
 
@@ -1039,7 +1029,6 @@ class BaseMap extends Component {
                             fill-opacity = '0.2'
                             />
                         )
-
                 })
 
             }
@@ -1170,29 +1159,74 @@ class BaseMap extends Component {
         const Regions = getRegionElements()
 
         // draw dots to the map
-        const Dots = this.state.pointsData.map((d,i) => {
-            return (
-            <circle
-            key = {`dot-${ i }`}
-            cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
-            cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
-            fill="#0000A0"
-            r = "0.6"
-            />
-            )
-        })
+        // const Dots = this.state.pointsData.map((d,i) => {
+        //     return (
+        //     <circle
+        //     key = {`dot-${ i }`}
+        //     cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
+        //     cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
+        //     fill="#0000A0"
+        //     r = "0.6"
+        //     />
+        //     )
+        // })
 
-        const Toy_Dots = this.state.point_ToyData.map((d,i) => {
-            return (
-            <circle
-            key = {`dot-${ i }`}
-            cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
-            cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
-            fill="red"
-            r = "0.6"
-            />
-            )
-        })
+        // const Toy_Dots = this.state.point_ToyData.map((d,i) => {
+        //     return (
+        //     <circle
+        //     key = {`dot-${ i }`}
+        //     cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
+        //     cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
+        //     fill="red"
+        //     r = "0.6"
+        //     />
+        //     )
+        // })
+        let Dots_first
+        if (this.state.deleteDuplicatePoints){
+            Dots_first = this.state.deleteDuplicatePoints.map((d,i) => {
+                return (
+                <circle
+                key = {`dot-${ i }`}
+                cx = { d[0]}
+                cy = { d[1] }
+                fill="red"
+                r = "1.5"
+                />
+                )
+            })
+        }
+
+        let Dots_second
+        if (this.state.deleteDuplicate_TpyPoints){
+            console.log(this.state.deleteDuplicate_TpyPoints)
+            Dots_second = this.state.deleteDuplicate_TpyPoints.map((d,i) => {
+                return (
+                <circle
+                key = {`dot-${ i }`}
+                cx = { d[0]}
+                cy = { d[1] }
+                fill="yellow"
+                r = "1.5"
+                />
+                )
+            })
+        }
+
+        let Dots_third
+        if (this.state.deleteDuplicate_TpyPoints_second){
+            Dots_third = this.state.deleteDuplicate_TpyPoints_second.map((d,i) => {
+                return (
+                <circle
+                key = {`dot-${ i }`}
+                cx = { d[0]}
+                cy = { d[1] }
+                fill="blue"
+                r = "1.5"
+                />
+                )
+            })
+        }
 
         let test_near
         if(this.state.test_near_points){
@@ -1281,16 +1315,18 @@ class BaseMap extends Component {
 
             </div> */}
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
-            <g className="Regions">
+            {/* <g className="Regions">
                 {Regions}
-            </g>
-             {/* <g className="Dots">
-                {Dots}
-            </g>
-
-            <g className="toy_Dots">
-               {Toy_Dots}
-           </g> */}
+            </g> */}
+           <g className="Dots-first">
+               {Dots_first}
+           </g>
+           <g className="Dots-third">
+               {Dots_third}
+           </g>
+           <g className="Dots-second">
+               {Dots_second}
+           </g>
             <g className="test_near">
                 {test_near}
             </g>
