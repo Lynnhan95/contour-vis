@@ -676,12 +676,13 @@ class BaseMap extends Component {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if ((prevState.subSegList !== this.state.subSegList) && (prevState.subSegList_out !== this.state.subSegList_out) && this.state.pointsData) {
             let point_Data = this.state.pointsData.filter((e,i) => {
-                return i <= 300
+                return i <= 450
             })
 
             let point_ToyData_first = this.state.point_ToyData.filter((e) => {
                 return e.Name_Type === "Daoism" || e.Name_Type === "Buddism" || e.Name_Type === "Catholicism" || e.Name_Type === "Protestantism"
             })
+
             let point_ToyData_second = this.state.point_ToyData.filter((e) => {
                 return e.Name_Type !== "Daoism" && e.Name_Type !== "Buddism" && e.Name_Type !== "Catholicism" && e.Name_Type !== "Protestantism"
             })
@@ -692,10 +693,18 @@ class BaseMap extends Component {
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
 
-            var points_ToyDataProjected_second = point_ToyData_second.map((e) => {
+            var points_ToyDataProjected_second_first = point_ToyData_second.map((e) => {
 
                 return _me.autoProjection([ e.Longitude, e.Latitude ])
             })
+
+            // duplicate second_first
+            var points_ToyDataProjected_second_second_temp = JSON.parse(JSON.stringify(points_ToyDataProjected_second_first))
+            // move slightly 
+            console.log(points_ToyDataProjected_second_second_temp)
+            // var points_ToyDataProjected_second_second = points_ToyDataProjected_second_second.map((e) => {
+                
+            // })
 
             var points_dataProjected = point_Data.map((e) => {
 
@@ -706,7 +715,7 @@ class BaseMap extends Component {
 
             let deleteDuplicatePoints = deleteDuplicate(points_dataProjected)
             let deleteDuplicate_TpyPoints = deleteDuplicate(points_ToyDataProjected)
-            let deleteDuplicate_TpyPoints_second = deleteDuplicate(points_ToyDataProjected_second)
+            let deleteDuplicate_TpyPoints_second = deleteDuplicate(points_ToyDataProjected_second_first)
 
             console.log( deleteDuplicatePoints )
             console.log(deleteDuplicate_TpyPoints)
@@ -1315,9 +1324,9 @@ class BaseMap extends Component {
 
             </div> */}
             <svg id="myCanvas" width = {this.svg_w} height = {this.svg_h} viewBox = {`0 0 ${this.svg_w} ${this.svg_h}`}>
-            {/* <g className="Regions">
+            <g className="Regions">
                 {Regions}
-            </g> */}
+            </g>
            <g className="Dots-first">
                {Dots_first}
            </g>
