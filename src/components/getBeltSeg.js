@@ -18,7 +18,7 @@ export function getBeltSeg(segPoly, strPath, clip_boundary ,index) {
   //   polyPath.add (temp_point)
   // }
   let offsetPath = getLinePathStr(clip_boundary)
-  offsetPath = roundPathCorners(offsetPath,0.1,true)
+  offsetPath = roundPathCorners(offsetPath,0,true)
   var polyPath = new Path(offsetPath)
 
   var ptC1 = new Point (segPoly[3][0],segPoly[3][1])

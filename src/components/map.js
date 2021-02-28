@@ -45,8 +45,8 @@ class BaseMap extends Component {
 
             /* Render Yunnan
             */
-            province_en: 'Anhui',
-            province_cn: '安徽',
+            province_en: 'Hunan',
+            province_cn: '湖南',
 
             /* Render Sichuan
             */
@@ -116,7 +116,7 @@ class BaseMap extends Component {
 
         /* Render Yunnan
         */
-       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_anhui.csv')])
+       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
 
         /* Render Sichuan
         */
@@ -340,7 +340,7 @@ class BaseMap extends Component {
         // let dist = 0.1/ (num)
         for(let i=1; i< num+1 ; i++) {
 
-            const padding = -0.2
+            const padding = -0.25
             ////console.log(padding)
             let offsetContour = new Offset(coordinates).offset(padding* i)
             // Set the first contour as clipping_boundary
@@ -375,7 +375,13 @@ class BaseMap extends Component {
                 //console.warn('dddddd', d);
 
                 const mainArea = d.geometry.coordinates
-                const simplifiedFactor = 0.4
+            //     const mainArea = [[110.15168145519114, 28.394454687741128], 
+            //     [112.92507572635785, 28.501773410085427], 
+            //     [110.45761153982053, 26.63856747328036], 
+            //     [113.31393253982571, 26.950171129760644]
+            // ]
+                console.log(mainArea)
+                const simplifiedFactor = 2
 
                 // Compute simplified area
                 let res = []
@@ -397,7 +403,7 @@ class BaseMap extends Component {
 
                 _me.state.simplifiedArea = simplifiedArea
 
-                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 5)
+                _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 2)
                 ////console.log('mainArea', _me.state.simplifiedContours)
 
                 let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
@@ -1050,9 +1056,9 @@ class BaseMap extends Component {
             <g className="Regions">
                 {Regions}
             </g>
-             {/* <g className="Dots">
+             <g className="Dots">
                 {Dots}
-            </g> */}
+            </g>
             <g className="test_near">
                 {test_near}
             </g>
