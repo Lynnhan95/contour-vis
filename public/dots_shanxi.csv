@@ -1,0 +1,748 @@
+﻿id,province,name,Latitude,Longitude,Type,Name_Type,Year
+615,Shanxi,Baolian Temple,37.735047,112.572274,3,Buddhism,2004
+616,Shanxi,Yuanzhao Temple,37.722306,112.57102,3,Buddhism,1999
+617,Shanxi,Xiaodian District Buddhist Association,37.693656,112.532504,30,Buddhism,2003
+618,Shanxi,Xiaodian Village Protestant Church,37.742745,112.573943,1,Protestantism,2003
+619,Shanxi,Yansheng Temple,37.693656,112.532504,3,Buddhism,2000
+620,Shanxi,Guansheng Temple,37.772746,112.563349,3,Buddhism,1997
+621,Shanxi,Dongpu Village Catholic Church,37.673953,112.529085,2,Catholicism,2000
+622,Shanxi,Liangjiazhuang Village Catholic Church,37.665433,112.556854,2,Catholicism,2000
+623,Shanxi,Lingze Temple,37.644413,112.514734,3,Buddhism,2000
+624,Shanxi,Guanyin Temple,37.673953,112.529085,3,Buddhism,2000
+625,Shanxi,Zhifu Temple,37.654199,112.590529,3,Buddhism,2000
+626,Shanxi,Sanxian Catholic Church,37.644413,112.514734,2,Catholicism,2000
+627,Shanxi,Chongfu Temple,37.646627,112.497594,3,Buddhism,2001
+628,Shanxi,Ganlu Temple,37.679345,112.517752,3,Buddhism,2003
+629,Shanxi,Guanyin Temple,37.636989,112.541868,3,Buddhism,2000
+630,Shanxi,Gaozhong Catholic Church,37.742266,112.628473,2,Catholicism,1986
+631,Shanxi,Xiwenzhuang Catholic Church,37.727031,112.629787,2,Catholicism,1976
+632,Shanxi,Zhenru Temple,37.648208,112.476323,3,Buddhism,2004
+633,Shanxi,Shanxi Province Islamic Association,37.869158,112.560963,5,Islam,1990
+634,Shanxi,Taiyuan Protestant Association,37.86773,112.568026,10,Protestantism,1981
+635,Shanxi,Shanxi Province Protestant Three-Self Patriotic Movement Committee,37.86773,112.568026,10,Protestantism,1981
+636,Shanxi,Chongshan Temple,37.867113,112.57987,3,Buddhism,1833
+637,Shanxi,Baiyun Temple,37.834543,112.611803,3,Buddhism,1878
+638,Shanxi,Taiyuan Catholic Diocese,37.892445,112.56262,2,Catholicism,1876
+639,Shanxi,Puji Temple,37.873376,112.562569,3,Buddhism,1997
+640,Shanxi,Shanxi Province Catholic Monastery,37.883025,112.465258,2,Catholicism,1985
+641,Shanxi,Dayan Village Catholic Church,37.891968,112.451693,2,Catholicism,1910
+642,Shanxi,Dngshe Catholic Church,37.886576,112.491155,2,Catholicism,1873
+643,Shanxi,Geliaogou Cathoilc Church,37.899815,112.467467,2,Catholicism,1873
+644,Shanxi,Shagou Catholic Church,37.833022,112.509502,2,Catholicism,1911
+645,Shanxi,Guanyin Temple,37.860875,112.50107,3,Buddhism,1998
+646,Shanxi,Beihan Catholic Church,37.858923,112.458488,2,Catholicism,1943
+647,Shanxi,Fengshenghe Catholic Church,37.878275,112.43592,2,Catholicism,1903
+648,Shanxi,Guangren Temple,37.865499,112.443557,3,Buddhism,1997
+649,Shanxi,Helongwan Catholic Church,37.844506,112.435099,2,Catholicism,1937
+650,Shanxi,Xiliulin Catholic Church,37.660681,112.468545,2,Catholicism,1990
+651,Shanxi,Longquan Temple,37.802359,112.481336,3,Buddhism,1996
+652,Shanxi,Wanbolin District Buddhist Associaiton,37.802359,112.481336,30,Buddhism,2000
+653,Shanxi,Guanyin Temple,37.791086,112.527249,3,Buddhism,2001
+654,Shanxi,Yijing Church,37.715241,112.477822,1,Protestantism,2002
+655,Shanxi,Luocheng Protestant Church,37.755368,112.481473,1,Protestantism,2000
+656,Shanxi,Changchun Temple,37.719245,112.476789,4,Daoism,1998
+657,Shanxi,Guanyin Temple,37.737938,112.507854,3,Buddhism,1993
+658,Shanxi,Beiji Temple,37.766287,112.529286,4,Daoism,2000
+659,Shanxi,Amitabha Temple,37.744445,112.540467,3,Buddhism,1994
+660,Shanxi,Guchengying Catholic Church,37.74055,112.493898,2,Catholicism,2000
+661,Shanxi,Confucius Temple,37.727657,112.488841,4,Daoism,2004
+662,Shanxi,Zhenwu Temple,37.737938,112.507854,4,Daoism,2001
+663,Shanxi,Puxian Temple,37.711072,112.479906,3,Buddhism,1999
+664,Shanxi,Guandi Temple,37.737938,112.507854,4,Daoism,2002
+665,Shanxi,Dafo Temple,37.781533,112.491512,3,Buddhism,2004
+666,Shanxi,Jiulong Temple,37.74055,112.493898,4,Daoism,1991
+667,Shanxi,Hufo Temple,37.700897,112.492548,3,Buddhism,2003
+668,Shanxi,Wufuying Catholic Church,37.715241,112.477822,2,Catholicism,2000
+669,Shanxi,Mount Tai Temple,37.727602,112.489912,4,Daoism,2003
+670,Shanxi,Guanyin Temple,37.737341,112.511977,3,Buddhism,2003
+671,Shanxi,Mount Tai Temple,37.726671,112.498727,3,Buddhism,1996
+672,Shanxi,Huata Temple,37.723037,112.461197,3,Buddhism,2003
+673,Shanxi,Mingxiu Temple,37.678334,112.441328,3,Buddhism,2004
+674,Shanxi,Yangjiabao Buddhist Association,37.52033,112.362563,30,Buddhism,2002
+675,Shanxi,Yangjiabao Catholic Church,37.52033,112.362563,2,Catholicism,1992
+676,Shanxi,Liuhe Catholic Church,37.607472,112.358694,2,Catholicism,1846
+677,Shanxi,Taohuaying Church,37.528863,112.437658,2,Catholicism,2000
+678,Shanxi,Beiguan Church,37.565389,112.516016,2,Catholicism,2000
+679,Shanxi,Hongcheng Catholic Church,37.587598,112.450672,2,Catholicism,1996
+680,Shanxi,Shancang Temple,38.059698,112.67593,3,Buddhism,1996
+681,Shanxi,Chaichang Catholic Church,37.937745,111.675128,2,Catholicism,1983
+682,Shanxi,Datong City Catholic Patriotic Association,40.075667,113.298004,20,Catholicism,1980
+683,Shanxi,Datong City Buddhist Association,40.075667,113.298004,30,Buddhism,2003
+684,Shanxi,Datong City Islamic Association,40.075667,113.298004,5,Islam,2004
+685,Shanxi,Datong City Protestant Three-Self Patriotic Movement Committee,40.075667,113.298004,10,Protestantism,1951
+686,Shanxi,Pingquan Temple,40.082943,113.294326,3,Buddhism,1994
+687,Shanxi,Huangle Temple,40.093574,113.296946,4,Daoism,2000
+688,Shanxi,Zhenwu Longwang Temple,40.137268,113.308136,4,Daoism,2001
+689,Shanxi,Xihehe Catholic Church,40.037779,113.288617,2,Catholicism,1999
+690,Shanxi,Pudu Chan Temple,40.033631,113.260479,3,Buddhism,1950
+691,Shanxi,Pingquan Protestant Church,40.038461,113.176407,1,Protestantism,2003
+692,Shanxi,Guandi Temple,40.016178,113.248343,4,Daoism,1998
+693,Shanxi,Pingwang Township Protestant Church,40.038006,113.219938,1,Protestantism,1994
+694,Shanxi,Wangjiayuan Protestant Three-Self Patriotic Committee Group,40.071181,113.214038,1,Protestantism,1998
+695,Shanxi,Xiyan Temple,40.071181,113.214038,3,Buddhism,1999
+696,Shanxi,Xinpingwang Protestant Church,40.036858,113.177207,1,Protestantism,1992
+697,Shanxi,Yongdingzhuang Protestant Church,40.036858,113.177207,1,Protestantism,1980
+698,Shanxi,Tongjialiang Protestant Church,40.036858,113.177207,1,Protestantism,1988
+699,Shanxi,Silaogou Protestant Church,40.036858,113.177207,1,Protestantism,1996
+700,Shanxi,Yanyajie Protestant Church,40.036858,113.177207,1,Protestantism,1994
+701,Shanxi,Xinzhouyao Protestant Church,40.036858,113.177207,1,Protestantism,1996
+702,Shanxi,Baidong Protestant Church,40.036858,113.177207,1,Protestantism,1991
+703,Shanxi,Wajinwan Protestant Church,40.036858,113.177207,1,Protestantism,1995
+704,Shanxi,Jinhuagong Protestant Church,40.036858,113.177207,1,Protestantism,1989
+705,Shanxi,Majiliang Protestant Church,40.036858,113.177207,1,Protestantism,2000
+706,Shanxi,Dadougou Protestant Church,40.036858,113.177207,1,Protestantism,1989
+707,Shanxi,Wangcun Protestant Church,40.036858,113.177207,1,Protestantism,1980
+708,Shanxi,Jiangjiawan Protestant Church,40.036858,113.177207,1,Protestantism,1996
+709,Shanxi,Xinquan Protestant Church,40.036858,113.177207,1,Protestantism,1990
+710,Shanxi,Minsheng Protestant Church Group ＃2,40.036858,113.177207,1,Protestantism,1999
+711,Shanxi,Kouquan Protestant Church,40.036858,113.177207,1,Protestantism,2000
+712,Shanxi,Qianfo Temple,40.036858,113.177207,3,Buddhism,2000
+713,Shanxi,Guanyin Temple,40.036858,113.177207,3,Buddhism,2000
+714,Shanxi,Huayan Temple,40.036858,113.177207,3,Buddhism,2000
+715,Shanxi,Xuantian Dadi Temple,40.036858,113.177207,4,Daoism,2001
+716,Shanxi,Nancai Temple,40.036858,113.177207,3,Buddhism,2001
+717,Shanxi,Yanzishan Protestant Church,40.036858,113.177207,1,Protestantism,1996
+718,Shanxi,Xingergou Protestant Church,40.036858,113.177207,1,Protestantism,1996
+719,Shanxi,Qingciyao Protestant Church,40.036858,113.177207,1,Protestantism,2002
+720,Shanxi,Sitai Protestant Church,40.036858,113.177207,1,Protestantism,1998
+721,Shanxi,Minsheng Protestant Church,40.033803,113.171637,1,Protestantism,1996
+722,Shanxi,Meiyukou Protestant Church,40.029553,113.147429,1,Protestantism,1991
+723,Shanxi,Liudaogou Protestant Church,40.029553,113.147429,1,Protestantism,1992
+724,Shanxi,Pingquan Protestant Church Group #2,40.031323,113.17303,1,Protestantism,1996
+725,Shanxi,Geigu Temple,40.00878,113.150401,3,Buddhism,1996
+726,Shanxi,Longhai Temple,40.005405,113.149693,3,Buddhism,1994
+727,Shanxi,Puji Temple,39.993588,113.201916,3,Buddhism,1991
+728,Shanxi,Longhua Temple,39.991901,113.157435,3,Buddhism,1993
+729,Shanxi,Huiquan Temple,40.038961,113.343834,3,Buddhism,1998
+730,Shanxi,Wangjiayuan Church,40.00878,113.150401,2,Catholicism,1995
+731,Shanxi,Qingta Temple,39.932938,113.10084,3,Buddhism,2001
+732,Shanxi,Zhantan Temple,40.082974,113.365808,3,Buddhism,1995
+733,Shanxi,Jiaozan Temple,40.099995,112.984929,3,Buddhism,1971
+734,Shanxi,Amitabha Temple,39.956251,113.141923,3,Buddhism,2004
+735,Shanxi,Sansheng Temple,40.005139,113.173694,3,Buddhism,1983
+736,Shanxi,Fuyan Temple,40.082866,113.363013,3,Buddhism,1995
+737,Shanxi,Puqing Temple,40.140849,113.326018,3,Buddhism,2004
+738,Shanxi,Meitan Temple,40.082974,113.365808,3,Buddhism,1996
+739,Shanxi,Yuzu Temple,40.00878,113.150401,4,Daoism,1949
+740,Shanxi,Dear Park (Temple),40.160865,113.267552,3,Buddhism,2000
+741,Shanxi,Ning Temple,40.255866,113.140005,3,Buddhism,1950
+742,Shanxi,Hongfa Temple,40.256496,113.136407,3,Buddhism,1995
+743,Shanxi,Yunlin Chan Temple,40.360748,113.747472,3,Buddhism,1996
+744,Shanxi,Xinhua Rd #2 Protestant Church,40.36624,113.753904,1,Protestantism,1995
+745,Shanxi,Xiaodong Street Protestant Church,40.371674,113.756068,1,Protestantism,1995
+746,Shanxi,Xuanyun Temple,40.36624,113.753904,3,Buddhism,2002
+747,Shanxi,Luowenzao Protestant Church,40.417798,113.901845,1,Protestantism,1995
+748,Shanxi,Qingyun Temple,40.437611,113.841335,3,Buddhism,2001
+749,Shanxi,Xijiawan Protestant Church,40.439104,113.969486,1,Protestantism,1996
+750,Shanxi,Liuyao Protestant Church,40.304697,113.680101,1,Protestantism,1995
+751,Shanxi,Xijinjiawa Protestant Church,40.126118,113.939138,1,Protestantism,1996
+752,Shanxi,Shengquan Temple,39.937097,113.869713,3,Buddhism,2001
+753,Shanxi,Śākyamuni Temple,39.934849,113.935122,3,Buddhism,2001
+754,Shanxi,Houguiren Catholic Church,40.36624,113.753904,2,Catholicism,1996
+755,Shanxi,Beixutun Protestant Church,40.367424,113.87647,1,Protestantism,2002
+756,Shanxi,Nanxutun Protestant Church,40.349841,113.89605,1,Protestantism,2002
+757,Shanxi,Jingci Temple,40.381725,113.818586,3,Buddhism,2001
+758,Shanxi,Shahetai Protestant Church,40.345144,113.824934,1,Protestantism,2002
+759,Shanxi,Dongshuangzhai Protestant Church,40.305886,113.931365,1,Protestantism,2002
+760,Shanxi,Jiafeng Catholic Church,40.36624,113.753904,2,Catholicism,1995
+761,Shanxi,Zhangguantun Village Catholic Church,40.234151,113.731591,2,Catholicism,1995
+763,Shanxi,Yulin Catholic Church,39.951926,113.961584,2,Catholicism,1996
+764,Shanxi,Ciyun Temple,40.424538,114.087207,3,Buddhism,1942
+765,Shanxi,Jiulian Buddhist Temple,39.7132,113.979174,3,Buddhism,1981
+766,Shanxi,Dongguan Protestant Church,39.750633,114.276854,1,Protestantism,1990
+767,Shanxi,Zhoutu Temple,39.626757,114.077792,3,Buddhism,1985
+768,Shanxi,Jile Temple,39.757748,114.107613,3,Buddhism,2000
+769,Shanxi,Quanzhong Temple,39.772372,114.091794,3,Buddhism,1984
+770,Shanxi,Yulin South Grand Temple,39.854327,114.139618,3,Buddhism,1980
+771,Shanxi,Yingfo Temple,39.843011,114.210849,3,Buddhism,1985
+772,Shanxi,Zhaoyang Temple,39.824889,114.231216,3,Buddhism,1987
+773,Shanxi,Shengquan Temple,39.760446,114.28273,3,Buddhism,1983
+774,Shanxi,Shengfo Temple,39.704144,114.241261,3,Buddhism,1980
+775,Shanxi,Shaojiazhuang Village Protestant Church,39.661899,114.267669,1,Protestantism,1983
+776,Shanxi,Xilin Temple,39.736644,114.182484,3,Buddhism,1982
+777,Shanxi,Lingqiu County Protestant Three-Self Patriotic Movement Committee,39.441324,114.219684,10,Protestantism,1981
+778,Shanxi,Lingqiu County Buddhist Association,39.442406,114.23435,30,Buddhism,1995
+779,Shanxi,Mount Heng Taizhen Temple,39.696819,113.695425,4,Daoism,1991
+780,Shanxi,Northern Peak Sanqing Temple,39.672913,113.708637,4,Daoism,1948
+781,Shanxi,Cuiping Temple,39.672913,113.708637,3,Buddhism,2004
+782,Shanxi,Yong'an Town Nunnery,39.69898,113.690377,3,Buddhism,1949
+783,Shanxi,Guandi Temple,39.783114,113.579697,4,Daoism,1995
+784,Shanxi,Cuiping Temple,39.543575,113.872627,3,Buddhism,1999
+785,Shanxi,Yunfeng Temple,39.603643,113.773419,3,Buddhism,1999
+786,Shanxi,Dongzhouyao Protestant Church,40.012362,112.881021,1,Protestantism,2004
+787,Shanxi,Qing'an Temple,40.067769,112.870826,3,Buddhism,2004
+788,Shanxi,Beiliuli Protestant Church,40.037394,112.713491,1,Protestantism,2004
+789,Shanxi,Dongxinzhuang Protestant Church,40.166738,112.822512,1,Protestantism,2004
+790,Shanxi,Panjiayao Protestant Church,39.916265,112.81619,1,Protestantism,2004
+791,Shanxi,Yushan Temple,39.872996,112.940967,3,Buddhism,2004
+792,Shanxi,Fuxing Temple,39.817058,112.855232,3,Buddhism,2004
+793,Shanxi,Nanshenjing Protestant Church,39.989554,112.956713,1,Protestantism,1997
+794,Shanxi,Zuoyun County Protestant Church,40.013794,112.702933,1,Protestantism,1996
+795,Shanxi,Dongershan Temple,39.879757,112.774483,3,Buddhism,2004
+796,Shanxi,Shuifo Temple,39.831387,112.817796,3,Buddhism,2004
+797,Shanxi,Wujiagou Protestant Church,39.94225,112.813751,1,Protestantism,2004
+798,Shanxi,Jiugaoshan Protestant Church,40.086769,112.897562,1,Protestantism,2004
+799,Shanxi,Puguang Temple,40.086769,112.897562,3,Buddhism,2004
+800,Shanxi,Santun Protestant Church,40.098239,112.726542,1,Protestantism,2004
+801,Shanxi,Dianwan Protestant Church,39.965678,112.874707,1,Protestantism,1999
+802,Shanxi,Daijiagou Protestant Church,40.019459,112.906983,1,Protestantism,2004
+803,Shanxi,Southern Chan Temple,40.013794,112.702933,3,Buddhism,1999
+804,Shanxi,Guanjiabao Protestant Church,40.180373,112.894854,1,Protestantism,2004
+805,Shanxi,Dizang Temple,39.994811,112.709413,3,Buddhism,1999
+806,Shanxi,Huayan Chan Temple,40.013778,112.702407,3,Buddhism,1999
+807,Shanxi,Madaotou Protestant Church,39.879757,112.774483,1,Protestantism,1997
+808,Shanxi,Zhifangtou Protestant Church,40.067769,112.870826,1,Protestantism,2004
+809,Shanxi,Diaoluosi Protestant Church,39.988471,112.873379,1,Protestantism,2004
+810,Shanxi,Huangjiadian Protestant Church,39.817058,112.855232,1,Protestantism,2004
+811,Shanxi,Wulizhuang Catholic Church,39.879642,112.774436,2,Catholicism,1978
+812,Shanxi,Shuitou Protestant Church,40.049788,113.612863,1,Protestantism,1994
+813,Shanxi,Haotian Temple,40.056255,113.614079,3,Buddhism,1992
+814,Shanxi,Xiping Village Protestant Church,40.040933,113.607285,1,Protestantism,1998
+815,Shanxi,Tianlong Temple,40.071579,113.462086,3,Buddhism,1998
+816,Shanxi,Xiluotuofang Village Protestant Church,40.095881,113.40863,1,Protestantism,2002
+817,Shanxi,Beijiazao Village Protestant Church,40.053436,113.474539,1,Protestantism,1999
+818,Shanxi,Sanguan Temple,40.131328,113.452175,4,Daoism,1998
+819,Shanxi,Jile Temple,40.12015,113.442397,3,Buddhism,1995
+820,Shanxi,Pudu Temple,40.12366,113.412897,3,Buddhism,1992
+821,Shanxi,Dizang Temple,40.179954,113.478849,3,Buddhism,1943
+822,Shanxi,Longfeng Temple,39.817978,113.474532,3,Buddhism,1993
+823,Shanxi,Duzhuang Church,40.040933,113.607285,1,Protestantism,2000
+824,Shanxi,Cuizhuang Church,39.989616,113.46591,1,Protestantism,1998
+825,Shanxi,Majiahui Mosque,39.90605,113.486501,5,Islam,1949
+826,Shanxi,Jianpu Village Protestant Church,39.990051,113.430254,1,Protestantism,2001
+827,Shanxi,Jule Township Protestant Church,40.170006,113.586284,1,Protestantism,1998
+828,Shanxi,Longquan Temple,40.040933,113.607285,3,Buddhism,2002
+829,Shanxi,Datong County Catholic Patriotic Committee,40.025018,113.788612,20,Catholicism,1977
+830,Shanxi,Wuyi Road Mosque,36.203519,113.123085,5,Islam,1996
+831,Shanxi,Fazhu Temple,36.19053,113.100737,3,Buddhism,1996
+832,Shanxi,Central Mosque,36.203519,113.123085,5,Islam,1928
+833,Shanxi,Xiguan Mosque,36.203519,113.123085,5,Islam,1991
+834,Shanxi,North Mosque,36.184226,113.107684,5,Islam,1900
+835,Shanxi,Luze Mosque,36.203519,113.123085,5,Islam,1988
+836,Shanxi,South Mosque,36.203519,113.123085,5,Islam,1900
+837,Shanxi,Jianhua Mosque,36.203519,113.123085,5,Islam,1994
+838,Shanxi,West Mosque,36.165083,113.103839,5,Islam,1942
+839,Shanxi,Digu Temple,36.205367,113.176945,3,Buddhism,1998
+840,Shanxi,Hongmei Temple,36.171613,113.147987,3,Buddhism,1996
+841,Shanxi,Huangmei Temple,36.092269,113.094791,3,Buddhism,1996
+842,Shanxi,Zhuangtou Protestant Church,35.987325,113.155811,1,Protestantism,1995
+843,Shanxi,Nanlixin Village Catholic Church,36.518096,113.0718,2,Catholicism,1995
+844,Shanxi,Zhaojialing Catholic Church,36.512895,112.924075,2,Catholicism,1995
+845,Shanxi,Tuqiao Village Catholic Church,36.524234,113.1191,2,Catholicism,1995
+846,Shanxi,Wuyang Village Catholic Church,36.481264,113.064813,2,Catholicism,1995
+847,Shanxi,Shanzheng Village Catholic Church,36.472614,113.152766,2,Catholicism,1995
+848,Shanxi,Shanfu Village Catholic Church,36.606881,113.014934,2,Catholicism,1995
+849,Shanxi,Guo Village Catholic Church,36.310197,112.878862,2,Catholicism,1996
+850,Shanxi,Wangzhuang Church,36.320483,112.969655,2,Catholicism,1978
+851,Shanxi,Sidi Seventh-day Adventist Church,36.380811,113.009926,1,Protestantism,1996
+852,Shanxi,Beigang Catholic Church,36.368377,112.983889,2,Catholicism,1986
+853,Shanxi,Taoyuan Catholic Church,36.365616,112.559189,2,Catholicism,1999
+854,Shanxi,Dongligao Catholic Church,36.254543,112.948426,2,Catholicism,1985
+855,Shanxi,Dongligao Catholic Church,36.254543,112.948426,2,Catholicism,1985
+856,Shanxi,Taoyuan Seventh-day Adventist Church,36.365616,112.559189,1,Protestantism,1996
+857,Shanxi,Yuan Village Protestant Church,36.368879,112.918584,1,Protestantism,1993
+858,Shanxi,Laojunzhuang Catholic Church,36.315663,112.891998,2,Catholicism,1992
+859,Shanxi,Paomaling Catholic Church,36.286426,112.732925,2,Catholicism,1996
+860,Shanxi,Wulizhuang Seventh-day Adventist Church,36.238216,112.895715,1,Protestantism,1978
+861,Shanxi,Baodian Town Mosque,36.323006,112.892601,5,Islam,1995
+862,Shanxi,Licheng County Catholic Church,36.518368,113.390416,2,Catholicism,2000
+863,Shanxi,Hongfu Chan Temple,36.554475,113.510651,3,Buddhism,2000
+864,Shanxi,Kongshan Temple,36.710835,113.356153,3,Buddhism,1842
+865,Shanxi,Zhaodian Catholic Church,36.451932,113.361958,2,Catholicism,1951
+866,Shanxi,Ankou Catholic Church,36.008254,113.37984,2,Catholicism,1957
+867,Shanxi,Huangyechi Mosque,36.115449,113.207049,5,Islam,1949
+868,Shanxi,Tongfu Protestant Church,36.119373,112.871728,1,Protestantism,1995
+869,Shanxi,Caofang Protestant Church,36.168158,112.872786,1,Protestantism,1995
+870,Shanxi,Chengguan Mosque,36.123178,112.877262,5,Islam,1995
+871,Shanxi,Dabaotou Mosque,36.069013,112.880387,5,Islam,1995
+872,Shanxi,Jiu Village Catholic Church,36.105682,112.980999,2,Catholicism,1995
+873,Shanxi,Zhangheshen Catholic Church,36.122334,112.8779,2,Catholicism,1995
+874,Shanxi,Xibi Village Protestant Church,36.153744,112.781389,1,Protestantism,1995
+875,Shanxi,Dananshi Buddhist Temple,36.086552,112.778871,3,Buddhism,1995
+876,Shanxi,Congcun Township Protestant Church,36.167334,112.952933,1,Protestantism,1995
+877,Shanxi,Lixiang Temple,36.837359,112.863792,3,Buddhism,1998
+878,Shanxi,Shangsi Catholic Church,36.762145,112.939111,2,Catholicism,1901
+879,Shanxi,Penglai Temple,36.942137,112.754001,3,Buddhism,2001
+880,Shanxi,Nantiangong Catholic Church,36.263091,113.148033,2,Catholicism,1904
+881,Shanxi,St. Antonio Catholic Church,36.275866,113.171736,2,Catholicism,1920
+882,Shanxi,Beishe Catholic Church,36.316395,113.151548,2,Catholicism,1920
+883,Shanxi,St. Francis Catholic Church,36.287494,113.149311,2,Catholicism,1920
+884,Shanxi,Yangjiazhuang Catholic Church,36.338127,113.230232,2,Catholicism,1990
+885,Shanxi,Jincheng City Buddhist Association,35.51813,112.819229,30,Buddhism,2002
+886,Shanxi,Jincheng City Islamic Association,35.496422,112.862525,5,Islam,2002
+887,Shanxi,Jingfo Temple,35.501593,112.853256,3,Buddhism,2001
+888,Shanxi,Baima Chan Temple,35.5293,112.839466,3,Buddhism,1992
+889,Shanxi,Cheng District Buddhist Associaton,35.5293,112.839466,30,Buddhism,1989
+890,Shanxi,Foguang Temple,35.45632,112.517594,3,Buddhism,2001
+891,Shanxi,Xinglong Temple,35.427508,112.466347,3,Buddhism,1996
+892,Shanxi,Lianshang Village Catholic Church,35.486029,112.414738,2,Catholicism,1996
+893,Shanxi,Chongwen Mosque,35.679627,113.3641,5,Islam,1988
+894,Shanxi,Fucheng Mosque,35.666085,113.158721,5,Islam,1950
+895,Shanxi,Taihe Catholic Church,35.775685,113.280688,2,Catholicism,1992
+896,Shanxi,Shuocheng District Protestant Association,39.313602,112.428945,10,Protestantism,1981
+897,Shanxi,Shuocheng District Catholic Church,39.312465,112.427295,2,Catholicism,1955
+898,Shanxi,Shuocheng District Buddhist Lay Organization,39.319827,112.4319,30,Buddhism,1980
+899,Shanxi,Ying County Protestant Three-Self Patriotic Association,39.554088,113.200011,10,Protestantism,2002
+900,Shanxi,Ying County Buddhist Association,39.554247,113.191099,30,Buddhism,1998
+901,Shanxi,Youyu County Protestant Association,39.989023,112.466968,1,Protestantism,1993
+902,Shanxi,Yushe County Catholic Patriotic Movement Committee,37.048351,112.813627,20,Catholicism,1982
+903,Shanxi,Shima Temple,37.574429,113.680156,3,Buddhism,2002
+904,Shanxi,Jingang Chan Temple,37.600111,113.704839,3,Buddhism,2002
+905,Shanxi,Shouyang County Protestant Three-Self Patriotic Movement Committee,37.894397,113.178102,10,Protestantism,1984
+906,Shanxi,Lengquan Temple,37.798832,113.079997,3,Buddhism,2003
+907,Shanxi,Taigu Mosque,37.421308,112.551357,5,Islam,1998
+908,Shanxi,Tianning Temple,37.390517,112.63271,3,Buddhism,1993
+909,Shanxi,Longquan Temple,37.368811,112.581249,4,Daoism,1999
+910,Shanxi,Qi County Protestant Three-Self Movement Committee,37.407422,112.306651,10,Protestantism,1984
+911,Shanxi,Catholic Patriotic Church,37.34677,112.304902,20,Catholicism,1992
+912,Shanxi,Pingyao County Protestant Church,37.202177,112.179083,1,Protestantism,1888
+913,Shanxi,Pingyao County Catholic Affairs Committee,37.201991,112.191372,20,Catholicism,1910
+914,Shanxi,Yuanxiang Temple Affairs Committee,37.186858,112.196404,3,Buddhism,1997
+915,Shanxi,Baiyun Temple Affairs Committee,37.081618,112.254362,3,Buddhism,1991
+916,Shanxi,Jiexiu City Catholic Patriotic Association,37.203844,112.185908,20,Catholicism,1958
+917,Shanxi,Niuwangmiao Protestant Church,36.776045,111.832827,1,Protestantism,2001
+918,Shanxi,Xiaozhuang Village Protestant Church,36.830411,111.835198,1,Protestantism,2002
+919,Shanxi,Shuiyu Protestant Church,36.853232,111.812677,1,Protestantism,1998
+920,Shanxi,Yucheng Village Protestant Church,36.816431,111.764441,1,Protestantism,2003
+921,Shanxi,Zhangjiahzuang Protestant Church,36.88258,111.789068,1,Protestantism,1996
+922,Shanxi,Yan'an Village Protestant Church,36.877523,111.810612,1,Protestantism,2000
+923,Shanxi,Caoqiao Protestant Church,36.869116,111.843895,1,Protestantism,2000
+924,Shanxi,Nanpu Village Protestant Church,36.883564,111.833934,1,Protestantism,1993
+925,Shanxi,Yukou Village Catholic Church,36.846806,111.777169,2,Catholicism,1990
+926,Shanxi,Xiamen Village Protestant Church,36.81432,111.706054,1,Protestantism,1988
+927,Shanxi,Wenshuyuan Protestant Church,36.847749,111.778654,1,Protestantism,2002
+928,Shanxi,Fujiatan Religious Site,36.847749,111.778654,4,Daoism,1995
+929,Shanxi,Nanguan Village Protestant Church,36.706842,111.687332,1,Protestantism,2000
+930,Shanxi,Sanjiao Catholic Church,36.715717,111.716558,2,Catholicism,2001
+931,Shanxi,Wujiawa Protestant Church,36.859307,111.511616,1,Protestantism,2001
+932,Shanxi,Mahe Protestant Church,36.869802,111.888957,1,Protestantism,1990
+933,Shanxi,Wangyu Township Catholic Church,36.775043,111.559264,2,Catholicism,1950
+934,Shanxi,Wenjiagou Village Protestant Church,36.907211,111.618541,1,Protestantism,2000
+935,Shanxi,Qingyu Village Protestant Church,36.928002,111.631857,1,Protestantism,1998
+936,Shanxi,Jiaokou Village Protestant Church,36.933222,111.596961,1,Protestantism,2002
+937,Shanxi,Jiexiu City Protestant Three-Self Patriotic Movement Committee,37.026955,111.916834,10,Protestantism,1983
+938,Shanxi,Yanhu District Catholic Patriotic Association,35.015101,110.998272,20,Catholicism,2004
+939,Shanxi,Yuncheng Protestant Three-Self Patriotic Association,35.014758,110.989099,10,Protestantism,1952
+940,Shanxi,Yuncheng City Mosque,35.034883,111.017734,5,Islam,1928
+941,Shanxi,Linyi County Protestant Three-Self Patriotic Association,35.143378,110.774613,10,Protestantism,1999
+942,Shanxi,Wenxi County Protestant Church,35.354569,111.226183,1,Protestantism,1980
+943,Shanxi,Xia County Protestant Three-Self Patriotic Committee,35.141679,111.22069,10,Protestantism,1985
+944,Shanxi,Xia County Protestant Social Welfare Center,35.077815,111.140608,10,Protestantism,1999
+945,Shanxi,Ruicheng County Daoist Association,34.623284,110.549954,4,Daoism,2000
+946,Shanxi,Yongji City Protestant Association,34.877256,110.393981,10,Protestantism,1988
+947,Shanxi,Yongji City Islamic Association,34.86705,110.447549,5,Islam,2004
+948,Shanxi,Yongji City Buddhist Association,34.86593,110.62679,30,Buddhism,2004
+949,Shanxi,Yongji City Catholic Patriotic Association,34.931037,110.449526,20,Catholicism,1988
+950,Shanxi,Hejin City Catholic Church,35.57304,110.808317,2,Catholicism,1980
+951,Shanxi,Hejin City Protestant Association,35.595986,110.712303,10,Protestantism,1999
+952,Shanxi,Hejin City Islamic Association,35.65632,110.723619,5,Islam,1985
+953,Shanxi,Hejin City Mosque Management Committee,35.65632,110.723619,5,Islam,2001
+954,Shanxi,Hejin City Buddhist Association,35.655267,110.706209,30,Buddhism,1985
+955,Shanxi,Xinfu District Catholic Church,38.393538,112.745869,2,Catholicism,1948
+956,Shanxi,Xinfu District Buddhist Association,38.40013,112.746311,30,Buddhism,2000
+957,Shanxi,Sanfo Xingguo Temple,38.40013,112.746311,3,Buddhism,2000
+958,Shanxi,Dongwang Protestant Church,38.443979,112.726931,1,Protestantism,1999
+959,Shanxi,Wenshu Temple,38.517548,112.611382,3,Buddhism,1997
+960,Shanxi,Longquan Temple,38.537916,112.609137,3,Buddhism,1996
+961,Shanxi,Zhenhai Temple Management Committee,38.973308,113.57243,3,Buddhism,1980
+962,Shanxi,Pushou Temple Management Committee,39.015776,113.598751,3,Buddhism,1980
+963,Shanxi,Guangzong Temple Management Committee,39.007808,113.596277,3,Buddhism,1980
+964,Shanxi,Shifo Temple Management Committee,39.007808,113.596277,3,Buddhism,1980
+965,Shanxi,Master Nenghai's Adamantine Stupa,39.007808,113.596277,3,Buddhism,1996
+966,Shanxi,Tayuan Temple Management Committee,39.010988,113.591183,3,Buddhism,1980
+967,Shanxi,Baiyun Temple Management Committee,38.943842,113.586405,3,Buddhism,1980
+968,Shanxi,Guanghua Temple Management Committee,39.014184,113.599311,3,Buddhism,1880
+969,Shanxi,Santa Temple Management Committee,39.010988,113.591183,3,Buddhism,1980
+970,Shanxi,Zhulin Temple Management Committee,39.001377,113.522593,3,Buddhism,1980
+971,Shanxi,Nanshan Temple Management Committee,38.982603,113.575111,3,Buddhism,1980
+972,Shanxi,Puhua Temple Management Committee,39.000107,113.595718,3,Buddhism,1844
+973,Shanxi,Fanxianshan (Temple) Management Committee,39.007808,113.596277,3,Buddhism,1980
+974,Shanxi,Guangji Rustic Temple Management Committee,39.029419,113.611231,3,Buddhism,1980
+975,Shanxi,Wanfo Cavern,39.007808,113.596277,3,Buddhism,1980
+976,Shanxi,Shuxiang Temple Management Committee,39.003314,113.593628,3,Buddhism,1980
+977,Shanxi,Wanghai Temple,39.041314,113.634094,3,Buddhism,1980
+978,Shanxi,Jinge Temple Management Committee,38.587912,113.353743,3,Buddhism,1980
+979,Shanxi,Yanjiao Temple,38.725861,113.256896,3,Buddhism,1844
+980,Shanxi,Shancai Cavern Temple Management Committee,38.728315,113.255309,3,Buddhism,1980
+981,Shanxi,Luohou Temple Management Committee,38.728315,113.255309,3,Buddhism,1980
+982,Shanxi,Sanquan Temple Management Committee,38.728315,113.255309,3,Buddhism,1980
+983,Shanxi,Guangren Temple Management Committee,38.728315,113.255309,3,Buddhism,1880
+984,Shanxi,Jifu Temple Management Committee,39.020948,113.602972,3,Buddhism,1870
+985,Shanxi,Shouning Temple Management Committee,38.728315,113.255309,3,Buddhism,1980
+986,Shanxi,Wanfo Temple Management Committee,39.007561,113.596812,3,Buddhism,1980
+987,Shanxi,Qingliang Temple Management Committee,38.962322,113.497652,3,Buddhism,1980
+988,Shanxi,Bodhisattva Peak Management Committee,39.013253,113.594631,3,Buddhism,1980
+989,Shanxi,Puji Temple,38.728315,113.255306,3,Buddhism,1980
+990,Shanxi,Wanyuan Buddhist Lay Society,38.975933,113.575354,3,Buddhism,1996
+991,Shanxi,Cifu Temple,39.017106,113.593174,3,Buddhism,1980
+992,Shanxi,Dailuo Peak Management Committee,38.728315,113.255309,3,Buddhism,1980
+993,Shanxi,Mingyue Pond Management Committee,38.966024,113.580516,3,Buddhism,1980
+994,Shanxi,Fenglin Temple Management Committee,39.007808,113.596277,3,Buddhism,1980
+995,Shanxi,Longquan Temple Management Committee,38.986841,113.558183,3,Buddhism,1980
+996,Shanxi,Xiantong Temple Management Committee,39.009656,113.59647,3,Buddhism,1980
+997,Shanxi,Lingying Temple,38.728315,113.255309,3,Buddhism,1820
+998,Shanxi,Yuanzhao Temple Management Committee,39.018479,113.601535,3,Buddhism,1980
+999,Shanxi,Shancai Cavern Management Committee,38.728315,113.255309,3,Buddhism,1980
+1000,Shanxi,Guanyin Cavern (Temple) Management Committee,38.988348,113.592151,3,Buddhism,1980
+1001,Shanxi,Baohua Temple Management Committee,38.728315,113.255309,3,Buddhism,1980
+1002,Shanxi,Songyankou Catholic Church,38.746558,113.583084,2,Catholicism,1989
+1003,Shanxi,Fahua Temple,38.86749,113.464653,3,Buddhism,1980
+1004,Shanxi,Wutai Temple,38.650641,113.550589,3,Buddhism,1980
+1005,Shanxi,Eling Temple,38.983954,113.341657,3,Buddhism,1980
+1006,Shanxi,Gufo Temple,38.646062,113.131061,3,Buddhism,1980
+1007,Shanxi,Gospel Church,38.643662,113.161688,1,Protestantism,1936
+1008,Shanxi,Futa Temple,38.612218,113.198449,3,Buddhism,1980
+1009,Shanxi,Songtai Church,38.683349,113.261445,2,Catholicism,1920
+1010,Shanxi,Baiyun Cavern Temple,38.797125,113.773589,3,Buddhism,1846
+1011,Shanxi,Lingjing Temple,38.893646,113.492993,3,Buddhism,1936
+1012,Shanxi,Yanqing Temple,38.748763,113.069945,3,Buddhism,1980
+1013,Shanxi,Zunsheng Temple,38.787135,113.376741,3,Buddhism,1980
+1014,Shanxi,Huayan Temple,38.728315,113.255306,3,Buddhism,1980
+1015,Shanxi,Xuanzhen Temple,38.699566,113.41025,3,Buddhism,1980
+1016,Shanxi,Puji Temple,38.86719,113.709909,3,Buddhism,1980
+1017,Shanxi,Yongquan Temple,38.919076,113.751612,3,Buddhism,2001
+1018,Shanxi,Xiezi Cliff,38.870483,113.722544,3,Buddhism,1825
+1019,Shanxi,Fuhai Temple,39.007808,113.596277,3,Buddhism,1980
+1020,Shanxi,Xibeijie Protestant Church,39.0684,112.956933,1,Protestantism,1998
+1021,Shanxi,Ciyun Abbey,39.06526,112.959558,3,Buddhism,1989
+1022,Shanxi,Pudu Temple,39.014657,112.882627,3,Buddhism,1993
+1023,Shanxi,Baonei Protestant Church,39.012726,112.8786,1,Protestantism,1998
+1024,Shanxi,Bairen Boulder,39.080867,112.784308,3,Buddhism,2000
+1025,Shanxi,Baiyun Temple,39.0669,112.960258,3,Buddhism,1994
+1026,Shanxi,Foguang Temple,39.141305,113.207417,3,Buddhism,1801
+1027,Shanxi,Jile Temple,39.142752,113.223852,3,Buddhism,1985
+1028,Shanxi,Zhengkong Temple,39.155983,113.215472,3,Buddhism,1801
+1029,Shanxi,Eling Temple,39.157908,113.184686,3,Buddhism,1801
+1030,Shanxi,Puzhao Temple,39.151838,113.176569,3,Buddhism,1801
+1031,Shanxi,Longhua Temple,39.125402,113.169143,3,Buddhism,1990
+1032,Shanxi,Pujiu Temple,39.09645,113.125322,3,Buddhism,1995
+1033,Shanxi,Chongqing Temple,39.178563,113.176424,3,Buddhism,1940
+1034,Shanxi,Qilang Tumb,39.181587,113.193757,4,Daoism,1995
+1035,Shanxi,Yang Family Shrine,39.185406,113.151527,4,Daoism,1911
+1036,Shanxi,Mount Tiantai,38.937103,113.016817,3,Buddhism,1916
+1037,Shanxi,Wenshu Temple,39.065181,113.017373,3,Buddhism,1947
+1038,Shanxi,Jianfu Temple,39.18965,113.253794,3,Buddhism,1996
+1039,Shanxi,Zhenru Temple,39.205213,113.225142,3,Buddhism,1946
+1040,Shanxi,Yongquan Temple,39.177751,113.293479,3,Buddhism,1992
+1041,Shanxi,Sansheng Temple,39.301412,113.589648,3,Buddhism,1949
+1042,Shanxi,Taining Temple,39.366548,113.600157,3,Buddhism,1997
+1043,Shanxi,Qingfeng Temple,39.354408,113.768175,3,Buddhism,1958
+1044,Shanxi,Guhe Temple,39.170736,113.249473,3,Buddhism,2002
+1045,Shanxi,Gongzhu Temple,39.149692,113.377245,3,Buddhism,1980
+1046,Shanxi,Daiyu Temple,39.385085,111.138611,4,Daoism,1909
+1047,Shanxi,Heshen Temple,39.385085,111.138611,4,Daoism,1909
+1048,Shanxi,Xiangshan Temple,39.414574,111.241909,3,Buddhism,1909
+1049,Shanxi,Holy Mother Shrine,39.4231,111.21344,4,Daoism,1909
+1050,Shanxi,Haichao Chan Temple,39.169406,111.223127,3,Buddhism,1909
+1051,Shanxi,Guoshou Temple,38.886046,112.765527,3,Buddhism,2003
+1052,Shanxi,Yaodu District Protestant Church,36.083405,111.520886,1,Protestantism,1958
+1053,Shanxi,Linfen City Catholic Church,36.06929,111.523301,2,Catholicism,1987
+1054,Shanxi,Houma City Protestant Association,36.088067,111.51888,10,Protestantism,1973
+1055,Shanxi,Quwo County Protestant Three-self Patriotic Movement Committee,35.637258,111.471962,10,Protestantism,1956
+1056,Shanxi,Quwo County Portestant Association,35.637258,111.471962,10,Protestantism,1955
+1057,Shanxi,Quwo County Buddhist Association,35.637258,111.471962,30,Buddhism,2001
+1058,Shanxi,Quwo County Mosque Management Committee,35.63392,111.479586,5,Islam,1950
+1059,Shanxi,Quwo County Catholic Church,35.647305,111.605519,2,Catholicism,1955
+1060,Shanxi,Yicheng County Protestant Church,35.738442,111.718942,1,Protestantism,1989
+1061,Shanxi,Yicheng County Mosque,35.72598,111.71484,5,Islam,1998
+1062,Shanxi,Fencheng Catholic Church,35.799133,111.261794,2,Catholicism,1990
+1063,Shanxi,Xiangfen County Protestant Three-Self Patriotic Movement Committee,35.879081,111.445542,10,Protestantism,1984
+1064,Shanxi,Huangya Catholic Church,36.01946,111.402719,2,Catholicism,1980
+1065,Shanxi,Hongdong Protestant Church,36.255661,111.676695,1,Protestantism,2001
+1066,Shanxi,Linfen Catholic Diocese Cathedral,36.249863,111.676708,2,Catholicism,1949
+1067,Shanxi,Guangsheng Temple,36.302895,111.808206,3,Buddhism,1949
+1068,Shanxi,Yaodian Catholic Church,36.165667,111.91483,2,Catholicism,1980
+1069,Shanxi,Yanhe Catholic Church,36.132693,111.87015,2,Catholicism,1971
+1070,Shanxi,Guanjiayuan Catholic Church,36.266914,111.920466,2,Catholicism,1971
+1071,Shanxi,Wumaling Catholic Church,36.212227,111.920383,2,Catholicism,1980
+1072,Shanxi,Dongchi Catholic Church,36.107181,111.893364,2,Catholicism,1971
+1073,Shanxi,Ji County Protestant Three-Self Patriotic Committee,36.098188,110.681763,10,Protestantism,1983
+1074,Shanxi,Daning County Protestant Church,36.465133,110.752903,1,Protestantism,1998
+1075,Shanxi,Xi County Protestant Three-self Patriotic Movement Committee,36.693355,110.940658,10,Protestantism,1879
+1076,Shanxi,Xipodi Catholic Church,36.693355,110.940658,2,Catholicism,1909
+1077,Shanxi,Yonghe County Three-self Patriotic Movement Committee,36.760079,110.630394,20,Catholicism,1988
+1078,Shanxi,Yonghe County Buddhist Association (Zhaoyang Temple),36.759507,110.632007,30,Buddhism,1999
+1079,Shanxi,Yonghe County Protestant Association,36.762408,110.628302,10,Protestantism,1980
+1080,Shanxi,Nanjie Mosque,35.605532,111.351318,5,Islam,2001
+1081,Shanxi,Fengcheng Church,35.637697,111.443846,1,Protestantism,1995
+1082,Shanxi,Xicheng Protestant Church,35.650641,111.431506,1,Protestantism,1992
+1083,Shanxi,Nanshangguan Protestant Church,35.668361,111.438776,1,Protestantism,1999
+1084,Shanxi,Huozhou City Buddhist Association,36.572749,111.727457,30,Buddhism,1999
+1085,Shanxi,Fusheng Temple,36.572758,111.724661,3,Buddhism,1989
+1086,Shanxi,Huoxing Temple,36.573578,111.723958,4,Daoism,1989
+1087,Shanxi,Huozhou Protestant Three-self Patriotic Movement Committee,36.572758,111.724661,10,Protestantism,1989
+1088,Shanxi,Xinli Village Catholic Church,37.468348,112.135147,2,Catholicism,1901
+1089,Shanxi,Mount Gua Scenic Area Management Committee,37.549758,112.165594,30,Buddhism,1984
+1090,Shanxi,Xuanzhong Temple,37.551968,112.155921,3,Buddhism,1800
+1091,Shanxi,Shanqing Temple,37.848046,110.994943,3,Buddhism,1996
+1092,Shanxi,Zhongyanglou Catholic Church,37.129157,111.813901,2,Catholicism,1980
+1093,Shanxi,Zhongyanglou Protestant Church,37.122355,111.811294,1,Protestantism,1980
+1094,Shanxi,Wenfeng Temple,37.243009,111.807253,3,Buddhism,2001
+1095,Shanxi,Fenyang City Protestant Association,37.27183,111.78362,10,Protestantism,1987
+20647,Shanxi,Buddhist Association,31.232399,115.002258,30,Buddhism,2002
+26506,Shanxi,Mount Baiyun Daoist Management Group,37.999356,110.5159,4,Daoism,2000
+38064,Shanxi,Taiyuan Catholic Diocese Headquarter,37.892445,112.56262,2,Catholicism,1876
+38065,Shanxi,Xinfu District Buddhist Association Headquarter,38.40013,112.746311,3,Buddhism,2000
+43106,Shanxi,Taiyuan Diocese Naoma Church,37.865774,112.628989,2,Catholicism,1879
+43107,Shanxi,Taiyuan Diocese Taiyuan Cathedral,37.892445,112.56262,2,Catholicism,1876
+43108,Shanxi,Taiyuan Diocese Taiyuan Cathedral,37.892445,112.56262,2,Catholicism,1876
+43109,Shanxi,Taiyuan Diocese Main Diocese,37.892445,112.56262,2,Catholicism,1876
+43110,Shanxi,Taiyuan Diocese Xijianhe Church,37.906486,112.574623,2,Catholicism,1888
+47953,Shanxi,Taiyuan Diocese Changgou Church,37.894431,112.570417,2,Catholicism,1876
+47954,Shanxi,Taiyuan Diocese Dongjianhe Church,37.915256,112.591145,2,Catholicism,1888
+47955,Shanxi,Taiyuan Diocese Beigunian Church,37.966063,112.518342,2,Catholicism,1876
+47956,Shanxi,Taiyuan Diocese Yangqu Church,37.992938,112.588633,2,Catholicism,1876
+47957,Shanxi,Taiyuan Diocese Fengxi Church,37.940412,112.489219,2,Catholicism,1876
+47958,Shanxi,Miaojixiang Temple,37.948431,112.567771,3,Buddhism,2001
+47959,Shanxi,Ciyun Temple,37.899767,112.509615,3,Buddhism,1999
+47960,Shanxi,Beigunian Catholic Church,37.966063,112.518342,2,Catholicism,1980
+47961,Shanxi,Shikong Temple,37.956422,112.474532,3,Buddhism,1998
+47962,Shanxi,Xizhang Catholic Church,37.940297,112.486963,2,Catholicism,1996
+47963,Shanxi,Guangji Temple,38.005538,112.44407,1,Protestantism,2000
+47964,Shanxi,Taiyuan Diocese Geliaogou Church,37.899815,112.467467,2,Catholicism,1876
+47965,Shanxi,Taiyuan Diocese Fengsheng Church,37.878275,112.43592,2,Catholicism,1876
+47966,Shanxi,Taiyuan Diocese Nanshe Church,37.858691,112.509244,2,Catholicism,1876
+47967,Shanxi,Taiyuan Diocese Shagou Church,37.833022,112.509502,2,Catholicism,1876
+47968,Shanxi,Taiyuan Diocese Honggou Church,37.844088,112.469087,2,Catholicism,1876
+47969,Shanxi,Honggou Catholic Church,37.844088,112.469087,2,Catholicism,1884
+47970,Shanxi,Taiyuan Diocese Wufuying Diocese,37.70559,112.491001,2,Catholicism,1876
+47971,Shanxi,Taiyuan Diocese Yaocun Church,37.649861,112.390521,2,Catholicism,1876
+47972,Shanxi,Taiyuan Diocese Dong'ergou Church,37.65326,112.375263,2,Catholicism,1876
+47973,Shanxi,Taiyuan Diocese Xiliulin Church Branch,37.660681,112.468545,2,Catholicism,1876
+47974,Shanxi,Taiyuan Diocese Xiliulin Church,37.660681,112.468545,2,Catholicism,1876
+47975,Shanxi,Jinyuan District,37.728842,112.461541,3,Buddhism,2003
+47976,Shanxi,Taiyuan Diocese Liuhe Church #1,37.613899,112.329921,2,Catholicism,1876
+47977,Shanxi,Taiyuan Diocese Liuhe Church #2,37.613899,112.329921,2,Catholicism,1876
+47978,Shanxi,Taiyuan Diocese Liuhe Church #3,37.607472,112.358694,2,Catholicism,1876
+47979,Shanxi,Taiyuan Diocese Dabei Village Church,37.602891,112.320114,2,Catholicism,1876
+47980,Shanxi,Taiyuan Diocese Hongcheng Church,37.587598,112.450672,2,Catholicism,1876
+47981,Shanxi,Taiyuan Diocese Heshangju Church,38.049282,112.767975,2,Catholicism,1876
+47982,Shanxi,Taiyuan Diocese Xiluoyin Church,38.072216,112.788353,2,Catholicism,1876
+47983,Shanxi,Taiyuan Diocese Xihuangshui Church,37.999465,112.643264,2,Catholicism,1876
+47984,Shanxi,Taiyuan Diocese Houcun Church,38.022499,112.659097,2,Catholicism,1876
+47985,Shanxi,Taiyuan Diocese Houcun Church,38.028963,112.651227,2,Catholicism,1987
+47986,Shanxi,Daniangou Catholic Church,38.022499,112.659097,2,Catholicism,1981
+47987,Shanxi,Huigou Catholic Church,38.015069,112.631093,2,Catholicism,1963
+47988,Shanxi,Yaozishang Church,37.990472,112.650698,2,Catholicism,1987
+47989,Shanxi,Shicheng Church,38.058477,112.672937,2,Catholicism,1954
+47990,Shanxi,Wangjianao Church,38.022499,112.659097,2,Catholicism,1993
+47991,Shanxi,Xizhuang Catholic Church,38.058477,112.672937,2,Catholicism,1999
+47992,Shanxi,Xihuangshui Church,37.999465,112.643264,2,Catholicism,1977
+47993,Shanxi,Shigoudong Village Catholic Church,38.058477,112.672937,2,Catholicism,1986
+47994,Shanxi,Luoyin Catholic Church,38.072216,112.788353,2,Catholicism,1905
+47995,Shanxi,Shuiquangou Village Church,38.057344,112.71722,2,Catholicism,1905
+47996,Shanxi,Heshangzui Catholic Church,38.049282,112.767975,2,Catholicism,1904
+47997,Shanxi,Tanling Village Church,38.058477,112.672937,2,Catholicism,1931
+47998,Shanxi,Jijiagang Village Catholic Church,38.036414,112.788538,2,Catholicism,1925
+47999,Shanxi,Niujiatan Catholic Church,38.030196,112.773626,2,Catholicism,1925
+48000,Shanxi,Pingtangwa Catholic Church,38.01775,112.752909,2,Catholicism,1905
+48001,Shanxi,Shanyan Catholic Church,38.058477,112.672937,2,Catholicism,1905
+48002,Shanxi,Donggang Catholic Church,38.058477,112.672937,2,Catholicism,1905
+48003,Shanxi,Mount Bansi Holy Mother Church,38.058477,112.672937,2,Catholicism,1988
+48004,Shanxi,Kaihua Temple,38.191653,112.694537,3,Buddhism,1985
+48005,Shanxi,Wangwenling Catholic Church,38.219211,112.702883,2,Catholicism,1880
+48006,Shanxi,Daquangou Catholic Church,38.149911,112.739791,2,Catholicism,1980
+48007,Shanxi,Beigang Village Catholic Church,38.058477,112.672937,2,Catholicism,1925
+48008,Shanxi,Taiyuan Diocese Loufan Church,37.937745,111.675128,2,Catholicism,1876
+48009,Shanxi,Taiyuan Diocese Gujiao Church,37.844404,111.832371,2,Catholicism,1876
+48010,Shanxi,Taiyuan Diocese Yanmen Church,37.957271,112.058046,2,Catholicism,1876
+48011,Shanxi,Lingqiu County Protestant Church (Headquarter ),39.441324,114.219684,1,Protestantism,1980
+48012,Shanxi,Lingqiu County Buddhist Association (Headquarter ),39.442406,114.23435,3,Buddhism,1995
+48013,Shanxi,Zhaobai Protestant Church,39.402667,114.405943,1,Protestantism,1990
+48014,Shanxi,Dongtai Protestant Church,39.470623,114.160008,1,Protestantism,1987
+48015,Shanxi,Shizhuang Protestant Church,39.52924,114.154523,1,Protestantism,1997
+48016,Shanxi,Lingqiu County Protestant Church,39.446802,114.320996,1,Protestantism,1993
+48017,Shanxi,Luoshuihe Protestant Church,39.447793,114.323115,1,Protestantism,1990
+48018,Shanxi,Hanping Protestant Church,39.488803,114.166645,1,Protestantism,1977
+48019,Shanxi,Zhengtai Protestant Church,39.19423,114.376997,1,Protestantism,1982
+48020,Shanxi,Shijiatian Protestant Church,39.539131,114.365001,1,Protestantism,2001
+48021,Shanxi,Yulan Temple,39.223016,114.319291,3,Buddhism,1994
+48022,Shanxi,Donghenan Village Protestant Church,39.382751,114.054559,1,Protestantism,1995
+48023,Shanxi,Shazui Buddhist Temple,39.443845,114.245817,3,Buddhism,1998
+48024,Shanxi,Shuangfeng Temple,39.223016,114.319291,3,Buddhism,1993
+48025,Shanxi,Guangming Temple Management Committee,39.374493,114.076685,3,Buddhism,1994
+48026,Shanxi,Pudu Temple,39.463995,114.236148,3,Buddhism,1994
+48027,Shanxi,Yuantong Temple,39.382751,114.054559,3,Buddhism,1992
+48028,Shanxi,Xifutian Protestant Church,39.423978,114.195516,1,Protestantism,1999
+48029,Shanxi,Ruiquan Temple,39.400834,114.230231,3,Buddhism,1998
+48030,Shanxi,Dengfeng Temple,39.322582,114.042338,3,Buddhism,1980
+48031,Shanxi,Gepo Protestant Church,39.498385,114.217335,1,Protestantism,1977
+48032,Shanxi,Yuanzhao Temple,39.419163,114.141855,3,Buddhism,1998
+48033,Shanxi,Chan'an Temple,39.134093,114.089767,3,Buddhism,1998
+48034,Shanxi,Nanshuilu Protestant Church,39.419663,114.266807,1,Protestantism,1996
+48035,Shanxi,Longquan Temple,39.523876,114.313517,3,Buddhism,1997
+48036,Shanxi,Xiaguan Village Protestant Activity Center,39.132899,114.196211,1,Protestantism,1985
+48037,Shanxi,Liuzhuang Village Protestant Church,39.277688,114.381612,1,Protestantism,1985
+48038,Shanxi,Xianandi Village Protestant Church,39.404638,114.140879,1,Protestantism,1996
+48039,Shanxi,Qingjian Village Protestant Church,39.413443,114.056943,1,Protestantism,1987
+48040,Shanxi,Liuzhuang Village Protestant Church,39.277688,114.381612,1,Protestantism,1981
+48041,Shanxi,Dazuo Protestant Church,39.440193,114.173461,1,Protestantism,1990
+48042,Shanxi,Yangshangoumen Protestant Church,39.442406,114.23435,1,Protestantism,1996
+48043,Shanxi,Gushu Protestant Church,39.399824,114.099491,1,Protestantism,1996
+48044,Shanxi,Zhanshang Village Protestant Church,39.198988,114.130529,1,Protestantism,1989
+48045,Shanxi,Yangquan City Catholic Affairs Committee,37.85637,113.572668,2,Catholicism,1984
+48046,Shanxi,Shengquan Temple,37.861694,113.468113,3,Buddhism,1992
+48047,Shanxi,Yangquan City Mosque Management Committee,37.847408,113.600698,5,Islam,1850
+48048,Shanxi,Shanghan Catholic Church,36.195386,113.116255,2,Catholicism,1995
+48049,Shanxi,Huangnian Catholic Church,36.364467,113.126832,2,Catholicism,2000
+48050,Shanxi,Gaozhuang Catholic Church,36.315777,113.118838,2,Catholicism,1988
+48051,Shanxi,Zhangzhuang Catholic Church,36.295143,113.121639,2,Catholicism,1989
+48052,Shanxi,Nanchui Catholic Church,36.216979,113.157899,2,Catholicism,1980
+48053,Shanxi,Anyang Catholic Church,36.336982,113.100877,2,Catholicism,1992
+48054,Shanxi,Machang Catholic Church,36.315777,113.118838,2,Catholicism,1983
+48055,Shanxi,Licungou Catholic Church,36.276808,113.120063,2,Catholicism,1985
+48056,Shanxi,Licungou Protestant Church,36.276808,113.120063,1,Protestantism,1989
+48057,Shanxi,Shalenghe Catholic Church,39.198253,112.495571,2,Catholicism,1940
+48058,Shanxi,Cuijiayao Catholic Church,39.317943,112.500552,2,Catholicism,1989
+48059,Shanxi,Shuocheng District Catholic Church Headquarter,39.312465,112.427295,2,Catholicism,1955
+48060,Shanxi,Sike Catholic Church,39.285443,112.617866,2,Catholicism,1949
+48061,Shanxi,Jingtu Temple,39.554247,113.191099,3,Buddhism,1987
+48062,Shanxi,Pure Land Buddhist Chanting Hall Temple,39.554247,113.191099,3,Buddhism,2003
+48063,Shanxi,Jile Temple,39.609224,113.161759,3,Buddhism,2003
+48064,Shanxi,Dongjie Protestant Church,39.564739,113.193064,1,Protestantism,2002
+48065,Shanxi,Yangbao Protestant Church,39.521322,113.301079,1,Protestantism,2002
+48066,Shanxi,Qielan Temple,39.486316,113.334556,3,Buddhism,1987
+48067,Shanxi,Pudu Temple,39.408939,113.218256,3,Buddhism,1987
+48068,Shanxi,Jingyu Buddhist Lay Society,39.554247,113.191099,3,Buddhism,2003
+48069,Shanxi,Foguan Temple,39.554247,113.191099,3,Buddhism,1987
+48070,Shanxi,Daan Temple,39.458169,113.262039,3,Buddhism,1987
+48071,Shanxi,Wenshu Temple,39.472865,113.303257,3,Buddhism,1987
+48072,Shanxi,Shuhai Temple,39.470543,113.328523,3,Buddhism,1987
+48073,Shanxi,Yongzhen Temple,39.47939,113.324776,3,Buddhism,1987
+48074,Shanxi,Guanyin Abbey,39.470543,113.328523,3,Buddhism,1987
+48075,Shanxi,Yingxian Buddhist Training Center,39.500056,113.239373,3,Buddhism,1987
+48076,Shanxi,Guanyin Temple,39.487918,113.260917,3,Buddhism,1987
+48077,Shanxi,Juewu Temple,39.438999,113.229377,3,Buddhism,1987
+48078,Shanxi,Hongming Temple,39.487405,113.269478,3,Buddhism,1987
+48079,Shanxi,Shengliang Temple,39.423697,113.090587,3,Buddhism,2003
+48080,Shanxi,Lengyan Temple,39.640526,113.221753,3,Buddhism,1987
+48081,Shanxi,Mount Heng Temple,39.516024,113.447416,3,Buddhism,2003
+48082,Shanxi,Ying County Buddhist Association Headquarter,39.554247,113.191099,3,Buddhism,1998
+48083,Shanxi,Ying County Protestant Three-self Patriotic Movement Committee Headquarter,39.557104,113.190422,1,Protestantism,2002
+48084,Shanxi,Qianlong Temple,39.554247,113.191099,3,Buddhism,2003
+48085,Shanxi,Yushe County Catholic Patriotic Movement Committee Headquarter,37.003495,112.922863,2,Catholicism,1982
+48086,Shanxi,Lintou Church,37.003495,112.922863,2,Catholicism,1982
+48087,Shanxi,Yunzhu Church,37.048351,112.813627,2,Catholicism,1982
+48088,Shanxi,Xiyang County Protestant Association Headquarter,37.600111,113.704839,1,Protestantism,1999
+48089,Shanxi,Bijialing Protestant Church,37.600111,113.704839,1,Protestantism,2002
+48090,Shanxi,Wanghuizhuang Catholic Church,37.421308,112.551357,2,Catholicism,2000
+48091,Shanxi,Pingyao County Catholic Affairs Committee Headquarter,37.201991,112.191372,2,Catholicism,1910
+48092,Shanxi,Qiaotou Village Holy Church,37.168537,112.129982,2,Catholicism,1880
+48093,Shanxi,Nanzheng Village Holy Church,37.233453,112.170813,2,Catholicism,1854
+48094,Shanxi,Daobei Village Holy Church,37.252944,112.178518,2,Catholicism,1940
+48095,Shanxi,Yincun Holy Church,37.232024,112.205468,2,Catholicism,1993
+48096,Shanxi,Wangjiazhuang Holy Church,37.282466,112.174875,2,Catholicism,1840
+48097,Shanxi,Baohe Holy Church,37.200268,112.182802,2,Catholicism,1930
+48098,Shanxi,Xiliu Holy Church,37.23199,112.145612,2,Catholicism,1998
+48099,Shanxi,Dongdapu Holy Church,37.189856,112.176266,2,Catholicism,1865
+48100,Shanxi,Duancun Holy Church,37.094382,112.190359,2,Catholicism,1805
+48101,Shanxi,Pingyao County Protestant Church Headquarter,37.202177,112.179083,1,Protestantism,1888
+48102,Shanxi,Hongshan Protestant Church,37.200268,112.182802,1,Protestantism,1986
+48103,Shanxi,Chengguan Protestant Church,37.202177,112.179083,1,Protestantism,1986
+48104,Shanxi,Xiaohu Village Protestant Church,37.189856,112.176266,1,Protestantism,1986
+48105,Shanxi,Xibuyi Protestant Church,37.189856,112.176266,1,Protestantism,1986
+48106,Shanxi,Xiangyuan Protestant Church,37.253839,112.331588,1,Protestantism,1986
+48107,Shanxi,Huangcang Protestant Church,37.136502,112.372561,1,Protestantism,1986
+48108,Shanxi,Liji Protestant Church,37.146477,112.223109,1,Protestantism,1986
+48109,Shanxi,Beihou Protestant Church,37.24651,112.091807,1,Protestantism,1986
+48110,Shanxi,Renzhuang Protestant Church,37.30923,112.078826,1,Protestantism,1986
+48111,Shanxi,Fengyi Protestant Church,37.185207,112.07427,1,Protestantism,1986
+48112,Shanxi,Yanliangzhuang Protestant Church,37.189856,112.176266,1,Protestantism,1986
+48113,Shanxi,Jiangjiabao Protestant Church,37.266407,112.144801,1,Protestantism,1986
+48114,Shanxi,Chengnanbao Protestant Church,37.193687,112.187979,1,Protestantism,1996
+48115,Shanxi,Xiaowangjia Protestant Church,37.282466,112.174875,1,Protestantism,1996
+48116,Shanxi,Liangjiabao Village Protestant Church,37.22802,112.086538,1,Protestantism,1996
+48117,Shanxi,Dongliangzhuang Protestant Church,37.289271,112.115815,1,Protestantism,1996
+48118,Shanxi,Dujiazhuang Protestant Church,37.11669,112.19748,1,Protestantism,1996
+48119,Shanxi,Liangguan Protestant Church,37.29273,112.28705,1,Protestantism,1996
+48120,Shanxi,Haokai Protestant Church,37.287524,112.324205,1,Protestantism,1996
+48121,Shanxi,Xiaoyan Village Protestant Church,37.263697,112.253593,1,Protestantism,1996
+48122,Shanxi,Nanzheng Protestant Church,37.252944,112.178518,1,Protestantism,1996
+48123,Shanxi,Yuebi Protestant Church,37.157991,112.215886,1,Protestantism,1999
+48124,Shanxi,Yanchangtou Protestant Church,37.189856,112.176266,1,Protestantism,1999
+48125,Shanxi,Yinhui Protestant Church,37.180449,112.218013,1,Protestantism,1999
+48126,Shanxi,Baicheng Protestant Church,37.283042,112.31261,1,Protestantism,1999
+48127,Shanxi,Wangguo Village Protestant Church,37.199583,112.061691,1,Protestantism,1999
+48128,Shanxi,Xiyoujia Protestant Church,37.252003,112.19373,1,Protestantism,1999
+48129,Shanxi,Qidong Protestant Church,37.127358,112.172811,1,Protestantism,1999
+48130,Shanxi,Beixiquan Protestant Church,37.126788,112.235396,1,Protestantism,1999
+48131,Shanxi,Xiguo Village Protestant Church,37.200279,112.215171,1,Protestantism,1999
+48132,Shanxi,Haodong Protestant Church,37.283485,112.278328,1,Protestantism,1999
+48133,Shanxi,Wangjiazhuang Protestant Church,37.282466,112.174875,1,Protestantism,1996
+48134,Shanxi,Tantou Protestant Church,37.239687,112.060444,1,Protestantism,1999
+48135,Shanxi,Houji Protestant Church,37.147049,112.139493,1,Protestantism,1999
+48136,Shanxi,Chaiyouji Protestant Church,37.189856,112.176266,1,Protestantism,1999
+48137,Shanxi,Liangcun Protestant Church,37.163088,112.234754,1,Protestantism,1999
+48138,Shanxi,Dongzhangzhao Protestant Church,37.189856,112.176266,1,Protestantism,1999
+48139,Shanxi,Jincun Protestant Church,37.139892,112.19677,1,Protestantism,1999
+48140,Shanxi,Qiaotou Village Protestant Church,37.168537,112.129982,1,Protestantism,1999
+48141,Shanxi,Sangji Protestant Church,37.292404,112.272438,1,Protestantism,1999
+48142,Shanxi,Shijiujie Village Protestant Church,37.192375,112.195521,1,Protestantism,1999
+48143,Shanxi,郝jiabao Village Protestant Church,37.200268,112.182802,1,Protestantism,1999
+48144,Shanxi,Xicun Protestant Church,37.172823,112.260888,1,Protestantism,1999
+48145,Shanxi,Nanxiquan Protestant Church,37.118285,112.244518,1,Protestantism,1999
+48146,Shanxi,Nandajie Catholic Headquarter,37.022318,111.923184,2,Catholicism,1958
+48147,Shanxi,Dafu Village Church,37.153021,112.09547,2,Catholicism,1996
+48148,Shanxi,Beijia Village Church,37.134086,112.120392,2,Catholicism,1996
+48149,Shanxi,Shi Village Church,37.108354,112.127128,2,Catholicism,1996
+48150,Shanxi,Zhongjie Village Church,37.146436,111.986225,2,Catholicism,1996
+48151,Shanxi,Xinjiang County Religious Affairs Bureau,35.618705,111.22369,90,Other,1986
+48152,Shanxi,Xinjiang County Mosque,35.612696,111.216381,5,Islam,1947
+48153,Shanxi,Poli Catholic Church,35.652641,111.261538,2,Catholicism,1986
+48154,Shanxi,Yuanqu County Mosque,35.297381,111.670052,5,Islam,2002
+48155,Shanxi,Hejin City Ethnic and Religious Affairs Bureau,35.595898,110.715616,90,Other,1987
+48156,Shanxi,Ciyun Temple,38.415829,112.754084,3,Buddhism,1996
+48157,Shanxi,Haiyan Temple,39.213838,113.430288,3,Buddhism,1991
+48158,Shanxi,Longxing Temple,39.158116,113.393547,3,Buddhism,1995
+48159,Shanxi,Wenshu Temple,39.167707,113.41789,3,Buddhism,1994
+48160,Shanxi,Xingfu Temple,39.190513,113.372324,3,Buddhism,1996
+48161,Shanxi,Guifeng Temple,39.188811,113.265564,3,Buddhism,1819
+48162,Shanxi,Baima Temple,39.111241,113.251413,3,Buddhism,1980
+48163,Shanxi,Xiangshan Temple,39.075918,113.290398,3,Buddhism,1936
+48164,Shanxi,Mimi Temple,39.081335,113.371102,3,Buddhism,1943
+48165,Shanxi,Huguo Temple,39.004127,113.475539,3,Buddhism,1983
+48166,Shanxi,Jixiang Temple,39.062561,113.334921,3,Buddhism,1983
+48167,Shanxi,Falei Temple,39.188811,113.265564,3,Buddhism,1840
+48168,Shanxi,Puzhao Temple,39.244812,113.937655,3,Buddhism,1972
+48169,Shanxi,Pujing Temple,39.280799,113.84915,3,Buddhism,1993
+48170,Shanxi,Lanruo Temple,39.192,113.499684,3,Buddhism,1999
+48171,Shanxi,Shouning Temple,39.211645,113.591939,3,Buddhism,1956
+48172,Shanxi,Dongshandi Protestant Church,39.218635,113.597738,1,Protestantism,1980
+48173,Shanxi,Hongfu Temple,39.241324,113.610501,3,Buddhism,1940
+48174,Shanxi,Qiuyue Temple,39.318777,113.810946,3,Buddhism,1986
+48175,Shanxi,Pule Temple,39.292828,113.766335,3,Buddhism,1986
+48176,Shanxi,Baoquan Temple,39.285471,113.748566,3,Buddhism,1992
+48177,Shanxi,Baozang Temple,39.224457,113.545647,3,Buddhism,1963
+48178,Shanxi,Longquan Temple,39.104899,113.473222,3,Buddhism,1942
+48179,Shanxi,Leiming Temple,38.807945,112.106245,3,Buddhism,1998
+48180,Shanxi,Wanfo Temple,38.993654,112.299259,3,Buddhism,1925
+48181,Shanxi,Jindian Church,36.048378,111.436743,1,Protestantism,1996
+48182,Shanxi,Protestant Church,35.98619,111.667876,1,Protestantism,1990
+48183,Shanxi,Xiaoxitian (Buddhist Temple),36.701197,110.932985,3,Buddhism,1945
+48184,Shanxi,Chengguan Church,36.652855,111.563951,1,Protestantism,1995
+48185,Shanxi,Tuanbai Church,36.523577,111.64696,1,Protestantism,1995
+48186,Shanxi,Zhangquan Church,36.497889,111.572807,1,Protestantism,1996
+48187,Shanxi,Qingxiang Church,36.688826,111.376465,1,Protestantism,1995
+48188,Shanxi,Beifangzhuang Church,36.59274,111.55098,1,Protestantism,1996
+48189,Shanxi,Liuwagou Church,36.565739,111.49225,1,Protestantism,1995
+48190,Shanxi,Baijiazhuang Church,36.551989,111.514462,1,Protestantism,1995
+48191,Shanxi,Magou Church,36.645243,111.554006,1,Protestantism,1995
+48192,Shanxi,Chenjiazhuang Church,36.629082,111.638145,1,Protestantism,1995
+48193,Shanxi,Maojiazhuang Church,36.589068,111.536976,1,Protestantism,1995
+48194,Shanxi,Guzhuang Church,36.587764,111.511785,1,Protestantism,1995
+48195,Shanxi,Xuzhuang Church,36.641829,111.31738,1,Protestantism,1995
+48196,Shanxi,Huluyuan Church,36.523022,111.577154,1,Protestantism,1999
+48197,Shanxi,Niangouhe Church,36.510255,111.511877,1,Protestantism,1999
+48198,Shanxi,Heda Church,36.549204,111.559069,1,Protestantism,1999
+48199,Shanxi,Xiatuanbai Church,36.496559,111.663587,1,Protestantism,1999
+48200,Shanxi,Liyizhang Church,36.510099,111.491644,1,Protestantism,1996
+48201,Shanxi,Waleping Church,36.526965,111.553589,1,Protestantism,1996
+48202,Shanxi,Wujialing Church,36.51976,111.474871,1,Protestantism,1996
+48203,Shanxi,Nandubi Village Catholic Church,36.568931,111.755398,2,Catholicism,2001
+48204,Shanxi,Baimugou Catholic Church,36.475927,111.778682,2,Catholicism,2000
+48205,Shanxi,Huozhou Catholic Church,36.562516,111.761044,2,Catholicism,2002
+48206,Shanxi,Holy Mother Church,36.471018,111.797666,2,Catholicism,2000
+48207,Shanxi,Xinzhi Protestant Church,36.495158,111.719709,1,Protestantism,2000
+48208,Shanxi,Beichangshou Protestant Church,37.327912,112.213639,1,Protestantism,1986
+48209,Shanxi,Fenyang Catholic Diocese Fenyang Cathedral,37.265454,111.787759,2,Catholicism,1926
+48210,Shanxi,Huguo lingyan Temple,37.265454,111.787759,3,Buddhism,2001

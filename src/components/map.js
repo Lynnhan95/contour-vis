@@ -45,8 +45,8 @@ class BaseMap extends Component {
 
             /* Render Yunnan
             */
-            province_en: 'Hunan',
-            province_cn: '湖南',
+            province_en: 'Shanxi',
+            province_cn: '山西',
 
             /* Render Sichuan
             */
@@ -116,7 +116,7 @@ class BaseMap extends Component {
 
         /* Render Yunnan
         */
-       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_hunan.csv')])
+       Promise.all([fetch("/chinaGeo.geojson"), csv('/dots_shanxi.csv')])
 
         /* Render Sichuan
         */
@@ -381,7 +381,7 @@ class BaseMap extends Component {
             //     [113.31393253982571, 26.950171129760644]
             // ]
                 console.log(mainArea)
-                const simplifiedFactor = 2
+                const simplifiedFactor = 0.25
 
                 // Compute simplified area
                 let res = []
@@ -404,6 +404,8 @@ class BaseMap extends Component {
                 _me.state.simplifiedArea = simplifiedArea
 
                 _me.state.simplifiedContours = _me.getInnerBoundaryContours(simplifiedArea, 2)
+                _me.state.simplifiedOutContours = _me.getOuterBoundaryContours(simplifiedArea, 2)
+
                 ////console.log('mainArea', _me.state.simplifiedContours)
 
                 let even_points = _me.getEvenPointsFromCoordinates(simplifiedArea, 0.05)
@@ -836,19 +838,19 @@ class BaseMap extends Component {
                       )
 
                 })
-                // cells1 = this.state.subSegList.map((d, i) => {
-                //     let pathStr0 = getLinePathStr(d[1])
-                //       return (
-                //           <path
-                //           key = {`split_boundary_segments-${i}`}
-                //           className = {`split_boundary_segments-${i}`}
-                //           d = {pathStr0}
-                //           fill = 'green'
-                //           // fill = {this.color_scale(d.dens)}
-                //           />
-                //       )
-                //
-                // })
+                cells1 = this.state.subSegList.map((d, i) => {
+                    let pathStr0 = getLinePathStr(d[1])
+                      return (
+                          <path
+                          key = {`split_boundary_segments-${i}`}
+                          className = {`split_boundary_segments-${i}`}
+                          d = {pathStr0}
+                          fill = 'green'
+                          // fill = {this.color_scale(d.dens)}
+                          />
+                      )
+                
+                })
                 cells2 = this.state.subSegList.map((d, i) => {
                     let pathStr0 = getLinePathStr(d[2])
                       return (
@@ -916,6 +918,7 @@ class BaseMap extends Component {
                     //clip_boundary
                     //linePts,
                     cells0,
+                    // cells2
                     // cells1,
                     // cells2,
                     //segPoly
@@ -945,7 +948,7 @@ class BaseMap extends Component {
             cx = { this.autoProjection([ d.Longitude, d.Latitude ])[0]}
             cy = { this.autoProjection([ d.Longitude, d.Latitude ])[1]}
             fill="purple"
-            r = "0.5"
+            r = "1"
             />
             )
         })
@@ -1065,12 +1068,12 @@ class BaseMap extends Component {
             {/* <g className="transDots">
                {transDots}
            </g> */}
-            {/* <g className="innerBoundary">
+            <g className="innerBoundary">
                 {innerBoundary}
             </g>
             <g className="outerBoundary">
                 {outerBoundary}
-            </g> */}
+            </g>
             <g className = "legend" ref = {this.legendRef}>
 
             </g>
