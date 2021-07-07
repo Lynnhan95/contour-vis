@@ -3,17 +3,26 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "antd": "^3.26.8",
+    "babylonjs": "^4.0.3",
     "d3": "^5.14.1",
     "d3-dsv": "^1.2.0",
     "d3-geo": "^1.11.9",
+    "d3-polygon": "^1.0.6",
+    "d3-svg-legend": "^2.25.6",
     "flo-mat": "^1.0.4",
     "hull.js": "^1.0.0",
-    "paper": "^0.12.3",
+    "lodash.keyby": "^4.6.0",
+    "mathjs": "^6.6.0",
+    "paper": "^0.12.4",
     "path-intersection": "^1.1.1",
+    "point-in-polygon": "^1.0.1",
+    "polygon-clipping": "^0.14.3",
     "polygon-offset": "^0.3.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-scripts": "3.2.0",
+    "simplify-js": "^1.2.3",
     "smooth-polyline": "^1.0.8",
     "snapsvg-cjs": "0.0.6",
     "topojson-client": "^3.1.0"
@@ -41,5 +50,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5"
   }
 }
